@@ -139,7 +139,7 @@ np.savetxt('data/dfm/congress-dtm-values.txt', X.data, fmt='%.0f')
 
 ## words
 words = vectorizer.get_feature_names_out()
-f = open('congress-words.txt', 'w')
+f = open('data/dfm/congress-words.txt', 'w')
 for item in words:
   f.write("%s\n" % item)
 
