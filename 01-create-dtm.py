@@ -41,6 +41,8 @@ from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 
+TWEETS_FOLDER = "tweets_from_deputesXVI_220620-230313"
+
 STOP_WORDS_FR = ['', "'d", "'ll", "'m", "'re", "'s", "'ve", '-', '0', '1', '2', '3', 
                  'a', 'ah', 'ai', 'aime', 'aller', 'alors', 'ans', 'apres', 'après', 
                  'as', 'au', 'aussi', 'autre', 'autres', 'aux', 'avais', 'avait', 
@@ -83,6 +85,7 @@ STOP_WORDS_FR = ['', "'d", "'ll", "'m", "'re", "'s", "'ve", '-', '0', '1', '2', 
                  'x', 'xd', 'y', 'ya', 'you', 'your', 'z', 'zu', 'zum', 'à', 'ça', 
                  'ça', 'étais', 'était', 'été', 'êtes', 'être', '–—']
 
+
 def custom_tokenizer(document):
     tokenizer = WordTokenizer(
         keep=['word', 'mention'],
@@ -95,8 +98,9 @@ def custom_tokenizer(document):
     )
     return list(token for _, token in tokenizer(document))
 
-def preprocess(root):
-    for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True)):
+    
+def preprocess(root, nb_files):
+    for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files):
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
         file_text = ""
@@ -111,18 +115,22 @@ def preprocess(root):
         # yield the text of all tweets of the day, remove last character - which is a space
         yield file_text[:-1]
         
-        
 
 def tokenizer(text):
 	doc = tokenizeRawTweetText(text)
 	doc = [d for d in doc if len(d)>2]
 	return(doc)
 
+
+def count_nb_files(folder):
+    return sum([len(files) for r, d, files in os.walk(folder)])
+
 vectorizer = CountVectorizer(stop_words=STOP_WORDS_FR, tokenizer=custom_tokenizer,
     max_features=75000, ngram_range=(1,2), 
     min_df=10, max_df=.90)
 
-X = vectorizer.fit_transform(preprocess("tweets_from_deputesXVI_220620-230313"))
+nb_files = count_nb_files(TWEETS_FOLDER)
+X = vectorizer.fit_transform(preprocess(TWEETS_FOLDER, nb_files))
 
 # checking words
 words = vectorizer.get_feature_names_out()
@@ -136,12 +144,11 @@ print(words[:10], words[-10:])
 np.savetxt('data/dfm/congress-dtm-indices.txt', X.indices, fmt='%.0f')
 np.savetxt('data/dfm/congress-dtm-pointers.txt', X.indptr, fmt='%.0f')
 np.savetxt('data/dfm/congress-dtm-values.txt', X.data, fmt='%.0f')
+with open('data/dfm/nb_files.txt', 'w') as f:
+    f.write(str(nb_files))
 
 ## words
 words = vectorizer.get_feature_names_out()
-f = open('data/dfm/congress-words.txt', 'w')
-for item in words:
-  f.write("%s\n" % item)
-
-f.close()
-
+with open('data/dfm/congress-words.txt', 'w') as f:
+    for item in words:
+      f.write("%s\n" % item)
