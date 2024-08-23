@@ -37,7 +37,7 @@ EMB_DIMENSION = 1024
 def preprocess(root):
     nb_files = count_nb_files(TWEETS_FOLDER)
     docs = []
-    for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files):
+    for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files, desc="Read csv files"):
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
         for row in reader:
@@ -85,17 +85,32 @@ topic_model = BERTopic(
 
 docs = preprocess(TWEETS_FOLDER)
 
-batch_size = 100
+batch_size = 1000
 embeddings = np.zeros((len(docs), EMB_DIMENSION))
-for i in tqdm(range(0, len(docs), batch_size)):
-    embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
-
 save_path = "data/embeddings/tweets_from_deputesXVI_220620-230313_sentence-camembert-large.npz"
+
+for i in tqdm(range(0, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
+    try:
+        embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
+    except RuntimeError as e:
+        np.savez_compressed(save_path.replace(".npz", "-{}.npz".format(i)), embeddings=embeddings)
+        print(e)
+        print("Trying to find source of error")
+        for j in range(batch_size):
+            idx = i + j
+            try:
+                embeddings[idx] = embedding_model.encode(docs[idx])
+            except RuntimeError:
+                print(idx, docs[idx])
+                raise
+
 np.savez_compressed(save_path, embeddings=embeddings)
+for file_path in glob.glob(save_path.replace(".npz", "*")):
+    if file_path != save_path:
+        os.remove(file_path)
 
 docs = np.array(docs)
 for k in [100, 1_000, 10_000, 100_000]:
-    print(k)
     sampled_idx = random.sample(range(1, len(docs)), k)
     sampled_docs = docs[sampled_idx]
     sampled_embeddings = embeddings[sampled_idx]
