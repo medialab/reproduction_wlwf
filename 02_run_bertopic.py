@@ -1,76 +1,34 @@
-'''
-# 02-run-BertTopic.py
-
-Date: 2024-08-21
-Author: Béatrice Mazoyer
-
-Takes csv files with tweets and run BERTopic 
-(this time, one document = one tweet, as opposed to 
-the strategy in 01-create-dtm.py)
-
-NOTE: running this script requires access to the original corpus of
-tweets, which we cannot share publicly in order to comply with Twitter's
-terms of service. For advice on how to re-run this script, please
-contact the corresponding author.
-
-All other scripts can be run without running this one first, since we
-are providing the files required to replicate the document-feature matrices
-we use in the analysis.
-
-'''
-import random
 import time
-import casanova
-from tqdm import tqdm
-import glob
-import os
-import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
-from sentence_transformers import SentenceTransformer
+import random
 
 from bertopic import BERTopic
+import numpy as np
+import matplotlib.pyplot as plt
 
-from utils import TWEETS_FOLDER, count_nb_files, vectorizer
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-EMB_DIMENSION = 1024
-
-def preprocess(root):
-    nb_files = count_nb_files(TWEETS_FOLDER)
-    docs = []
-    for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files, desc="Read csv files"):
-        reader = casanova.reader(filename)
-        text_pos = reader.headers.text
-        for row in reader:
-            try:
-                 docs.append(row[text_pos].replace("\n", " "))
-            except IndexError:
-                print(filename)
-                print(row)
-                continue
-    return docs
-
+from utils import TWEETS_FOLDER, count_nb_files, vectorizer, preprocess
 
 def st_time(func):
     """
         decorator to compute the total time of a function
     """
 
-    def st_func(*args, **keyArgs):
+    def st_func(*args, times=[]):
         t1 = time.time()
-        r = func(*args, **keyArgs)
+        r = func(*args, times=times)
         t2 = time.time()
         print("Function=%s, Time=%s" % (func.__name__, t2 - t1))
+        times.append(t2 - t1)
         return r
 
     return st_func
 
+
 @st_time
-def compute_topics(docs, embeddings):
+def compute_topics(docs, embeddings, times=[]):
     print("Nb documents: ", len(docs))
     topics, probs = topic_model.fit_transform(docs, embeddings)
     print(topic_model.get_topic_info())
 
-embedding_model = SentenceTransformer("dangvantuan/sentence-camembert-large")
 
 topic_model = BERTopic(
 
@@ -83,38 +41,37 @@ topic_model = BERTopic(
 
 )
 
-docs = preprocess(TWEETS_FOLDER)
 
-batch_size = 1000
-embeddings = np.zeros((len(docs), EMB_DIMENSION))
+def plot_time(x, y):
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
+    
+    ax.set(xlabel='nb_docs', ylabel='time (s)')
+    ax.grid()
+    
+    fig.savefig("plots/bertopic_time.png")
+    plt.show()
+
+
+
+docs = preprocess(TWEETS_FOLDER)
 save_path = "data/embeddings/tweets_from_deputesXVI_220620-230313_sentence-camembert-large.npz"
 
-for i in tqdm(range(0, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
-    try:
-        embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
-    except RuntimeError as e:
-        np.savez_compressed(save_path.replace(".npz", "-{}.npz".format(i)), embeddings=embeddings)
-        print(e)
-        print("Trying to find source of error")
-        for j in range(batch_size):
-            idx = i + j
-            try:
-                embeddings[idx] = embedding_model.encode(docs[idx])
-            except RuntimeError:
-                print(idx, docs[idx])
-                raise
-
-np.savez_compressed(save_path, embeddings=embeddings)
-for file_path in glob.glob(save_path.replace(".npz", "*")):
-    if file_path != save_path:
-        os.remove(file_path)
+embeddings = np.load(save_path)["embeddings"]
 
 docs = np.array(docs)
-for k in [100, 1_000, 10_000, 100_000]:
-    sampled_idx = random.sample(range(1, len(docs)), k)
+
+sizes = [1_000, 10_000, 100_000, len(docs)]
+times = []
+
+for k in [1_000, 10_000, 100_000, len(docs)]:
+    if k == len(docs):
+        sampled_idx = range(len(docs))
+    else:
+        sampled_idx = random.sample(range(1, len(docs)), k)
     sampled_docs = docs[sampled_idx]
     sampled_embeddings = embeddings[sampled_idx]
     
-    compute_topics(sampled_docs, sampled_embeddings)
+    compute_topics(sampled_docs, sampled_embeddings, times=times)
 
-
+plot_time(sizes, times)

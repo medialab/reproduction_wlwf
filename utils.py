@@ -1,8 +1,13 @@
 import os
+import glob
+from tqdm import tqdm
+import casanova
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 
 TWEETS_FOLDER = "tweets_from_deputesXVI_220620-230313"
+SBERT_NAME = "dangvantuan/sentence-camembert-large"
+EMB_DIMENSION = 1024
 
 STOP_WORDS_FR = ['', "'d", "'ll", "'m", "'re", "'s", "'ve", '-', '0', '1', '2', '3', 
                  'a', 'ah', 'ai', 'aime', 'aller', 'alors', 'ans', 'apres', 'après', 
@@ -59,14 +64,31 @@ def custom_tokenizer(document):
     )
     return list(token for _, token in tokenizer(document))
 
+
 def count_nb_files(folder):
     count = 0
     for r, d, files in os.walk(folder):
         count += len(files)
     return count
 
+
+def preprocess(root):
+    nb_files = count_nb_files(TWEETS_FOLDER)
+    docs = []
+    for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files, desc="Read csv files"):
+        reader = casanova.reader(filename)
+        text_pos = reader.headers.text
+        for row in reader:
+            try:
+                 docs.append(row[text_pos].replace("\n", " ")[:500])
+            except IndexError:
+                print(filename)
+                print(row)
+                continue
+    return docs
+
+
 vectorizer = CountVectorizer(stop_words=STOP_WORDS_FR, tokenizer=custom_tokenizer,
-    max_features=75000, ngram_range=(1,2), 
-    min_df=10, max_df=.90)
+    max_features=75000, ngram_range=(1,2), min_df=10)
 
 nb_files = count_nb_files(TWEETS_FOLDER)
