@@ -1,3 +1,10 @@
+# R project
+*.Rproj.user
+*.Rproj
+*.Rhistory
+*.RData
+*.Ruserdata
+
 # CSV files
 *.csv
 
