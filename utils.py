@@ -73,18 +73,25 @@ def count_nb_files(folder):
 
 
 def preprocess(root):
+    counter_all = 0
+    counter_original = 0
     nb_files = count_nb_files(TWEETS_FOLDER)
     docs = []
     for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files, desc="Read csv files"):
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
+        rt_pos = reader.headers.retweeted_id
         for row in reader:
-            try:
-                 docs.append(row[text_pos].replace("\n", " ")[:500])
-            except IndexError:
-                print(filename)
-                print(row)
-                continue
+            counter_all += 1
+            if not row[rt_pos]:
+                counter_original += 1
+                try:
+                     docs.append(row[text_pos].replace("\n", " ")[:500])
+                except IndexError:
+                    print(filename)
+                    print(row)
+                    continue
+    print("nb of tweets: {}, nb of original tweets: {}".format(counter_all, counter_original))
     return docs
 
 

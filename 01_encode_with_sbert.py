@@ -22,20 +22,23 @@ import casanova
 from tqdm import tqdm
 import glob
 import os
+import sys
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sentence_transformers import SentenceTransformer
 
-from utils import TWEETS_FOLDER, SBERT_NAME, EMB_DIMENSION, count_nb_files, vectorizer, preprocess
+from utils import SBERT_NAME, EMB_DIMENSION, count_nb_files, vectorizer, preprocess
 
 
 embedding_model = SentenceTransformer(SBERT_NAME)
 
-docs = preprocess(TWEETS_FOLDER)
+folder = sys.argv[1]
+
+docs = preprocess(folder)
 
 batch_size = 1000
 embeddings = np.zeros((len(docs), EMB_DIMENSION))
-save_path = "data/embeddings/tweets_from_deputesXVI_220620-230313_sentence-camembert-large.npz"
+save_path = "data_prod/embeddings/{}_sentence-camembert-large.npz".format(folder)
 max_index = 0
 
 # Check if a temporary dump exists
