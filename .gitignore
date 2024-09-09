@@ -3,6 +3,9 @@
 *.Rproj
 *.Rhistory
 
+# data_prod non-compressé
+data_prod
+
 # CSV files
 *.csv
 
