@@ -27,48 +27,23 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sentence_transformers import SentenceTransformer
 
-from utils import SBERT_NAME, EMB_DIMENSION, count_nb_files, vectorizer, preprocess
+from utils import SBERT_NAME, EMB_DIMENSION, count_nb_files, preprocess
 
 
 embedding_model = SentenceTransformer(SBERT_NAME)
 
-folder = sys.argv[1]
+path = sys.argv[1]
 
-docs = preprocess(folder)
+docs = preprocess(path, count_nb_files(path))
 
 batch_size = 1000
 embeddings = np.zeros((len(docs), EMB_DIMENSION))
 save_path = "data_prod/embeddings/tweets_sentence-camembert-large.npz"
 max_index = 0
 
-# Check if a temporary dump exists
-for file_path in glob.glob(save_path.replace(".npz", "*.npy")):
-    if file_path != save_path:
-        idx = int(file_path[len(save_path) - len(".npy") +1:-len(".npy")])
-        if idx > max_index:
-            max_index = idx
-
-# Load temporary dump
-if max_index > 0:
-    print("Loading previous archive")
-    embeddings = np.load(save_path.replace(".npz", "-{}.npy".format(max_index)))
-    print(embeddings[max_index - 1:max_index + 1])
-
 # Encode docs
 for i in tqdm(range(max_index, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
-    try:
-        embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
-    except RuntimeError as e:
-        np.save(save_path.replace(".npz", "-{}.npy".format(i)), embeddings)
-        print(e)
-        raise
+    embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
 
 # Save encoded docs
 np.savez_compressed(save_path, embeddings=embeddings)
-
-# Remove other dumps
-for file_path in glob.glob(save_path.replace(".npz", "*.npy")):
-    if file_path != save_path:
-        os.remove(file_path)
-
-
