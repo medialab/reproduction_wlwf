@@ -38,7 +38,7 @@ docs = preprocess(folder)
 
 batch_size = 1000
 embeddings = np.zeros((len(docs), EMB_DIMENSION))
-save_path = "data_prod/embeddings/{}_sentence-camembert-large.npz".format(folder)
+save_path = "data_prod/embeddings/tweets_sentence-camembert-large.npz"
 max_index = 0
 
 # Check if a temporary dump exists
