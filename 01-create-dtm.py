@@ -20,37 +20,49 @@ we use in the analysis.
 
 '''
 import glob
+import sys
 import re
 import numpy as np
 import casanova
 from unidecode import unidecode
 from tqdm import tqdm
 
-from utils import vectorizer, nb_files, TWEETS_FOLDER
+from utils import vectorizer, nb_files
 
 
 ####################################
 # creating matrix for French MPs (députés)
 ####################################
 def preprocess(root, nb_files):
+    counter_all = 0
+    counter_original = 0
     for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files):
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
+        rt_pos = reader.headers.retweeted_id
+        
         file_text = ""
         for row in reader:
-            try:
-                row_text = unidecode(re.sub(r'http\S+|RT|&amp;|,|\.|\xe2\x80\xa6|-', "", row[text_pos].replace("\n", "")))
-            except IndexError:
-                print(filename)
-                print(row)
-                continue
-            file_text += row_text + " "
+            counter_all += 1
+            if not row[rt_pos]:
+                counter_original += 1
+                try:
+                    row_text = unidecode(re.sub(r'http\S+|RT|&amp;|,|\.|\xe2\x80\xa6|-', "", row[text_pos].replace("\n", "")))
+                except IndexError:
+                    print(filename)
+                    print(row)
+                    continue
+                file_text += row_text + " "
+
         # yield the text of all tweets of the day, remove last character - which is a space
         yield file_text[:-1]
+    print("nb of tweets: {}, nb of original tweets: {}".format(counter_all, counter_original))
 
 
 if __name__ == "__main__":
-    X = vectorizer.fit_transform(preprocess(TWEETS_FOLDER, nb_files))
+    folder = sys.argv[1]
+    
+    X = vectorizer.fit_transform(preprocess(folder, nb_files))
     
     # checking words
     words = vectorizer.get_feature_names_out()
