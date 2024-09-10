@@ -102,6 +102,9 @@ def preprocess(root, nb_files):
                     print(filename)
                     print(row)
                     continue
+    if file_extension:
+        if file_extension == ".xz":
+            tar.close()
     print("nb of tweets: {}, nb of original tweets: {}".format(counter_all, counter_original))
     return docs
 
