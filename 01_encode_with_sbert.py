@@ -62,7 +62,7 @@ if os.path.isfile(save_path):
 for i in tqdm(range(max_index, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
     embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
     if i % 100000 == 0 and i != max_index:
-        np.savez_compressed(save_path, embeddings=embeddings)
+        np.savez_compressed(save_path, embeddings=embeddings[:i + batch_size])
 
 
 # Save encoded docs
