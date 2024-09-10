@@ -82,7 +82,7 @@ def preprocess(root, nb_files):
     if file_extension:
         if file_extension == ".xz":
             tar = tarfile.open(root, "r:xz")
-            loop = (tarinfo.name for tarinfo in tar)
+            loop = (tarinfo.name for tarinfo in tar if tarinfo.isreg())
         else:
             raise ValueError("Invalid file extension: {}".format(file_extension))
     else:
