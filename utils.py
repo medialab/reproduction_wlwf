@@ -83,7 +83,7 @@ def preprocess(root, nb_files):
     if file_extension:
         if file_extension == ".xz":
             tar = tarfile.open(root, "r:xz")
-            loop = tqdm(io.TextIOWrapper(tar.extractfile(member)) for member in tar.getmembers() if member.isreg(), # type: ignore
+            loop = tqdm((io.TextIOWrapper(tar.extractfile(member)) for member in tar.getmembers() if member.isreg()), # type: ignore
                         total=nb_files,
                         desc="Read compressed files"
                         )
