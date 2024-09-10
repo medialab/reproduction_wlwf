@@ -49,15 +49,14 @@ if os.path.isfile(save_path):
           """.format(save_path))
     if input == "y":
         previous = np.load(save_path)["embeddings"]
-        len_previous = previous.shape[0] #type: ignore
-        if len_previous > len(docs):
-            raise ValueError("Previous embedding file contains {} rows while there are {} docs to encode".format(len_previous, len(docs)))
-        embeddings[:len_previous] = previous
+        max_index = np.any(previous, axis=1).sum() # Count non-zero rows
+        if max_index >= len(docs):
+            raise ValueError("Previous embedding file contains {} rows while there are {} docs to encode".format(max_index, len(docs)))
+        embeddings[:max_index] = previous
+
 
     elif input == "c":
         sys.exit(0)
-
-
 
 # Encode docs
 for i in tqdm(range(max_index, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
