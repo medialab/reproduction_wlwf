@@ -41,9 +41,30 @@ embeddings = np.zeros((len(docs), EMB_DIMENSION))
 save_path = "data_prod/embeddings/tweets_sentence-camembert-large.npz"
 max_index = 0
 
+if os.path.isfile(save_path):
+    input("""{} already exists, do you want to continue encoding from there?
+          y continue from there
+          n overwrite file
+          c cancel this script
+          """.format(save_path))
+    if input == "y":
+        previous = np.load(save_path)["embeddings"]
+        len_previous = previous.shape[0] #type: ignore
+        if len_previous > len(docs):
+            raise ValueError("Previous embedding file contains {} rows while there are {} docs to encode".format(len_previous, len(docs)))
+        embeddings[:len_previous] = previous
+
+    elif input == "c":
+        sys.exit(0)
+
+
+
 # Encode docs
 for i in tqdm(range(max_index, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
     embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
+    if i % 100000 == 0:
+        np.savez_compressed(save_path, embeddings=embeddings)
+
 
 # Save encoded docs
 np.savez_compressed(save_path, embeddings=embeddings)
