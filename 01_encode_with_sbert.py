@@ -54,15 +54,16 @@ for file in glob.glob(save_path.replace(".npz", "_*")):
     index = int(file[len(save_path) - 3:-len(".npz")])
     if index > max_index:
         max_index = index
-    embeddings[index:min(len(docs), index + 10000)] = np.load(file)["embeddings"]
+    embeddings[index - 10000 : index] = np.load(file)["embeddings"]
 
 print("Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum()))
 
 # Encode docs
 for i in tqdm(range(max_index, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
+    if i % 10000 == 0 and i > 0:
+        np.savez_compressed(save_path.replace(".npz", "_" + str(i)), embeddings=embeddings[i - 10000 : i])
     embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
-    if i % 10000 == 0:
-        np.savez_compressed(save_path.replace(".npz", "_" + str(i)), embeddings=embeddings[i:i + batch_size])
+
 
 
 # Save encoded docs
