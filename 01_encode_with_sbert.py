@@ -42,27 +42,22 @@ save_path = "data_prod/embeddings/tweets_sentence-camembert-large.npz"
 max_index = 0
 
 if os.path.isfile(save_path):
-    input("""{} already exists, do you want to continue encoding from there?
-          y continue from there
-          n overwrite file
-          c cancel this script
+    input("""{} already exists, do you want to overwrite file?
+          y overwrite file
+          n cancel this script
           """.format(save_path))
-    if input == "y":
-        previous = np.load(save_path)["embeddings"]
-        max_index = np.any(previous, axis=1).sum() # Count non-zero rows
-        if max_index >= len(docs):
-            raise ValueError("Previous embedding file contains {} rows while there are {} docs to encode".format(max_index, len(docs)))
-        embeddings[:max_index] = previous
 
-
-    elif input == "c":
+    if input == "n":
         sys.exit(0)
+
+for file in sorted(glob.glob(save_path + "_*")):
+    print(file)
 
 # Encode docs
 for i in tqdm(range(max_index, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
     embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
-    if i % 100000 == 0 and i != max_index:
-        np.savez_compressed(save_path, embeddings=embeddings[:i + batch_size])
+    if i % 10000 == 0:
+        np.savez_compressed(save_path + "_" + str(i), embeddings=embeddings[i:i + batch_size])
 
 
 # Save encoded docs
