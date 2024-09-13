@@ -36,7 +36,8 @@ path = sys.argv[1]
 
 docs = preprocess(path, count_nb_files(path))
 
-batch_size = 1000
+batch_size = 1_000
+save_size = 100_000
 embeddings = np.zeros((len(docs), EMB_DIMENSION))
 save_path = "data_prod/embeddings/tweets_sentence-camembert-large.npz"
 max_index = 0
@@ -54,17 +55,20 @@ for file in glob.glob(save_path.replace(".npz", "_*")):
     index = int(file[len(save_path) - 3:-len(".npz")])
     if index > max_index:
         max_index = index
-    embeddings[index - 10000 : index] = np.load(file)["embeddings"]
+        
+    if index % save_size == 0:
+        embeddings[index - save_size : index] = np.load(file)["embeddings"]
+    else:
+        embeddings[embeddings.shape[0] - (embeddings.shape[0] % save_size) :] = np.load(file)["embeddings"]
 
 print("Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum()))
 
 # Encode docs
 for i in tqdm(range(max_index, len(docs), batch_size), desc="Encode sentences using CamemBERT large"):
-    if i % 10000 == 0 and i > 0:
-        np.savez_compressed(save_path.replace(".npz", "_" + str(i)), embeddings=embeddings[i - 10000 : i])
+    if i % save_size == 0 and i > 0:
+        np.savez_compressed(save_path.replace(".npz", "_" + str(i)), embeddings=embeddings[i - save_size : i])
     embeddings[i:min(len(docs), i + batch_size)] = embedding_model.encode(docs[i:i + batch_size])
 
+np.savez_compressed(save_path.replace(".npz", "_" + str(len(docs))), embeddings=embeddings[len(docs) - (len(docs) % save_size) :])
 
 
-# Save encoded docs
-np.savez_compressed(save_path, embeddings=embeddings)
