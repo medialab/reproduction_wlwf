@@ -4,6 +4,7 @@ import glob
 import tarfile
 from tqdm import tqdm
 import casanova
+from unidecode import unidecode
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -74,10 +75,9 @@ def count_nb_files(folder):
     return count
 
 
-def preprocess(root, nb_files):
+def preprocess(root, nb_files, apply_unidecode=False):
     counter_all = 0
     counter_original = 0
-    docs = []
 
     _, file_extension = os.path.splitext(root)
     if file_extension:
@@ -93,24 +93,72 @@ def preprocess(root, nb_files):
         loop = tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files, desc="Read csv files")
 
     for filename in loop:
+        group_name = ""
+        # We search for 'LREM' before searching for 'LR'
+        for group in ["LREM", "LR", "RN", "NUPES"]:
+            if group in filename:
+                group_name = group
+                break
+
+        thread_ids = dict()
+        threads = dict()
         reader = casanova.reader(filename)
+
         text_pos = reader.headers.text
+        id_pos = reader.headers.id
         rt_pos = reader.headers.retweeted_id
+        user_pos = reader.headers.user_id
+        to_user_pos = reader.headers.to_userid
+        to_id_pos = reader.headers.to_tweetid
+
         for row in reader:
             counter_all += 1
             if not row[rt_pos]:
                 counter_original += 1
-                try:
-                     docs.append(row[text_pos].replace("\n", " ")[:500])
-                except IndexError:
-                    print(filename)
-                    print(row)
-                    continue
+                # if the tweet is a reply to another tweet of the same user, keep its id to form threads
+                if row[to_user_pos] == row[user_pos] and row[to_id_pos]:
+                    thread_ids[row[id_pos]] = (row[to_id_pos], row[text_pos])
+                    if row[to_id_pos] not in thread_ids:
+                        thread_ids[row[to_id_pos]] = None
+
+        for key, value in sorted(thread_ids.items()):
+            if not value:
+                threads[key] = ""
+            else:
+                origin = value[0]
+                while origin not in threads:
+                    origin = thread_ids[origin][0]
+                threads[origin] += " " + value[1]
+
+        with open(filename) as input_file, open(filename.replace(".csv", "_preprocessed.csv"), "w") as output_file:
+            enricher = casanova.enricher(input_file, output_file, add=["is_thread", "group"])
+            for row in enricher:
+                if not row[rt_pos]:
+                    is_thread = 0
+                    if row[id_pos] in threads:
+                        is_thread = 1
+                        doc = row[text_pos] + " " + threads[row[id_pos]]
+
+                    elif row[id_pos] not in thread_ids:
+                        doc = row[text_pos]
+
+                    else:
+                        continue
+
+                    # A common value for BERT-based models are 512 tokens, which corresponds to about 300-400 words (for English)
+                    doc = " ".join(doc.split()[:300]).replace("\n", " ")
+                    if apply_unidecode:
+                        doc = unidecode(doc)
+
+                    row[text_pos] = doc
+
+                    enricher.writerow(row, [is_thread, group_name])
+                    yield row
+
     if file_extension:
         if file_extension == ".xz":
             tar.close()
     print("nb of tweets: {}, nb of original tweets: {}".format(counter_all, counter_original))
-    return docs
 
 
 vectorizer = CountVectorizer(stop_words=STOP_WORDS_FR, tokenizer=custom_tokenizer,
