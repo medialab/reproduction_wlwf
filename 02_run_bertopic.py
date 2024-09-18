@@ -1,17 +1,19 @@
 import sys
 import json
-import time
-import random
 
 from hdbscan import HDBSCAN
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
-import matplotlib.pyplot as plt
 
 from utils import count_nb_files, vectorizer, preprocess, SBERT_NAME
 
-hdbscan_model = HDBSCAN(min_cluster_size=3, metric='euclidean', cluster_selection_method='eom', prediction_data=False)
+hdbscan_model = HDBSCAN(
+    min_cluster_size=3,
+    metric="euclidean",
+    cluster_selection_method="eom",
+    prediction_data=False,
+)
 
 topic_model = BERTopic(
     vectorizer_model=vectorizer,
@@ -25,6 +27,7 @@ topic_model = BERTopic(
 
 class NpEncoder(json.JSONEncoder):
     """From https://stackoverflow.com/a/57915246/6053864"""
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -59,6 +62,7 @@ def save_ctfidf_config(model, path):
     with path.open("w") as f:
         json.dump(config, f, indent=2, cls=NpEncoder)
 
+
 save_utils.save_ctfidf_config = save_ctfidf_config
 
 path = sys.argv[1]
@@ -67,10 +71,16 @@ load_path = "data_prod/embeddings/tweets_from_deputesXVI_220620-230313_sentence-
 
 embeddings = np.load(load_path)["embeddings"]
 
-docs = np.array(doc for doc in preprocess(path, count_nb_files(path), apply_unidecode=True))
+docs = np.array(
+    doc for doc in preprocess(path, count_nb_files(path), apply_unidecode=True)
+)
 
 topic_model.fit(docs, embeddings)
 
-#Save model
-topic_model.save("data_prod/bertopic/fit_on_deputesXVI_220620-230313_sentence-camembert-large", serialization="safetensors", save_ctfidf=True, save_embedding_model=SBERT_NAME)
-
+# Save model
+topic_model.save(
+    "data_prod/bertopic/fit_on_deputesXVI_220620-230313_sentence-camembert-large",
+    serialization="safetensors",
+    save_ctfidf=True,
+    save_embedding_model=SBERT_NAME,
+)

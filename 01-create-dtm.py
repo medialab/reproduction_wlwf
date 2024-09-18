@@ -1,4 +1,4 @@
-'''
+"""
 # 01-create-dtm.py
 
 Date: 6/6/2015
@@ -18,7 +18,8 @@ All other scripts can be run without running this one first, since we
 are providing the files required to replicate the document-feature matrices
 we use in the analysis.
 
-'''
+"""
+
 import glob
 import sys
 import re
@@ -36,18 +37,26 @@ from utils import vectorizer, nb_files
 def preprocess(root, nb_files):
     counter_all = 0
     counter_original = 0
-    for filename in tqdm(glob.iglob(root + '/**/*.csv', recursive=True), total=nb_files):
+    for filename in tqdm(
+        glob.iglob(root + "/**/*.csv", recursive=True), total=nb_files
+    ):
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
         rt_pos = reader.headers.retweeted_id
-        
+
         file_text = ""
         for row in reader:
             counter_all += 1
             if not row[rt_pos]:
                 counter_original += 1
                 try:
-                    row_text = unidecode(re.sub(r'http\S+|RT|&amp;|,|\.|\xe2\x80\xa6|-', "", row[text_pos].replace("\n", "")))
+                    row_text = unidecode(
+                        re.sub(
+                            r"http\S+|RT|&amp;|,|\.|\xe2\x80\xa6|-",
+                            "",
+                            row[text_pos].replace("\n", ""),
+                        )
+                    )
                 except IndexError:
                     print(filename)
                     print(row)
@@ -56,30 +65,33 @@ def preprocess(root, nb_files):
 
         # yield the text of all tweets of the day, remove last character - which is a space
         yield file_text[:-1]
-    print("nb of tweets: {}, nb of original tweets: {}".format(counter_all, counter_original))
+    print(
+        "nb of tweets: {}, nb of original tweets: {}".format(
+            counter_all, counter_original
+        )
+    )
 
 
 if __name__ == "__main__":
     folder = sys.argv[1]
-    
+
     X = vectorizer.fit_transform(preprocess(folder, nb_files))
-    
+
     # checking words
     words = vectorizer.get_feature_names_out()
     print(words[:10], words[-10:])
-    
-    
+
     ####################################
     # exporting DFM matrix
     ####################################
-    
-    np.savetxt('data/dfm/congress-dtm-indices.txt', X.indices, fmt='%.0f')
-    np.savetxt('data/dfm/congress-dtm-pointers.txt', X.indptr, fmt='%.0f')
-    np.savetxt('data/dfm/congress-dtm-values.txt', X.data, fmt='%.0f')
-    with open('data/dfm/nb_files.txt', 'w') as f:
+
+    np.savetxt("data/dfm/congress-dtm-indices.txt", X.indices, fmt="%.0f")
+    np.savetxt("data/dfm/congress-dtm-pointers.txt", X.indptr, fmt="%.0f")
+    np.savetxt("data/dfm/congress-dtm-values.txt", X.data, fmt="%.0f")
+    with open("data/dfm/nb_files.txt", "w") as f:
         f.write(str(nb_files))
-    
+
     ## words
-    with open('data/dfm/congress-words.txt', 'w') as f:
+    with open("data/dfm/congress-words.txt", "w") as f:
         for item in words:
-          f.write("%s\n" % item)
+            f.write("%s\n" % item)
