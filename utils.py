@@ -2,13 +2,14 @@ import io
 import os
 import glob
 import tarfile
+import re
 from tqdm import tqdm
 import casanova
 from unidecode import unidecode
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 
-TWEETS_FOLDER = "tweets_from_deputesXVI_220620-230313"
+TWEETS_FOLDER = "tweets_from_deputesXVI_220617-230717"
 SBERT_NAME = "dangvantuan/sentence-camembert-large"
 EMB_DIMENSION = 1024
 
@@ -448,11 +449,13 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
         )
 
     for filename in loop:
+        print(filename)
         group_name = ""
         # We search for 'LREM' before searching for 'LR'
         for group in ["LREM", "LR", "RN", "NUPES"]:
             if group in filename:
                 group_name = group
+                print("group_name", group_name)
                 break
 
         thread_ids = dict()
@@ -484,6 +487,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                 while origin not in threads:
                     origin = thread_ids[origin][0]
                 threads[origin] += " " + value[1]
+                print("here is a thread", key, value)
 
         with open(filename) as input_file:
             if write_files:
@@ -508,6 +512,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
 
                     # A common value for BERT-based models are 512 tokens, which corresponds to about 300-400 words (for English)
                     doc = " ".join(doc.split()[:300]).replace("\n", " ")
+                    doc = re.sub(r"^(@[a-zA-Z]+(?:\s+@[a-zA-Z]+)*)", "", doc)
                     if apply_unidecode:
                         doc = unidecode(doc)
 
@@ -515,7 +520,10 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                         row[text_pos] = doc
                         enricher.writerow(row, [is_thread, group_name])
                     counter_threads += 1
-                    yield doc
+                    if len(doc) > 50 :
+                        yield doc
+                    else :
+                        continue
             if write_files:
                 output_file.close()
 
@@ -529,10 +537,14 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
     )
 
 
-vectorizer = CountVectorizer(
-    stop_words=STOP_WORDS_FR,
-    tokenizer=custom_tokenizer,
-    max_features=75000,
-    ngram_range=(1, 2),
-    min_df=10,
-)
+# vectorizer = CountVectorizer(
+#     stop_words=STOP_WORDS_FR,
+#     tokenizer=custom_tokenizer,
+#     max_features=75000,
+#     ngram_range=(1, 2),
+#     min_df=10,
+# )
+print(count_nb_files(TWEETS_FOLDER))
+for doc in preprocess(root = TWEETS_FOLDER, nb_files = count_nb_files(TWEETS_FOLDER), apply_unidecode=False, write_files=False) :
+    print("NEW\n")
+    print(doc)
