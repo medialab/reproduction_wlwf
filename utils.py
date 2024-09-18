@@ -390,11 +390,11 @@ def existing_dir_path(string):
 def create_dir(string):
     try:
         os.mkdir(string)
-    except FileExistsError as e:
-        answer = input(e + "Do you want to resume where you stopped last time? y/n").lower()
-        if answer == "y" or answer == "yes":
-            return string
-        raise
+    # If a parent directory in the path does not exist, FileNotFoundError is raised.
+    except FileExistsError:
+        os.makedirs(string, exist_ok=True)
+        return string
+
     return string
 
 
