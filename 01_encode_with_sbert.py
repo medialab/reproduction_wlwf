@@ -23,22 +23,40 @@ from tqdm import tqdm
 import glob
 import os
 import sys
+import argparse
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from utils import SBERT_NAME, EMB_DIMENSION, count_nb_files, preprocess
+from utils import (
+    SBERT_NAME,
+    EMB_DIMENSION,
+    count_nb_files,
+    preprocess,
+    existing_dir_path,
+    create_dir,
+)
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "input_path",
+    help="Path to a folder or to a .tar.xz archive containing all input csv files",
+    type=existing_dir_path,
+)
+parser.add_argument(
+    "output_folder",
+    help="Path to a folder that will be created and contain all encoded vectors",
+    type=create_dir,
+)
+args = parser.parse_args()
 
 embedding_model = SentenceTransformer(SBERT_NAME)
 
-path = sys.argv[1]
-
-docs = [doc for doc in preprocess(path, count_nb_files(path))]
+docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
 
 batch_size = 1_000
 save_size = 100_000
 embeddings = np.zeros((len(docs), EMB_DIMENSION))
-save_path = "data_prod/embeddings/tweets_sentence-camembert-large.npz"
+save_path = os.path.join(args.output_folder, "tweets_sentence-camembert-large.npz")
 max_index = 0
 
 if os.path.isfile(save_path):

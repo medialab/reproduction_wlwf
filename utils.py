@@ -378,6 +378,20 @@ STOP_WORDS_FR = [
 ]
 
 
+def existing_dir_path(string):
+    if os.path.isdir(string):
+        return string
+    elif os.path.splitext(string)[1] == ".xz":
+        return string
+    else:
+        raise NotADirectoryError(string)
+
+
+def create_dir(string):
+    os.mkdir(string)
+    return string
+
+
 def custom_tokenizer(document):
     tokenizer = WordTokenizer(
         keep=["word", "mention"],
