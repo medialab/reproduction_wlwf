@@ -52,11 +52,10 @@ parser.add_argument(
     type=create_dir,
 )
 parser.add_argument(
-    "save_size",
+    "--save_size",
     help="Size of saved files in number of vectors",
     type=int,
     default=default_save_size,
-    required=False
 )
 args = parser.parse_args()
 
