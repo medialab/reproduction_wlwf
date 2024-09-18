@@ -78,6 +78,7 @@ def count_nb_files(folder):
 def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
     counter_all = 0
     counter_original = 0
+    counter_threads = 0
 
     _, file_extension = os.path.splitext(root)
     if file_extension:
@@ -157,7 +158,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                     if write_files:
                         row[text_pos] = doc
                         enricher.writerow(row, [is_thread, group_name])
-
+                    counter_threads += 1
                     yield doc
             if write_files:
                 output_file.close()
@@ -165,7 +166,9 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
     if file_extension:
         if file_extension == ".xz":
             tar.close()
-    print("nb of tweets: {}, nb of original tweets: {}".format(counter_all, counter_original))
+    print("nb of tweets: {}, nb of original tweets: {}, nb of original tweets grouped by threads: {}".format(
+        counter_all, counter_original, counter_threads
+        ))
 
 
 vectorizer = CountVectorizer(stop_words=STOP_WORDS_FR, tokenizer=custom_tokenizer,
