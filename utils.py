@@ -422,11 +422,13 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
         if file_extension == ".xz":
             tar = tarfile.open(root, "r:xz")
             loop = tqdm(
-                (
-                    io.TextIOWrapper(tar.extractfile(member))
-                    for member in tar.getmembers()
-                    if member.isreg()
-                ),  # type: ignore
+                sorted(
+                    (
+                        io.TextIOWrapper(tar.extractfile(member))
+                        for member in tar.getmembers()
+                        if member.isreg()
+                    )
+                ),
                 total=nb_files,
                 desc="Read compressed files",
             )
@@ -434,7 +436,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
             raise ValueError("Invalid file extension: {}".format(file_extension))
     else:
         loop = tqdm(
-            glob.iglob(root + "/**/*.csv", recursive=True),
+            sorted(glob.iglob(root + "/**/*.csv", recursive=True)),
             total=nb_files,
             desc="Read csv files",
         )
