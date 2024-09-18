@@ -56,6 +56,7 @@ parser.add_argument(
     help="Size of saved files in number of vectors",
     type=int,
     default=default_save_size,
+    required=False
 )
 args = parser.parse_args()
 
