@@ -52,7 +52,7 @@ parser.add_argument(
     type=create_dir,
 )
 parser.add_argument(
-    "--save_size",
+    "--save-size",
     help="Size of saved files in number of vectors",
     type=int,
     default=default_save_size,
@@ -68,7 +68,6 @@ max_index = 0
 def format_output(size):
     return SAVE_PATH.replace(".npz", "_" + str(size) + ".npz")
 
-
 if os.path.isfile(format_output(args.save_size)):
     answer = input(
         """Files in the output folder already exist, do you want to resume from there?
@@ -82,9 +81,21 @@ if os.path.isfile(format_output(args.save_size)):
 
 elif os.path.isfile(format_output(default_save_size)):
     raise ValueError(
-        """Files in the output folder have a different save_size than the input save_size.
-        It is impossible to resume from there"""
+        """Files in the output folder have a different save_size than the input save_size ({}).
+        It is impossible to resume from there.""".format(args.save_size)
     )
+
+else:
+    files_contain_save_size = []
+    for file in glob.glob(SAVE_PATH.replace(".npz", "_*")):
+        index = int(file[len(SAVE_PATH) - 3 : -len(".npz")])
+        files_contain_save_size.append(index == args.save_size)
+    if len(files_contain_save_size) > 0 and not any(files_contain_save_size):
+         raise ValueError(
+            """Files in the output folder have a different save_size than the input save_size ({}).
+            It is impossible to resume from there.""".format(args.save_size)
+    )
+            
 
 docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
 embeddings = np.zeros((len(docs), EMB_DIMENSION))
