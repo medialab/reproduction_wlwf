@@ -34,7 +34,7 @@ embedding_model = SentenceTransformer(SBERT_NAME)
 
 path = sys.argv[1]
 
-docs = preprocess(path, count_nb_files(path))
+docs = [doc for doc in preprocess(path, count_nb_files(path))]
 
 batch_size = 1_000
 save_size = 100_000
@@ -55,7 +55,7 @@ for file in glob.glob(save_path.replace(".npz", "_*")):
     index = int(file[len(save_path) - 3:-len(".npz")])
     if index > max_index:
         max_index = index
-        
+
     if index % save_size == 0:
         embeddings[index - save_size : index] = np.load(file)["embeddings"]
     else:

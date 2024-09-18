@@ -75,7 +75,7 @@ def count_nb_files(folder):
     return count
 
 
-def preprocess(root, nb_files, apply_unidecode=False):
+def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
     counter_all = 0
     counter_original = 0
 
@@ -130,8 +130,12 @@ def preprocess(root, nb_files, apply_unidecode=False):
                     origin = thread_ids[origin][0]
                 threads[origin] += " " + value[1]
 
-        with open(filename) as input_file, open(filename.replace(".csv", "_preprocessed.csv"), "w") as output_file:
-            enricher = casanova.enricher(input_file, output_file, add=["is_thread", "group"])
+        with open(filename) as input_file:
+            if write_files:
+                output_file = open(filename.replace(".csv", "_preprocessed.csv"), "w")
+                enricher = casanova.enricher(input_file, output_file, add=["is_thread", "group"])
+            else:
+                enricher = casanova.reader(input_file)
             for row in enricher:
                 if not row[rt_pos]:
                     is_thread = 0
@@ -150,10 +154,13 @@ def preprocess(root, nb_files, apply_unidecode=False):
                     if apply_unidecode:
                         doc = unidecode(doc)
 
-                    row[text_pos] = doc
+                    if write_files:
+                        row[text_pos] = doc
+                        enricher.writerow(row, [is_thread, group_name])
 
-                    enricher.writerow(row, [is_thread, group_name])
-                    yield row
+                    yield doc
+            if write_files:
+                output_file.close()
 
     if file_extension:
         if file_extension == ".xz":

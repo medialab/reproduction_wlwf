@@ -55,20 +55,19 @@ def save_ctfidf_config(model, path):
         "params": cv_params,
         "vocab": model.vectorizer_model.vocabulary_,
     }
-    
+
     with path.open("w") as f:
         json.dump(config, f, indent=2, cls=NpEncoder)
 
 save_utils.save_ctfidf_config = save_ctfidf_config
 
 path = sys.argv[1]
-docs = preprocess(path, count_nb_files(path))
 load_path = "data_prod/embeddings/tweets_from_deputesXVI_220620-230313_sentence-camembert-large.npz"
 
 
 embeddings = np.load(load_path)["embeddings"]
 
-docs = np.array(docs)
+docs = np.array(doc for doc in preprocess(path, count_nb_files(path), apply_unidecode=True))
 
 topic_model.fit(docs, embeddings)
 
