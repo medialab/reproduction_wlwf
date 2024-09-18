@@ -59,17 +59,6 @@ embeddings = np.zeros((len(docs), EMB_DIMENSION))
 save_path = os.path.join(args.output_folder, "tweets_sentence-camembert-large.npz")
 max_index = 0
 
-if os.path.isfile(save_path):
-    input(
-        """{} already exists, do you want to overwrite file?
-          y overwrite file
-          n cancel this script
-          """.format(save_path)
-    )
-
-    if input == "n":
-        sys.exit(0)
-
 for file in glob.glob(save_path.replace(".npz", "_*")):
     index = int(file[len(save_path) - 3 : -len(".npz")])
     if index > max_index:

@@ -388,7 +388,13 @@ def existing_dir_path(string):
 
 
 def create_dir(string):
-    os.mkdir(string)
+    try:
+        os.mkdir(string)
+    except FileExistsError as e:
+        answer = input(e + "Do you want to resume where you stopped last time? y/n").lower()
+        if answer == "y" or answer == "yes":
+            return string
+        raise
     return string
 
 
