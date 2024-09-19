@@ -2,6 +2,7 @@ import io
 import os
 import glob
 import tarfile
+import re
 from tqdm import tqdm
 import casanova
 from unidecode import unidecode
@@ -508,14 +509,20 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
 
                     # A common value for BERT-based models are 512 tokens, which corresponds to about 300-400 words (for English)
                     doc = " ".join(doc.split()[:150]).replace("\n", " ")
+                    doc = re.sub(r"^(@\w+(?:\s+@\w+)*)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
+                    doc = re.sub(r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?", "", doc, flags=re.MULTILINE | re.IGNORECASE)
+                    doc = re.sub(r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
                     if apply_unidecode:
                         doc = unidecode(doc)
 
-                    if write_files:
-                        row[text_pos] = doc
-                        enricher.writerow(row, [is_thread, group_name])
-                    counter_threads += 1
-                    yield doc
+                    if len(doc) > 50 :
+                        if write_files:
+                            row[text_pos] = doc
+                            enricher.writerow(row, [is_thread, group_name])
+                        counter_threads += 1
+                        yield doc
+                    else :
+                        continue
             if write_files:
                 output_file.close()
 
