@@ -509,7 +509,9 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
 
                     # A common value for BERT-based models are 512 tokens, which corresponds to about 300-400 words (for English)
                     doc = " ".join(doc.split()[:150]).replace("\n", " ")
-                    doc = re.sub(r"^(@[a-zA-Z0-9_]+(?:\s+@[a-zA-Z0-9_]+)*)", "", doc)
+                    doc = re.sub(r"^(@\w+(?:\s+@\w+)*)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
+                    doc = re.sub(r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?", "", doc, flags=re.MULTILINE | re.IGNORECASE)
+                    doc = re.sub(r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
                     if apply_unidecode:
                         doc = unidecode(doc)
 
