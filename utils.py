@@ -6,6 +6,7 @@ import re
 from tqdm import tqdm
 import casanova
 from unidecode import unidecode
+from transformers import CamembertTokenizer
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -399,6 +400,22 @@ def create_dir(string):
     return string
 
 
+def reduce_doc_size(doc, length=512):
+    tokens = camembert_tokenizer.tokenize(doc)
+    while len(tokens) > length:
+        point_index = -1
+        for i, token in reversed(list(enumerate(tokens))):
+            if token == "." and i != len(tokens) - 1:
+                point_index = i + 1
+                break
+        if point_index == -1:
+            tokens = tokens[:length]
+        else :
+            tokens = tokens[:point_index]
+    short_doc = "".join(tokens).replace("▁", " ").strip()
+    return short_doc
+
+
 def custom_tokenizer(document):
     tokenizer = WordTokenizer(
         keep=["word", "mention"],
@@ -507,22 +524,26 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                     else:
                         continue
 
-                    # A common value for BERT-based models are 512 tokens, which corresponds to about 300-400 words (for English)
-                    doc = " ".join(doc.split()[:150]).replace("\n", " ")
+                    #Remove trailing mentions
                     doc = re.sub(r"^(@\w+(?:\s+@\w+)*)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
+                    #Remove urls
                     doc = re.sub(r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?", "", doc, flags=re.MULTILINE | re.IGNORECASE)
+                    #Remove AN hashtags
                     doc = re.sub(r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
+                    
                     if apply_unidecode:
                         doc = unidecode(doc)
 
+                    #Keep only documents whith more than 50 characters
                     if len(doc) > 50 :
+                        # A common value for BERT-based models is 512 tokens
+                        doc = reduce_doc_size(doc, length=500)
                         if write_files:
                             row[text_pos] = doc
                             enricher.writerow(row, [is_thread, group_name])
                         counter_threads += 1
                         yield doc
-                    else :
-                        continue
+
             if write_files:
                 output_file.close()
 
@@ -535,6 +556,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
         )
     )
 
+camembert_tokenizer = CamembertTokenizer.from_pretrained(SBERT_NAME)
 
 vectorizer = CountVectorizer(
     stop_words=STOP_WORDS_FR,
