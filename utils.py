@@ -410,7 +410,7 @@ def reduce_doc_size(doc, length=512):
                 break
         if point_index == -1:
             tokens = tokens[:length]
-        else :
+        else:
             tokens = tokens[:point_index]
     short_doc = "".join(tokens).replace("▁", " ").strip()
     return short_doc
@@ -440,18 +440,18 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
     counter_all = 0
     counter_original = 0
     counter_threads = 0
+    compressed = False
 
     _, file_extension = os.path.splitext(root)
     if file_extension:
         if file_extension == ".xz":
+            compressed = True
             tar = tarfile.open(root, "r:xz")
             loop = tqdm(
-                sorted(
-                    (
-                        io.TextIOWrapper(tar.extractfile(member))
-                        for member in tar.getmembers()
-                        if member.isreg()
-                    )
+                (
+                    member
+                    for member in sorted(tar.getmembers(), key=lambda x: x.name)
+                    if member.isreg()
                 ),
                 total=nb_files,
                 desc="Read compressed files",
@@ -465,7 +465,12 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
             desc="Read csv files",
         )
 
-    for filename in loop:
+    for file in loop:
+        if compressed:
+            filename = file.name
+        else:
+            filename = file
+
         group_name = ""
         # We search for 'LREM' before searching for 'LR'
         for group in ["LREM", "LR", "RN", "NUPES"]:
@@ -475,7 +480,12 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
 
         thread_ids = dict()
         threads = dict()
-        reader = casanova.reader(filename)
+
+        if compressed:
+            filestream = io.TextIOWrapper(tar.extractfile(file))
+        else:
+            filestream = open(file)
+        reader = casanova.reader(filestream)
 
         text_pos = reader.headers.text
         id_pos = reader.headers.id
@@ -493,6 +503,8 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                     thread_ids[row[id_pos]] = (row[to_id_pos], row[text_pos])
                     if row[to_id_pos] not in thread_ids:
                         thread_ids[row[to_id_pos]] = None
+        if not compressed:
+            filestream.close()
 
         for key, value in sorted(thread_ids.items()):
             if not value:
@@ -503,58 +515,80 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                     origin = thread_ids[origin][0]
                 threads[origin] += " " + value[1]
 
-        with open(filename) as input_file:
-            if write_files:
-                output_file = open(filename.replace(".csv", "_preprocessed.csv"), "w")
-                enricher = casanova.enricher(
-                    input_file, output_file, add=["is_thread", "group"]
+        if compressed:
+            input_file = io.TextIOWrapper(tar.extractfile(file))
+        else:
+            input_file = open(file)
+
+        if write_files:
+            output_file = open(filename.replace(".csv", "_preprocessed.csv"), "w")
+            enricher = casanova.enricher(
+                input_file, output_file, add=["is_thread", "group"]
+            )
+        else:
+            enricher = casanova.reader(input_file)
+
+        for row in enricher:
+            if not row[rt_pos]:
+                is_thread = 0
+                if row[id_pos] in threads:
+                    is_thread = 1
+                    doc = row[text_pos] + " " + threads[row[id_pos]]
+
+                elif row[id_pos] not in thread_ids:
+                    doc = row[text_pos]
+
+                else:
+                    continue
+
+                # Remove trailing mentions
+                doc = re.sub(
+                    r"^(@\w+(?:\s+@\w+)*)",
+                    "",
+                    doc,
+                    flags=re.MULTILINE | re.IGNORECASE,
                 )
-            else:
-                enricher = casanova.reader(input_file)
-            for row in enricher:
-                if not row[rt_pos]:
-                    is_thread = 0
-                    if row[id_pos] in threads:
-                        is_thread = 1
-                        doc = row[text_pos] + " " + threads[row[id_pos]]
+                # Remove urls
+                doc = re.sub(
+                    r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?",
+                    "",
+                    doc,
+                    flags=re.MULTILINE | re.IGNORECASE,
+                )
+                # Remove AN hashtags
+                doc = re.sub(
+                    r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)",
+                    "",
+                    doc,
+                    flags=re.MULTILINE | re.IGNORECASE,
+                )
 
-                    elif row[id_pos] not in thread_ids:
-                        doc = row[text_pos]
+                if apply_unidecode:
+                    doc = unidecode(doc)
 
-                    else:
-                        continue
+                # Keep only documents whith more than 50 characters
+                if len(doc) > 50:
+                    # A common value for BERT-based models is 512 tokens
+                    doc = reduce_doc_size(doc, length=500)
+                    if write_files:
+                        row[text_pos] = doc
+                        enricher.writerow(row, [is_thread, group_name])
+                    counter_threads += 1
+                    yield doc
 
-                    #Remove trailing mentions
-                    doc = re.sub(r"^(@\w+(?:\s+@\w+)*)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
-                    #Remove urls
-                    doc = re.sub(r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?", "", doc, flags=re.MULTILINE | re.IGNORECASE)
-                    #Remove AN hashtags
-                    doc = re.sub(r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)", "", doc, flags=re.MULTILINE | re.IGNORECASE)
-                    
-                    if apply_unidecode:
-                        doc = unidecode(doc)
+        if write_files:
+            output_file.close()
+        if not compressed:
+            input_file.close()
 
-                    #Keep only documents whith more than 50 characters
-                    if len(doc) > 50 :
-                        # A common value for BERT-based models is 512 tokens
-                        doc = reduce_doc_size(doc, length=500)
-                        if write_files:
-                            row[text_pos] = doc
-                            enricher.writerow(row, [is_thread, group_name])
-                        counter_threads += 1
-                        yield doc
-
-            if write_files:
-                output_file.close()
-
-    if file_extension:
-        if file_extension == ".xz":
-            tar.close()
+    if compressed:
+        tar.close()
     print(
         "nb of tweets: {}, nb of original tweets: {}, nb of original tweets grouped by threads: {}".format(
             counter_all, counter_original, counter_threads
         )
     )
+
 
 camembert_tokenizer = CamembertTokenizer.from_pretrained(SBERT_NAME)
 
