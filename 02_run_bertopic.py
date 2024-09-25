@@ -35,7 +35,9 @@ parser.add_argument(
     default=DEFAULT_SAVE_SIZE,
 )
 args = parser.parse_args()
-SAVE_PATH = os.path.join(args.output_folder, "tweets_sentence-camembert-large.npz")
+embeddings_path = os.path.join(
+    args.embeddings_folder, "tweets_sentence-camembert-large.npz"
+)
 
 
 hdbscan_model = HDBSCAN(
@@ -101,7 +103,7 @@ docs = np.array(
     doc for doc in preprocess(path, count_nb_files(path), apply_unidecode=True)
 )
 max_index, embeddings = load_embeddings(
-    args.embeddings,
+    embeddings_path,
     args.save_size,
     len(docs),
 )
