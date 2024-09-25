@@ -105,7 +105,7 @@ docs = np.array(
 max_index, embeddings = load_embeddings(
     embeddings_path,
     args.save_size,
-    len(docs),
+    docs.shape[0],
 )
 
 print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
