@@ -565,13 +565,13 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                     flags=re.MULTILINE | re.IGNORECASE,
                 )
 
-                if apply_unidecode:
-                    doc = unidecode(doc)
-
                 # Keep only documents whith more than 50 characters
                 if len(doc) > 50:
                     # A common value for BERT-based models is 512 tokens
                     doc = reduce_doc_size(doc, length=500)
+
+                    if apply_unidecode:
+                        doc = unidecode(doc)
                     if write_files:
                         row[text_pos] = doc
                         enricher.writerow(row, [is_thread, group_name])
