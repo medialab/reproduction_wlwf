@@ -30,11 +30,11 @@ from utils import (
     existing_dir_path,
     create_dir,
     load_embeddings,
+    DEFAULT_SAVE_SIZE,
 )
 
 
 batch_size = 1_000
-default_save_size = 100_000
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -51,7 +51,7 @@ parser.add_argument(
     "--save-size",
     help="Size of saved files in number of vectors",
     type=int,
-    default=default_save_size,
+    default=DEFAULT_SAVE_SIZE,
 )
 args = parser.parse_args()
 
@@ -75,7 +75,7 @@ if os.path.isfile(format_output(args.save_size)):
     if answer == "n" or answer == "no":
         sys.exit(0)
 
-elif os.path.isfile(format_output(default_save_size)):
+elif os.path.isfile(format_output(DEFAULT_SAVE_SIZE)):
     raise ValueError(
         """Files in the output folder have a different save_size than the input save_size ({}).
         It is impossible to resume from there.""".format(args.save_size)

@@ -1,12 +1,42 @@
+import os
 import sys
 import json
+import argparse
 
 from hdbscan import HDBSCAN
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
 
-from utils import count_nb_files, vectorizer, preprocess, SBERT_NAME
+from utils import (
+    count_nb_files,
+    create_dir,
+    vectorizer,
+    preprocess,
+    load_embeddings,
+    SBERT_NAME,
+    DEFAULT_SAVE_SIZE,
+)
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "embeddings_folder",
+    help="Path to a folder containing .npz embeddings. It is the output_folder arg in 01_encode_with_sbert.py",
+)
+parser.add_argument(
+    "output_folder",
+    help="Path to a folder that will be created and contain the BERTopic model",
+    type=create_dir,
+)
+parser.add_argument(
+    "--save-size",
+    help="Size of saved files (in embeddings_folder) in number of vectors",
+    type=int,
+    default=DEFAULT_SAVE_SIZE,
+)
+args = parser.parse_args()
+SAVE_PATH = os.path.join(args.output_folder, "tweets_sentence-camembert-large.npz")
+
 
 hdbscan_model = HDBSCAN(
     min_cluster_size=3,
@@ -66,20 +96,22 @@ def save_ctfidf_config(model, path):
 save_utils.save_ctfidf_config = save_ctfidf_config
 
 path = sys.argv[1]
-load_path = "data_prod/embeddings/tweets_from_deputesXVI_220620-230313_sentence-camembert-large.npz"
-
-
-embeddings = np.load(load_path)["embeddings"]
 
 docs = np.array(
     doc for doc in preprocess(path, count_nb_files(path), apply_unidecode=True)
 )
+max_index, embeddings = load_embeddings(
+    args.embeddings,
+    args.save_size,
+    len(docs),
+)
 
+print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
 topic_model.fit(docs, embeddings)
 
 # Save model
 topic_model.save(
-    "data_prod/bertopic/fit_on_deputesXVI_220620-230313_sentence-camembert-large",
+    args.output_folder,
     serialization="safetensors",
     save_ctfidf=True,
     save_embedding_model=SBERT_NAME,

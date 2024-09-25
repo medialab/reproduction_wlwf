@@ -11,9 +11,10 @@ from transformers import CamembertTokenizer
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 
-TWEETS_FOLDER = "tweets_from_deputesXVI_220620-230313"
 SBERT_NAME = "dangvantuan/sentence-camembert-large"
 EMB_DIMENSION = 1024
+DEFAULT_SAVE_SIZE = 100_000
+
 
 STOP_WORDS_FR = [
     "",
