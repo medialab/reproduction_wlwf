@@ -1,10 +1,11 @@
 import io
 import os
+import re
 import glob
 import tarfile
-import re
-from tqdm import tqdm
 import casanova
+import numpy as np
+from tqdm import tqdm
 from unidecode import unidecode
 from transformers import CamembertTokenizer
 from fog.tokenizers.words import WordTokenizer
@@ -588,6 +589,25 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
             counter_all, counter_original, counter_threads
         )
     )
+
+
+def load_embeddings(path, save_size, nb_docs):
+    max_index = 0
+    embeddings = np.zeros((nb_docs, EMB_DIMENSION))
+    for file in glob.glob(path.replace(".npz", "_*")):
+        index = int(file[len(path) - 3 : -len(".npz")])
+        if index > max_index:
+            max_index = index
+
+        if index % save_size == 0:
+            embeddings[index - save_size : index] = np.load(file)["embeddings"]
+        else:
+            embeddings[embeddings.shape[0] - (embeddings.shape[0] % save_size) :] = (
+                np.load(file)["embeddings"]
+            )
+
+    print("Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum()))
+    return max_index, embeddings
 
 
 camembert_tokenizer = CamembertTokenizer.from_pretrained(SBERT_NAME)

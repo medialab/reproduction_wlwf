@@ -5,17 +5,13 @@ Date: 2024-08-21
 Author: Béatrice Mazoyer
 
 Takes csv files with tweets and encode them using Sentence-BERT
-(this time, one document = one tweet, as opposed to
+(this time, one document = one thread, as opposed to
 the strategy in 01-create-dtm.py)
 
 NOTE: running this script requires access to the original corpus of
 tweets, which we cannot share publicly in order to comply with Twitter's
 terms of service. For advice on how to re-run this script, please
 contact the corresponding author.
-
-All other scripts can be run without running this one first, since we
-are providing the files required to replicate the document-feature matrices
-we use in the analysis.
 
 """
 
@@ -29,11 +25,11 @@ from sentence_transformers import SentenceTransformer
 
 from utils import (
     SBERT_NAME,
-    EMB_DIMENSION,
     count_nb_files,
     preprocess,
     existing_dir_path,
     create_dir,
+    load_embeddings,
 )
 
 
@@ -62,11 +58,11 @@ args = parser.parse_args()
 embedding_model = SentenceTransformer(SBERT_NAME)
 
 SAVE_PATH = os.path.join(args.output_folder, "tweets_sentence-camembert-large.npz")
-max_index = 0
 
 
 def format_output(size):
     return SAVE_PATH.replace(".npz", "_" + str(size) + ".npz")
+
 
 if os.path.isfile(format_output(args.save_size)):
     answer = input(
@@ -91,28 +87,19 @@ else:
         index = int(file[len(SAVE_PATH) - 3 : -len(".npz")])
         files_contain_save_size.append(index == args.save_size)
     if len(files_contain_save_size) > 0 and not any(files_contain_save_size):
-         raise ValueError(
+        raise ValueError(
             """Files in the output folder have a different save_size than the input save_size ({}).
             It is impossible to resume from there.""".format(args.save_size)
-    )
-            
-
-docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
-embeddings = np.zeros((len(docs), EMB_DIMENSION))
-
-for file in glob.glob(SAVE_PATH.replace(".npz", "_*")):
-    index = int(file[len(SAVE_PATH) - 3 : -len(".npz")])
-    if index > max_index:
-        max_index = index
-
-    if index % args.save_size == 0:
-        embeddings[index - args.save_size : index] = np.load(file)["embeddings"]
-    else:
-        embeddings[embeddings.shape[0] - (embeddings.shape[0] % args.save_size) :] = (
-            np.load(file)["embeddings"]
         )
 
-print("Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum()))
+
+docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
+max_index, embeddings = load_embeddings(
+    SAVE_PATH,
+    args.save_size,
+    len(docs),
+)
+
 
 # Encode docs
 for i in tqdm(
