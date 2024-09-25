@@ -11,6 +11,7 @@ import numpy as np
 from utils import (
     count_nb_files,
     create_dir,
+    existing_dir_path,
     vectorizer,
     preprocess,
     load_embeddings,
@@ -19,6 +20,11 @@ from utils import (
 )
 
 parser = argparse.ArgumentParser()
+parser.add_argument(
+    "input_path",
+    help="Path to a folder or to a .tar.xz archive containing all input csv files",
+    type=existing_dir_path,
+)
 parser.add_argument(
     "embeddings_folder",
     help="Path to a folder containing .npz embeddings. It is the output_folder arg in 01_encode_with_sbert.py",
@@ -97,11 +103,10 @@ def save_ctfidf_config(model, path):
 
 save_utils.save_ctfidf_config = save_ctfidf_config
 
-path = sys.argv[1]
-
 docs = np.array(
-    doc for doc in preprocess(path, count_nb_files(path), apply_unidecode=True)
+    [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path), apply_unidecode=True)]
 )
+
 max_index, embeddings = load_embeddings(
     embeddings_path,
     args.save_size,
