@@ -27,7 +27,7 @@ import casanova
 from unidecode import unidecode
 from tqdm import tqdm
 
-from utils import vectorizer, nb_files, clean_text
+from utils import vectorizer, count_nb_files, clean_text
 
 
 ####################################
@@ -67,7 +67,7 @@ def preprocess(root, nb_files):
 
 if __name__ == "__main__":
     folder = sys.argv[1]
-
+    nb_files = count_nb_files(folder)
     X = vectorizer.fit_transform(preprocess(folder, nb_files))
 
     # checking words
