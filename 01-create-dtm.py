@@ -22,7 +22,6 @@ we use in the analysis.
 
 import glob
 import sys
-import re
 import numpy as np
 import casanova
 from unidecode import unidecode
@@ -79,13 +78,13 @@ if __name__ == "__main__":
     # exporting DFM matrix
     ####################################
 
-    np.savetxt("data/dfm/congress-dtm-indices.txt", X.indices, fmt="%.0f")
-    np.savetxt("data/dfm/congress-dtm-pointers.txt", X.indptr, fmt="%.0f")
-    np.savetxt("data/dfm/congress-dtm-values.txt", X.data, fmt="%.0f")
-    with open("data/dfm/nb_files.txt", "w") as f:
+    np.savetxt("data_prod/dfm/congress-dtm-indices.txt", X.indices, fmt="%.0f")
+    np.savetxt("data_prod/dfm/congress-dtm-pointers.txt", X.indptr, fmt="%.0f")
+    np.savetxt("data_prod/dfm/congress-dtm-values.txt", X.data, fmt="%.0f")
+    with open("data_prod/dfm/nb_files.txt", "w") as f:
         f.write(str(nb_files))
 
     ## words
-    with open("data/dfm/congress-words.txt", "w") as f:
+    with open("data_prod/dfm/congress-words.txt", "w") as f:
         for item in words:
             f.write("%s\n" % item)

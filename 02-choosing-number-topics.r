@@ -8,9 +8,9 @@
 #           Richard Bonneau, John Jost, Joshua A. Tucker
 #  Purpose: run multiple LDA models to choose number of topics based on
 #           logLikelihood and perplexity
-#  Data In: 
+#  Data In:
 #           ./data/tweets/text/* & data/dfm/congress-*
-#  Data Out: 
+#  Data Out:
 #           appendix figure with cross-validated model fit
 #===============================================================================
 
@@ -29,11 +29,11 @@ library(grid)
 # DATA
 #===============================================================================
 ## preparing Congress matrix
-nb_fls <- as.numeric(scan("data/dfm/nb_files.txt"))
-ind <- scan("data/dfm/congress-dtm-indices.txt")
-pointers <- scan("data/dfm/congress-dtm-pointers.txt")
-values <- scan("data/dfm/congress-dtm-values.txt")
-words <- scan("data/dfm/congress-words.txt", what="character", sep="\n")
+nb_fls <- as.numeric(scan("data_prod/dfm/nb_files.txt"))
+ind <- scan("data_prod/dfm/congress-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/congress-dtm-pointers.txt")
+values <- scan("data_prod/dfm/congress-dtm-values.txt")
+words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
 	dims=c(nb_fls, length(words)), index1=FALSE)
@@ -76,11 +76,11 @@ for (k in K){
     cat("\n\n\n##########\n\n\n ", k, "topics", "\n\n\n")
     res <- cvLDA(k, dtm)
     results[[i]] <- res
-    save(results, file=sprintf("topics/\"%s\"_topics_results_cv.Rdata", k))
+    save(results, file=sprintf("data_prod/topics/\"%s\"_topics_results_cv.Rdata", k))
     i = i + 1
 }
 
-save(results, file="topics/k_topics_results_cv.Rdata")
+save(results, file="data_prod/topics/k_topics_results_cv.Rdata")
 
 
 # PLOT
@@ -107,11 +107,11 @@ pd$sd <- pd2$value
 levels(pd$variable) <- c("Perplexity", "LogLikelihood")
 
 p <- ggplot(pd, aes(x=k, y=value, linetype=variable))
-pq <- p + geom_line() + geom_point(aes(shape=variable), 
+pq <- p + geom_line() + geom_point(aes(shape=variable),
         fill="white", shape=21, size=1.40) +
     geom_errorbar(aes(ymax=value+sd, ymin=value-sd), width=4) +
     scale_y_continuous("Ratio wrt worst value") +
-    scale_x_continuous("Number of topics", 
+    scale_x_continuous("Number of topics",
         breaks=c(40, 60, 80, 100, 120, 140)) +
     theme_bw() +
     scale_shape_discrete(guide="none") +
@@ -121,7 +121,7 @@ pq <- p + geom_line() + geom_point(aes(shape=variable),
     panel.grid.minor = element_blank(),
     panel.border = element_blank(),
     panel.background = element_blank(),
-    legend.key.size=unit(0.5, "cm"), legend.position=c(0.70,.90), 
+    legend.key.size=unit(0.5, "cm"), legend.position=c(0.70,.90),
     legend.box.just = "left", legend.direction="horizontal",
     legend.title=element_blank()) +
         annotate("text", x=100, y=0.86, label="Perplexity", size=3) +
