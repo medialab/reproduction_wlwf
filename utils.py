@@ -14,6 +14,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 SBERT_NAME = "dangvantuan/sentence-camembert-large"
 EMB_DIMENSION = 1024
 DEFAULT_SAVE_SIZE = 100_000
+TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
+URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
+AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"
 
 
 STOP_WORDS_FR = [
@@ -382,6 +385,31 @@ STOP_WORDS_FR = [
 ]
 
 
+def clean_text(doc):
+    # Remove trailing mentions
+    doc = re.sub(
+        TRAILING_MENTIONS_PATTERN,
+        "",
+        doc,
+        flags=re.MULTILINE | re.IGNORECASE,
+    )
+    # Remove urls
+    doc = re.sub(
+        URLS_PATTERN,
+        "",
+        doc,
+        flags=re.MULTILINE | re.IGNORECASE,
+    )
+    # Remove AN hashtags
+    doc = re.sub(
+        AN_HASHTAGS_PATTERN,
+        "",
+        doc,
+        flags=re.MULTILINE | re.IGNORECASE,
+    )
+    return doc
+
+
 def existing_dir_path(string):
     if os.path.isdir(string):
         return string
@@ -543,27 +571,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
                 else:
                     continue
 
-                # Remove trailing mentions
-                doc = re.sub(
-                    r"^(@\w+(?:\s+@\w+)*)",
-                    "",
-                    doc,
-                    flags=re.MULTILINE | re.IGNORECASE,
-                )
-                # Remove urls
-                doc = re.sub(
-                    r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?",
-                    "",
-                    doc,
-                    flags=re.MULTILINE | re.IGNORECASE,
-                )
-                # Remove AN hashtags
-                doc = re.sub(
-                    r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)",
-                    "",
-                    doc,
-                    flags=re.MULTILINE | re.IGNORECASE,
-                )
+                doc = clean_text(doc)
 
                 # Keep only documents whith more than 50 characters
                 if len(doc) > 50:

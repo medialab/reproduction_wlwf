@@ -28,7 +28,7 @@ import casanova
 from unidecode import unidecode
 from tqdm import tqdm
 
-from utils import vectorizer, nb_files
+from utils import vectorizer, nb_files, clean_text
 
 
 ####################################
@@ -50,13 +50,7 @@ def preprocess(root, nb_files):
             if not row[rt_pos]:
                 counter_original += 1
                 try:
-                    row_text = unidecode(
-                        re.sub(
-                            r"http\S+|RT|&amp;|,|\.|\xe2\x80\xa6|-",
-                            "",
-                            row[text_pos].replace("\n", ""),
-                        )
-                    )
+                    row_text = unidecode(clean_text(row[text_pos].replace("\n", "")))
                 except IndexError:
                     print(filename)
                     print(row)
