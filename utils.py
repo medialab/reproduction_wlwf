@@ -501,6 +501,8 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
         else:
             filename = file
 
+        loop.set_description(filename)
+
         group_name = ""
         # We search for 'LREM' before searching for 'LR'
         for group in ["LREM", "LR", "RN", "NUPES"]:
@@ -542,7 +544,10 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
             else:
                 origin = value[0]
                 while origin not in threads:
-                    origin = thread_ids[origin][0]
+                    if thread_ids[origin] is not None:
+                        origin = thread_ids[origin][0]
+                    else:
+                        threads[origin] = ""
                 threads[origin] += " " + value[1]
 
         if compressed:
