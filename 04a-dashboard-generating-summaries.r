@@ -241,32 +241,44 @@ df |>
 #   prop = c(results$topics), stringsAsFactors=F)
 # 
 # ## random users
-# for (k in 1:K){
-# 
-#   # parties
-# 	sbs <- df[df$topic==k,]
-# 	sbs <- aggregate(sbs$prop, by=list(date=sbs$date, party=sbs$party), FUN=mean)
-# 	# media
-#   mm <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-#     media[media$topic==k, c("date", "prop")], all.x=TRUE)
-#   mm$prop[is.na(mm$prop)] <- 0
-# 
-#   # public
-#   pp <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-#     pub[pub$topic==k, c("date", "prop")], all.x=TRUE)
-#   pp$prop[is.na(pp$prop)] <- 0
-#   dd <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-#     dem[dem$topic==k, c("date", "prop")], all.x=TRUE)
-#   dd$prop[is.na(dd$prop)] <- 0
-#   rr <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-#     rep[rep$topic==k, c("date", "prop")], all.x=TRUE)
-#   rr$prop[is.na(rr$prop)] <- 0
-# 
-#   ## random users
-#   rnn <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-#     rnd[rnd$topic==k, c("date", "prop")], all.x=TRUE)
-#   rnn$prop[is.na(rnn$prop)] <- 0
-# 
+
+for (k in 1:K){
+  # récupérer les scores moyens / parti / jour et sauvegarder dans un fichier
+  sbs <- df |>
+    filter(topic == k) |>
+    group_by(date, party) |>
+    summarise(x = mean(prop)) |>
+    mutate(x = round(x, 3)) |> 
+    ungroup() |>
+    pivot_wider(names_from = party,
+                names_prefix = "prop_",
+                values_from = x)
+  
+
+	# sbs <- df[df$topic==k,]
+	# sbs <- aggregate(sbs$prop, by=list(date=sbs$date, party=sbs$party), FUN=mean)
+	# media
+  # mm <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
+  #   media[media$topic==k, c("date", "prop")], all.x=TRUE)
+  # mm$prop[is.na(mm$prop)] <- 0
+  # 
+  # # public
+  # pp <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
+  #   pub[pub$topic==k, c("date", "prop")], all.x=TRUE)
+  # pp$prop[is.na(pp$prop)] <- 0
+  # dd <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
+  #   dem[dem$topic==k, c("date", "prop")], all.x=TRUE)
+  # dd$prop[is.na(dd$prop)] <- 0
+  # rr <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
+  #   rep[rep$topic==k, c("date", "prop")], all.x=TRUE)
+  # rr$prop[is.na(rr$prop)] <- 0
+  # 
+  # ## random users
+  # rnn <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
+  #   rnd[rnd$topic==k, c("date", "prop")], all.x=TRUE)
+  # rnn$prop[is.na(rnn$prop)] <- 0
+
+  
 #   sbs <- data.frame(
 # 		date = unique(sbs$date),
 # 		Democrats = round(sbs$x[sbs$party=="dem"], 3),
@@ -276,11 +288,11 @@ df |>
 #     Democratic_Supporters = round(dd$prop, 3),
 #     Republican_Supporters = round(rr$prop, 3),
 #     Random_Users= round(rnn$prop, 3))
-# 
-# 	write.csv(sbs, file=paste0("dashboard/files/data/ts-", k, '.csv'),
-# 		row.names=FALSE, quote=FALSE)
-# 
-# }
+
+	write.csv(sbs, file=paste0("dashboard/files/data/ts-", k, '.csv'),
+		row.names=FALSE, quote=FALSE)
+}
+
 # 
 # ###############################################################################
 # ### C) Computing quantities of interest
