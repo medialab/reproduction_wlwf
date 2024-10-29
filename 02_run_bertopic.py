@@ -1,9 +1,10 @@
 import os
-import sys
 import json
+import random
 import argparse
 
 from hdbscan import HDBSCAN
+from umap import UMAP
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
@@ -17,6 +18,7 @@ from utils import (
     load_embeddings,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
+    RANDOM_SEED,
 )
 
 parser = argparse.ArgumentParser()
@@ -40,6 +42,7 @@ parser.add_argument(
     type=int,
     default=DEFAULT_SAVE_SIZE,
 )
+parser.add_argument("--sample", action="store_true")
 args = parser.parse_args()
 embeddings_path = os.path.join(
     args.embeddings_folder, "tweets_sentence-camembert-large.npz"
@@ -53,9 +56,19 @@ hdbscan_model = HDBSCAN(
     prediction_data=False,
 )
 
+umap_model = UMAP(
+    n_neighbors=15,
+    n_components=5,
+    min_dist=0.0,
+    metric="cosine",
+    low_memory=False,
+    random_state=RANDOM_SEED,
+)
+
 topic_model = BERTopic(
     vectorizer_model=vectorizer,
     hdbscan_model=hdbscan_model,
+    umap_model=umap_model,
     nr_topics=100,
     # Hyperparameters
     top_n_words=10,
@@ -104,7 +117,12 @@ def save_ctfidf_config(model, path):
 save_utils.save_ctfidf_config = save_ctfidf_config
 
 docs = np.array(
-    [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path), apply_unidecode=True)]
+    [
+        doc
+        for doc in preprocess(
+            args.input_path, count_nb_files(args.input_path), apply_unidecode=True
+        )
+    ]
 )
 
 max_index, embeddings = load_embeddings(
@@ -123,3 +141,16 @@ topic_model.save(
     save_ctfidf=True,
     save_embedding_model=SBERT_NAME,
 )
+
+if args.sample:
+    indices = random.choices(range(len(docs)), 1000)
+    docs = docs[indices]
+    embeddings = embeddings[indices]
+
+    topic_model.fit(docs, embeddings)
+    topic_model.save(
+        os.path.join(args.output_folder, "sample"),
+        serialization="safetensors",
+        save_ctfidf=True,
+        save_embedding_model=SBERT_NAME,
+    )

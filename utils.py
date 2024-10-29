@@ -14,6 +14,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 SBERT_NAME = "dangvantuan/sentence-camembert-large"
 EMB_DIMENSION = 1024
 DEFAULT_SAVE_SIZE = 100_000
+RANDOM_SEED = 98347
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"
