@@ -131,25 +131,28 @@ max_index, embeddings = load_embeddings(
     docs.shape[0],
 )
 
-print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
-topic_model.fit(docs, embeddings)
-
-# Save model
-topic_model.save(
-    args.output_folder,
-    serialization="safetensors",
-    save_ctfidf=True,
-    save_embedding_model=SBERT_NAME,
-)
-
 if args.sample:
-    indices = random.choices(range(len(docs)), 1000)
+    indices = random.choices(range(len(docs)), k=1000)
     docs = docs[indices]
     embeddings = embeddings[indices]
 
     topic_model.fit(docs, embeddings)
     topic_model.save(
         os.path.join(args.output_folder, "sample"),
+        serialization="safetensors",
+        save_ctfidf=True,
+        save_embedding_model=SBERT_NAME,
+    )
+
+else:
+    print(
+        "Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__)
+    )
+    topic_model.fit(docs, embeddings)
+
+    # Save model
+    topic_model.save(
+        args.output_folder,
         serialization="safetensors",
         save_ctfidf=True,
         save_embedding_model=SBERT_NAME,
