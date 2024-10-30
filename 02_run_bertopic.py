@@ -21,6 +21,8 @@ from utils import (
     RANDOM_SEED,
 )
 
+random.seed(a=RANDOM_SEED)
+
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "input_path",
