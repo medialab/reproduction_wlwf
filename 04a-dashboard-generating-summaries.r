@@ -26,7 +26,7 @@ library(ggthemes)
 library(slam)
 library(Matrix)
 library(tm)
-# library(tidyverse)
+library(tidyverse)
 
 # DATA
 #===============================================================================
@@ -244,15 +244,16 @@ df |>
 
 for (k in 1:K){
   # récupérer les scores moyens / parti / jour et sauvegarder dans un fichier
+  # pour les graphiques de time series générés dans 04b, on produit un fichier "long".
   sbs <- df |>
     filter(topic == k) |>
     group_by(date, party) |>
-    summarise(x = mean(prop)) |>
-    mutate(x = round(x, 3)) |> 
-    ungroup() |>
-    pivot_wider(names_from = party,
-                names_prefix = "prop_",
-                values_from = x)
+    summarise(prop = mean(prop)) |>
+    mutate(prop = round(prop, 3)) |> 
+    ungroup() # |>
+    # pivot_wider(names_from = party,
+    #             names_prefix = "prop_",
+    #             values_from = x)
   
 
 	# sbs <- df[df$topic==k,]
