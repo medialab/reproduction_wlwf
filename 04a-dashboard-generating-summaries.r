@@ -174,9 +174,9 @@ df <- data.frame(#chamber = rep(chamber, each=100),
     date = rep(as.Date(dates), each = 100),
     party = rep(party, each = 100),
     topic = rep(1:100, length(dates)),
-    prop = c(time.series # la distribution des sujets pour chaque doc,
+    prop = c(time.series#, # la distribution des sujets pour chaque doc,
                           # = le score moyen par jour de chaque topic.
-            #  rep(0, 400)  # en attendant de récupérer le 14 mars pour les députés, je triche en complétant avec des 0.
+             # rep(0, 400)  # en attendant de récupérer le 14 mars pour les députés, je triche en complétant avec des 0.
              ),
     stringsAsFactors = F)
 
@@ -245,6 +245,12 @@ df |>
 #   prop = c(results$topics), stringsAsFactors=F)
 # 
 # ## random users
+
+# créé le répertoire data si besoin
+if (!dir.exists("dashboard/files/data")) {
+  dir.create("dashboard/files/data",
+             recursive = TRUE)
+}
 
 for (k in 1:K){
   # récupérer les scores moyens / parti / jour et sauvegarder dans un fichier
@@ -329,8 +335,8 @@ sbs <- df
 df <- data.frame(#chamber = rep(chamber, each=100),
     date = rep(as.Date(dates), each=100),
     party = rep(party, each=100),
-    topic = rep(1:100, length(dates)), prop=c(time.series
-                                              #rep(0, 400) # tricherie
+    topic = rep(1:100, length(dates)), prop=c(time.series#,
+                                             # rep(0, 400) # tricherie
                                               ),
     stringsAsFactors=F)
 
