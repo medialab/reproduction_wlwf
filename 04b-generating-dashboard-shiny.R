@@ -1,9 +1,11 @@
 ### first try on dashboarding Topic Models from a LDA on French MP's tweets
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("shiny", "topicmodels", "ggplot2")
 
 library(shiny)
 library(topicmodels)
 library(ggplot2)
-library(dygraphs)
+
 # Chargement des données
 
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
@@ -25,7 +27,8 @@ ui <- fluidPage(
       )
     ),
  fluidRow(
-        column(8, plotOutput("topic_ts", height = "500px")),
+        column(8, plotOutput("topic_ts", height = "500px",
+                             brush = "plot_brush")),
         column(4, imageOutput("topwords_image"))
       #,
       # fluidRow(
@@ -39,7 +42,10 @@ ui <- fluidPage(
                        selected = c("majority", "lr", "rn", "nupes"), #qois_long |> distinct(parti) |> pull()
                        inline = TRUE
     )
-  )
+  ),
+ fluidRow(
+   tableOutput("brushed_data")
+ )
 )
 
 # time serie des topics
@@ -84,6 +90,12 @@ server <- function(input, output){
     plot_ts(df(), checked_partys(), selected_topic())
     }, res = 96
               )
+ 
+ output$brushed_data <- renderTable(
+   {
+     brushedPoints(df(), input$plot_brush)
+   }
+ )
 
     # avec dygraph
   # output$topic_timeseries <- renderPlot({
