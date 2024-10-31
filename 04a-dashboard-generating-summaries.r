@@ -173,10 +173,11 @@ time.series <- t(lda.fit@gamma)
 df <- data.frame(#chamber = rep(chamber, each=100),
     date = rep(as.Date(dates), each = 100),
     party = rep(party, each = 100),
-    topic = rep(1:100, length(dates)), 
-    prop = c(time.series, # la distribution des sujets pour chaque doc,
+    topic = rep(1:100, length(dates)),
+    prop = c(time.series # la distribution des sujets pour chaque doc,
                           # = le score moyen par jour de chaque topic.
-             rep(0, 400)), # en attendant de récupérer le 14 mars pour les députés, je triche en complétant avec des 0.
+            #  rep(0, 400)  # en attendant de récupérer le 14 mars pour les députés, je triche en complétant avec des 0.
+             ),
     stringsAsFactors = F)
 
 # verif
@@ -328,8 +329,8 @@ sbs <- df
 df <- data.frame(#chamber = rep(chamber, each=100),
     date = rep(as.Date(dates), each=100),
     party = rep(party, each=100),
-    topic = rep(1:100, length(dates)), prop=c(time.series,
-                                              rep(0, 400) # tricherie
+    topic = rep(1:100, length(dates)), prop=c(time.series
+                                              #rep(0, 400) # tricherie
                                               ),
     stringsAsFactors=F)
 
