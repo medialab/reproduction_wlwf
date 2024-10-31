@@ -15,6 +15,9 @@
 
 # PACKAGES
 #===============================================================================
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load("topicmodels", "reshape", "ggplot2", "gtable", "gridExtra", "scales", "ggdendro", "ggthemes", "slam", "Matrix", "tm", "tidyverse")
+
 library(topicmodels)
 library(reshape)
 library(ggplot2)
@@ -141,7 +144,7 @@ for (k in 1:K){
 
 	pq
 
-	ggsave(pq, file=paste0("dashboard/files/img/words-plot-", k, '.png'), height=3.5, width=3)
+	ggsave(pq, file=paste0("data_prod/dashboard/files/img/words-plot-", k, '.png'), height=3.5, width=3, create.dir = TRUE)
 
 }
 
