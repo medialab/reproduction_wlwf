@@ -45,13 +45,19 @@ ui <- fluidPage(
 # time serie des topics
 
 plot_ts  <- function(df, checked_partys, selected_topic){
+
   df |>
     filter(party %in% {{checked_partys}}) |>
     ggplot() +
     aes(x = date, y = prop, color = party, group = party) +
     geom_line() +
-    scale_x_date(date_breaks = "month", date_labels = "%Y-%b") +
-  #  khroma::scale_color_bright() +
+    scale_x_date(#date_breaks = "month", 
+                 breaks = c(seq(ymd("2022-06-20"), ymd("2023-03-14"), by = "1 month"), ymd("2022-06-20"), ymd("2023-03-14")),
+                 date_minor_breaks = "2 weeks",
+                 date_labels = "%y-%b-%d",
+                 limits = c(ymd("2022-06-20"), ymd("2023-03-14")),
+                # expand = expansion(c(0,0))
+                 ) +
     scale_color_manual(values = c("lr" = "darkblue",
                                   "majority" = "orange",
                                   "nupes" = "red",
@@ -61,11 +67,10 @@ plot_ts  <- function(df, checked_partys, selected_topic){
          y = "Score moyen") +
   #  ylim(0,1) +
     theme_clean() +
-    theme(#axis.text.x = element_text(size = rel(0.8)
-    #)
-    ) +
-    ggtitle(paste0("Évolution de l'attention accordée au topic", selected_topic))
+    theme(axis.text.x = element_text(size = rel(0.8)))+
+    ggtitle(paste0("Évolution de l'attention accordée au topic ", selected_topic))
 }
+
 # Server
 server <- function(input, output){
   df <- reactive({
@@ -77,7 +82,7 @@ server <- function(input, output){
 
  output$topic_ts <- renderPlot({
     plot_ts(df(), checked_partys(), selected_topic())
-    }
+    }, res = 96
               )
 
     # avec dygraph
@@ -118,3 +123,5 @@ server <- function(input, output){
 
 # Run the application
 shinyApp(ui = ui, server = server)
+
+
