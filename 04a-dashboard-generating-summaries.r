@@ -16,7 +16,7 @@
 # PACKAGES
 #===============================================================================
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("topicmodels", "reshape", "ggplot2", "gtable", "gridExtra", "scales", "ggdendro", "ggthemes", "slam", "Matrix", "tm", "tidyverse")
+pacman::p_load("topicmodels", "reshape", "ggplot2", "gtable", "gridExtra", "scales", "ggdendro", "ggthemes", "slam", "Matrix", "tm", "tidyverse", "khroma")
 
 library(topicmodels)
 library(reshape)
