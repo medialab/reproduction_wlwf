@@ -1,10 +1,11 @@
 ### first try on dashboarding Topic Models from a LDA on French MP's tweets
 if (!require("pacman")) install.packages("pacman")
-pacman::p_load("shiny", "topicmodels", "ggplot2")
+pacman::p_load("shiny", "topicmodels", "ggplot2", "readr")
 
 library(shiny)
 library(topicmodels)
 library(ggplot2)
+library(readr)
 
 # Chargement des données
 
@@ -28,7 +29,8 @@ ui <- fluidPage(
     ),
  fluidRow(
         column(8, plotOutput("topic_ts", height = "500px",
-                             brush = "plot_brush")),
+                             brush = brushOpts("plot_brush"),
+                             )),
         column(4, imageOutput("topwords_image"))
       #,
       # fluidRow(
@@ -81,7 +83,7 @@ plot_ts  <- function(df, checked_partys, selected_topic){
 server <- function(input, output){
   df <- reactive({
     file_name <- paste0("dashboard/files/data/ts-", input$topic,".csv")
-    read_csv(file_name)
+    read_csv(file_name) 
   })
   selected_topic <- reactive(input$topic)
   checked_partys <- reactive(input$partys)
