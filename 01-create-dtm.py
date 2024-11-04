@@ -24,10 +24,11 @@ import glob
 import sys
 import numpy as np
 import casanova
+import argparse
 from unidecode import unidecode
 from tqdm import tqdm
 
-from utils import vectorizer, count_nb_files, clean_text
+from utils import vectorizer, count_nb_files, clean_text, existing_dir_path
 
 
 ####################################
@@ -36,12 +37,12 @@ from utils import vectorizer, count_nb_files, clean_text
 def preprocess(root, nb_files):
     counter_all = 0
     counter_original = 0
-    for filename in tqdm(
-        glob.iglob(root + "/**/*.csv", recursive=True), total=nb_files
-    ):
+    loop = tqdm(glob.iglob(root + "/**/*.csv", recursive=True), total=nb_files)
+    for filename in loop:
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
         rt_pos = reader.headers.retweeted_id
+        loop.set_description(filename)
 
         file_text = ""
         for row in reader:
@@ -66,9 +67,21 @@ def preprocess(root, nb_files):
 
 
 if __name__ == "__main__":
-    folder = sys.argv[1]
-    nb_files = count_nb_files(folder)
-    X = vectorizer.fit_transform(preprocess(folder, nb_files))
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "folder",
+        help="Path to a folder containing all input csv files",
+        type=existing_dir_path,
+    )
+    parser.add_argument(
+        "name",
+        help="""Name of the output files. For example, if the name is 'congress',
+        the output files will be 'congress-dtm-indices.txt', 'congress-dtm-pointers.txt', etc.""",
+    )
+    args = parser.parse_args()
+
+    nb_files = count_nb_files(args.folder)
+    X = vectorizer.fit_transform(preprocess(args.folder, nb_files))
 
     # checking words
     words = vectorizer.get_feature_names_out()
@@ -78,13 +91,15 @@ if __name__ == "__main__":
     # exporting DFM matrix
     ####################################
 
-    np.savetxt("data_prod/dfm/congress-dtm-indices.txt", X.indices, fmt="%.0f")
-    np.savetxt("data_prod/dfm/congress-dtm-pointers.txt", X.indptr, fmt="%.0f")
-    np.savetxt("data_prod/dfm/congress-dtm-values.txt", X.data, fmt="%.0f")
-    with open("data_prod/dfm/nb_files.txt", "w") as f:
+    np.savetxt(
+        "data_prod/dfm/{}-dtm-indices.txt".format(args.name), X.indices, fmt="%.0f"
+    )
+    np.savetxt("data_prod/dfm/{}-dtm-pointers.txt", X.indptr, fmt="%.0f")
+    np.savetxt("data_prod/dfm/{}-dtm-values.txt", X.data, fmt="%.0f")
+    with open("data_prod/dfm/{}-nb_files.txt", "w") as f:
         f.write(str(nb_files))
 
     ## words
-    with open("data_prod/dfm/congress-words.txt", "w") as f:
+    with open("data_prod/dfm/{}-words.txt", "w") as f:
         for item in words:
             f.write("%s\n" % item)
