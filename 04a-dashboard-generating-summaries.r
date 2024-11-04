@@ -8,7 +8,7 @@
 #           Richard Bonneau, John Jost, Joshua A. Tucker
 #  Purpose: generate data for html pages in dashboard
 #  Data In:
-#           ./data/tweets/text/* & var/lda_results-twokenizer.Rdata & 
+#           ./data/tweets/text/* & var/lda_results-twokenizer.Rdata &
 #           var/lda-ouput/*
 #===============================================================================
 
@@ -42,7 +42,7 @@ load("data_prod/topics/lda_results-twokenizer.Rdata")
 
 K <- 100
 num.words <- 15
-normalized.topics <- exp(lda.fit@beta) / rowSums(exp(lda.fit@beta)) # exp(lda.fit@beta) contient la matrice de probabilités associées 
+normalized.topics <- exp(lda.fit@beta) / rowSums(exp(lda.fit@beta)) # exp(lda.fit@beta) contient la matrice de probabilités associées
 # aux mots (en colonne) dans les thèmes (en ligne). Les valeurs brutes sont probablement des log-probabilités, puisqu'elles sont négatives.
 
 calculate.specificity <- function(mod) {
@@ -53,46 +53,46 @@ calculate.specificity <- function(mod) {
   # 2. Extraction des résultats du modèle
   terms <- posterior(mod)$terms # contient les termes de la matrice des probas
   topics <- posterior(mod)$topics
-  
+
   # 3. Définition des dimensions
   Nwords <- ncol(terms)
   Ntopics <- ncol(topics)
   Ndocs <- nrow(topics)
-  
+
   # 4. Calcul de la distribution des sujets (probabilité d'un sujet sur l'ensemble des documents)
   ptopic <- apply(topics, 2, sum) / Ndocs
-  
+
   # 5. Calcul de la probabilité des mots pondérée par la distribution des sujets
   pwords <- apply(terms, 2, function(x)
     sum(x * ptopic)
     )
-  
+
   # 6. numer : p of word in a topic * p of topic
   # Chaque élément de la matrice représente la contribution d'un mot à un sujet, pondérée par la probabilité d'apparition de ce sujet dans le corpus.
   numer <- terms * ptopic
-  
+
   # 7. denom : proba de chaque mot répétée pour chaque sujet, pour avoir une matrice de même dimension que numer
   denom  <- matrix(pwords,
                    nrow = Ntopics,
                    ncol = Nwords,
                    byrow = TRUE)
-  
+
   # 8. Spécificité = p word in each topic * p topic / overall p of words
   return(numer / denom)
 }
 
 normalized.words <- calculate.specificity(lda.fit)
 
-scores <- apply(normalized.topics, 2, function(x) 
+scores <- apply(normalized.topics, 2, function(x)
     x * ( log(x + 1e-05) - sum(log(x + 1e-05))/length(x)) )
 
 colnames(scores) <- lda.fit@terms
 
 # les 15 mots avec le score de spécificité le plus élevé par topic ?
-words <- apply(scores, 1, function(x) 
+words <- apply(scores, 1, function(x)
         colnames(scores)[order(x, decreasing = TRUE)[1:num.words]])
 
-f.scores <- apply(scores, 1, function(x) 
+f.scores <- apply(scores, 1, function(x)
         x[order(x, decreasing = TRUE)[1:num.words]])
 
 n.topics <- rep(seq(1, K, 1), each=num.words)
@@ -120,14 +120,14 @@ for (k in 1:K){
 
 	df <- info.df[info.df$topic==paste0('Topic ', k),]
 
-	p <- ggplot(data=df, 
+	p <- ggplot(data=df,
 		aes(y=order, x=specificity, label=word))
-	pq <- p + geom_text(aes(size=score), hjust=1) + 
-    	scale_size_continuous(range=c(3,5)) + 
+	pq <- p + geom_text(aes(size=score), hjust=1) +
+    	scale_size_continuous(range=c(3,5)) +
     	scale_y_discrete("Top 10 scoring words for each topic",
         	expand=c(0.03, 0.1)) +
     	scale_x_continuous("Specificity of word to each topic",
-        	limit=c(min(df$specificity)-.75, 1)) + 
+        	limit=c(min(df$specificity)-.75, 1)) +
     	theme_bw() +
     	theme(axis.line = element_blank(),
     	panel.grid.major = element_blank(),
@@ -155,18 +155,18 @@ for (k in 1:K){
 # getting list of dates
 fls <- scan("data_prod/dfm/partis-dates-list.txt", what = "character", sep = "\n") # liste des partis-dates préalablement extraites des noms de fichier
 
-dates <- fls |> 
+dates <- fls |>
   str_extract("\\d{4}-\\d{2}-\\d{2}")
-  
-party <- fls |> 
+
+party <- fls |>
   str_extract("[^/]*")  # tout ce qui précède "/"
-  
+
 
 # verif
 party |> unique()
 
 # chamber <- gsub('.*_(.*)','\\1',fls)
-# 
+#
 # ## computing differences across parties
 time.series <- t(lda.fit@gamma)
 
@@ -184,8 +184,8 @@ df <- data.frame(#chamber = rep(chamber, each=100),
 
 # visu
 
-df |> 
-  filter(topic == 1) |> 
+df |>
+  filter(topic == 1) |>
   ggplot() +
   aes(x = date, y = prop, color = party) +
   geom_line() +
@@ -200,17 +200,17 @@ df |>
         ) +
   ggtitle("Topic 1")
 
-# 
+#
 # load("topics/lda-output/lda-media-results.Rdata")
 # dd <- seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "day")
-# 
+#
 # media <- data.frame(
-#   topic = rep(1:100, 
+#   topic = rep(1:100,
 #               length(dd)),
 #   date = rep(dd, 100),
 #   prop = c(results$topics),
 #   stringsAsFactors=F)
-# 
+#
 # ## public
 # users <- scan("data/dfm/users-list.txt", what='character')
 # load("topics/lda-output/lda-public-results.Rdata")
@@ -219,7 +219,7 @@ df |>
 #   date = rep(as.Date(dd), K),
 #   topic = rep(1:K, each=nrow(results$topics)),
 #   prop = c(results$topics), stringsAsFactors=F)
-# 
+#
 # # public (democrats)
 # dd <- substr(users[grep('_democr', users)], 1, 10)
 # load("topics/lda-output/lda-dems-results.Rdata")
@@ -227,7 +227,7 @@ df |>
 #   date = rep(as.Date(dd), K),
 #   topic = rep(1:K, each=nrow(results$topics)),
 #   prop = c(results$topics), stringsAsFactors=F)
-# 
+#
 # # public (republicans)
 # dd <- substr(users[grep('_repub', users)], 1, 10)
 # load("topics/lda-output/lda-reps-results.Rdata")
@@ -235,7 +235,7 @@ df |>
 #   date = rep(as.Date(dd), K),
 #   topic = rep(1:K, each=nrow(results$topics)),
 #   prop = c(results$topics), stringsAsFactors=F)
-# 
+#
 # # random users
 # dd <- seq(as.Date("2013-01-01"), as.Date("2014-12-31"), by="day")
 # load("topics/lda-output/lda-USrs-results.Rdata")
@@ -243,12 +243,12 @@ df |>
 #   date = rep(as.Date(dd), K),
 #   topic = rep(1:K, each=nrow(results$topics)),
 #   prop = c(results$topics), stringsAsFactors=F)
-# 
+#
 # ## random users
 
 # créé le répertoire data si besoin
-if (!dir.exists("dashboard/files/data")) {
-  dir.create("dashboard/files/data",
+if (!dir.exists("data_prod/dashboard/files/data")) {
+  dir.create("data_prod/dashboard/files/data",
              recursive = TRUE)
 }
 
@@ -259,12 +259,12 @@ for (k in 1:K){
     filter(topic == k) |>
     group_by(date, party) |>
     summarise(prop = mean(prop)) |>
-    mutate(prop = round(prop, 3)) |> 
+    mutate(prop = round(prop, 3)) |>
     ungroup() # |>
     # pivot_wider(names_from = party,
     #             names_prefix = "prop_",
     #             values_from = x)
-  
+
 
 	# sbs <- df[df$topic==k,]
 	# sbs <- aggregate(sbs$prop, by=list(date=sbs$date, party=sbs$party), FUN=mean)
@@ -272,7 +272,7 @@ for (k in 1:K){
   # mm <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
   #   media[media$topic==k, c("date", "prop")], all.x=TRUE)
   # mm$prop[is.na(mm$prop)] <- 0
-  # 
+  #
   # # public
   # pp <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
   #   pub[pub$topic==k, c("date", "prop")], all.x=TRUE)
@@ -283,13 +283,13 @@ for (k in 1:K){
   # rr <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
   #   rep[rep$topic==k, c("date", "prop")], all.x=TRUE)
   # rr$prop[is.na(rr$prop)] <- 0
-  # 
+  #
   # ## random users
   # rnn <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
   #   rnd[rnd$topic==k, c("date", "prop")], all.x=TRUE)
   # rnn$prop[is.na(rnn$prop)] <- 0
 
-  
+
 #   sbs <- data.frame(
 # 		date = unique(sbs$date),
 # 		Democrats = round(sbs$x[sbs$party=="dem"], 3),
@@ -300,15 +300,15 @@ for (k in 1:K){
 #     Republican_Supporters = round(rr$prop, 3),
 #     Random_Users= round(rnn$prop, 3))
 
-	write.csv(sbs, file=paste0("dashboard/files/data/ts-", k, '.csv'),
+	write.csv(sbs, file=paste0("data_prod/dashboard/files/data/ts-", k, '.csv'),
 		row.names=FALSE, quote=FALSE)
 }
 
-# 
+#
 # ###############################################################################
 # ### C) Computing quantities of interest
 # ###############################################################################
-# 
+#
 qois <- data.frame(
   topic = 1:K,
   prop = NA,
@@ -342,32 +342,32 @@ df <- data.frame(#chamber = rep(chamber, each=100),
 
 # same as below in tidyverse
 
-qois <- df |> 
-  group_by(topic, party) |> 
+qois <- df |>
+  group_by(topic, party) |>
   summarise(x = mean(prop)
-            ) |> 
-  ungroup() |> 
+            ) |>
+  ungroup() |>
   pivot_wider(names_from = party,
               names_prefix = "prop_",
-              values_from = x) |> 
+              values_from = x) |>
   right_join(qois,
              by = "topic")
 
 
 # agg <- aggregate(df$prop, by=list(topic=df$topic, party=df$party#, chamber=df$chamber
 #                                   ), FUN=mean)
-# 
+#
 # qois$prop_sen_dems <- agg$x[agg$party=="dem" & agg$chamber=="senate"]*100
 # qois$prop_sen_reps <- agg$x[agg$party=="rep" & agg$chamber=="senate"]*100
 # qois$prop_house_dems <- agg$x[agg$party=="dem" & agg$chamber=="house"]*100
 # qois$prop_house_reps <- agg$x[agg$party=="rep" & agg$chamber=="house"]*100
-# 
+#
 
 ###### to be done
 
 # load("topics/lda-output/lda-media-results.Rdata")
 # qois$media <- sapply(1:K, function(x) mean(results$topics[,x]))*100
-# 
+#
 # # public
 # load("topics/lda-output/lda-public-results.Rdata")
 # qois$public <- sapply(1:K, function(x) mean(results$topics[,x]))*100
@@ -377,14 +377,14 @@ qois <- df |>
 # qois$republicans <- sapply(1:K, function(x) mean(results$topics[,x]))*100
 # load("topics/lda-output/lda-USrs-results.Rdata")
 # qois$random <- sapply(1:K, function(x) mean(results$topics[,x]))*100
-# 
+#
 # # saving to disk
-save(qois, file="dashboard/qois.rdata")
-# 
+save(qois, file="data_prod/dashboard/qois.rdata")
+#
 # ###############################################################################
 # ### D) Representative tweets
 # ###############################################################################
-# 
+#
 library(slam)
 library(Matrix)
 library(tm)
@@ -394,38 +394,38 @@ library(tm)
 # values <- scan("data_prod/dfm/rs-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 # tweets <- read.csv("data_prod/dfm/tweets-random-sample.csv", stringsAsFactors=F, colClasses="character")
-# 
+#
 # X <- sparseMatrix(j=ind, p=pointers, x=values,
 #   dims=c(nrow(tweets), length(words)), index1=FALSE)
 # dimnames(X)[[2]] <- words
-# 
+#
 # # deleting empty rows
 # todelete <- which(rowSums(X)==0)
 # X <- X[-todelete,]
 # tweets <- tweets[-todelete,]
-# 
+#
 # load('topics/lda-output/lda-rs-results.Rdata')
-# 
+#
 # # deleting duplicated tweets
 # duplicated <- which(duplicated(tweets$text))
 # tweets <- tweets[-duplicated,]
 # results$topics <- results$topics[-duplicated,]
-# 
+#
 # # deleting weird tweets
 # todelete <- grep('xss', tweets$text)
 # tweets <- tweets[-todelete,]
 # results$topics <- results$topics[-todelete,]
-# 
+#
 # K <- 100
 # rs <- list()
-# 
+#
 # for (k in 1:K){
 #   choices <- tail(order(results$topics[,k]),n=6)
 #   rs[[k]] <- tweets[choices,]
 #   rs[[k]]$topic <- k
 # }
 # rs <- do.call(rbind, rs)
-# 
+#
 # # function to display embedded tweet
 # tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
 #     txt <- paste0('<blockquote class="twitter-tweet" data-cards="hidden" data-conversation="none" width="450"><p>',
@@ -439,60 +439,60 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 #     }
 #     return(txt)
 # }
-# 
+#
 # # preparing embed
 # rs$embed <- NA
 # for (i in 1:nrow(rs)){
-# 
+#
 #   rs$embed[i] <- tw.embed(rs$text[i], rs$screen_name[i], rs$screen_name[i], rs$id_str[i],
 #     "", "")
-# 
+#
 # }
-# 
-# save(rs, file="dashboard/rs-tweets.rdata")
-# 
-# 
+#
+# save(rs, file="data_prod/dashboard/rs-tweets.rdata")
+#
+#
 # ###############################################################################
 # ### D) Representative media tweets
 # ###############################################################################
-# 
+#
 # ind <- scan("data/dfm/media-rs-dtm-indices.txt")
 # pointers <- scan("data/dfm/media-rs-dtm-pointers.txt")
 # values <- scan("data/dfm/media-rs-dtm-values.txt")
 # words <- scan("data/dfm/congress-words.txt", what="character", sep="\n")
 # tweets <- read.csv("data/dfm/media-tweets-random-sample.csv", stringsAsFactors=F, colClasses="character")
-# 
+#
 # X <- sparseMatrix(j=ind, p=pointers, x=values,
 #   dims=c(nrow(tweets), length(words)), index1=FALSE)
 # dimnames(X)[[2]] <- words
-# 
+#
 # # deleting empty rows
 # todelete <- which(rowSums(X)==0)
 # X <- X[-todelete,]
 # tweets <- tweets[-todelete,]
-# 
+#
 # load('topics/lda-output/lda-media-rs-results.Rdata')
-# 
+#
 # # deleting duplicated tweets
 # duplicated <- which(duplicated(tweets$text))
 # tweets <- tweets[-duplicated,]
 # results$topics <- results$topics[-duplicated,]
-# 
+#
 # # deleting weird tweets
 # todelete <- grep('xss', tweets$text)
 # tweets <- tweets[-todelete,]
 # results$topics <- results$topics[-todelete,]
-# 
+#
 # K <- 100
 # rs <- list()
-# 
+#
 # for (k in 1:K){
 #   choices <- tail(order(results$topics[,k]),n=6)
 #   rs[[k]] <- tweets[choices,]
 #   rs[[k]]$topic <- k
 # }
 # rs <- do.call(rbind, rs)
-# 
+#
 # # function to display embedded tweet
 # tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
 #     txt <- paste0('<blockquote class="twitter-tweet" data-cards="hidden" data-conversation="none" width="450"><p>',
@@ -506,46 +506,46 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 #     }
 #     return(txt)
 # }
-# 
+#
 # # preparing embed
 # rs$embed <- NA
 # for (i in 1:nrow(rs)){
-# 
+#
 #   rs$embed[i] <- tw.embed(rs$text[i], rs$screen_name[i], rs$screen_name[i], rs$id_str[i],
 #     "", "")
-# 
+#
 # }
-# 
+#
 # media_rs <- rs
 # save(media_rs, file="dashboard/media-rs-tweets.rdata")
-# 
+#
 # ###############################################################################
 # ### F) MCs using each topic the most
 # ###############################################################################
-# 
+#
 # load('topics/lda-output/lda-mcs-results.Rdata')
 # mcs <- scan("data/dfm/mcs-list.txt", what='character')
-# 
+#
 # K <- 100
 # topmcs <- list()
-# 
+#
 # for (k in 1:K){
 #   choices <- tail(order(results$topics[,k]),n=5)
 #   topmcs[[k]] <- data.frame(screenName = mcs[choices], stringsAsFactors=F)
 #   topmcs[[k]]$topic <- k
 # }
-# 
+#
 # topmcs <- do.call(rbind, topmcs)
 # topmcs$order <- 1:nrow(topmcs)
 # mcs <- read.csv("data/congress_data.csv", stringsAsFactors=F)
-# 
+#
 # topmcs <- merge(topmcs,
 #   mcs[,c("screenName", "party", "state")], all.x=TRUE, sort=FALSE)
-# 
+#
 # topmcs <- topmcs[order(topmcs$order),]
 # topmcs$text <- paste0(
 #   ' <a href="http://www.twitter.com/', topmcs$screenName, '">@', topmcs$screenName, ' (',
 #     topmcs$party, '-', topmcs$state, ')</a>')
-# 
+#
 # save(topmcs, file="dashboard/top-mcs.rdata")
-# 
+#

@@ -13,15 +13,15 @@ library(tidyverse)
 # Chargement des données
 
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
-# load("dashboard/qois.rdata")  # topic_scores
+# load("data_prod/dashboard/qois.rdata")  # topic_scores
 
-# qois_long <- qois |> 
-#   select(topic, starts_with("prop_")) |>  
-#   pivot_longer(cols = starts_with("prop"), 
-#                names_to = "party", 
-#                names_prefix = "prop_", 
+# qois_long <- qois |>
+#   select(topic, starts_with("prop_")) |>
+#   pivot_longer(cols = starts_with("prop"),
+#                names_to = "party",
+#                names_prefix = "prop_",
 #                values_to = "prop")
-  
+
 # UI
 ui <- fluidPage(
   titlePanel("Annotation de Topics LDA"),
@@ -42,8 +42,8 @@ ui <- fluidPage(
       # )
     ),
  fluidRow(
-    checkboxGroupInput("partys", "Afficher :", 
-                       choices = c("majority", "lr", "rn", "nupes"), #qois_long |> distinct(parti) |> pull(), 
+    checkboxGroupInput("partys", "Afficher :",
+                       choices = c("majority", "lr", "rn", "nupes"), #qois_long |> distinct(parti) |> pull(),
                        selected = c("majority", "lr", "rn", "nupes"), #qois_long |> distinct(parti) |> pull()
                        inline = TRUE
     )
@@ -62,7 +62,7 @@ plot_ts  <- function(df, checked_partys, selected_topic){
     ggplot() +
     aes(x = date, y = prop, color = party, group = party) +
     geom_line() +
-    scale_x_date(#date_breaks = "month", 
+    scale_x_date(#date_breaks = "month",
                  breaks = c(seq(ymd("2022-06-20"), ymd("2023-03-14"), by = "1 month"), ymd("2022-06-20"), ymd("2023-03-14")),
                  date_minor_breaks = "2 weeks",
                  date_labels = "%y-%b-%d",
@@ -85,7 +85,7 @@ plot_ts  <- function(df, checked_partys, selected_topic){
 # Server
 server <- function(input, output){
   df <- reactive({
-    file_name <- paste0("dashboard/files/data/ts-", input$topic,".csv")
+    file_name <- paste0("data_prod/dashboard/files/data/ts-", input$topic,".csv")
     read_csv(file_name)
   })
   selected_topic <- reactive(input$topic)
@@ -95,7 +95,7 @@ server <- function(input, output){
     plot_ts(df(), checked_partys(), selected_topic())
     }, res = 96
               )
- 
+
  output$brushed_data <- renderTable(
    {
      brushedPoints(df(), input$plot_brush)
@@ -113,7 +113,7 @@ server <- function(input, output){
 
   # Image des mots spécifiques du topic
   output$topwords_image <- renderImage({
-    list(src = file.path("dashboard/files/img", paste0("words-plot-", input$topic, ".png")),
+    list(src = file.path("data_prod/dashboard/files/img", paste0("words-plot-", input$topic, ".png")),
          contentType = 'image/png',
          alt = "Mots spécifiques",
          width = "100%",
