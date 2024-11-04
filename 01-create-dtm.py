@@ -94,12 +94,14 @@ if __name__ == "__main__":
     np.savetxt(
         "data_prod/dfm/{}-dtm-indices.txt".format(args.name), X.indices, fmt="%.0f"
     )
-    np.savetxt("data_prod/dfm/{}-dtm-pointers.txt", X.indptr, fmt="%.0f")
-    np.savetxt("data_prod/dfm/{}-dtm-values.txt", X.data, fmt="%.0f")
-    with open("data_prod/dfm/{}-nb_files.txt", "w") as f:
+    np.savetxt(
+        "data_prod/dfm/{}-dtm-pointers.txt".format(args.name), X.indptr, fmt="%.0f"
+    )
+    np.savetxt("data_prod/dfm/{}-dtm-values.txt".format(args.name), X.data, fmt="%.0f")
+    with open("data_prod/dfm/{}-nb_files.txt".format(args.name), "w") as f:
         f.write(str(nb_files))
 
     ## words
-    with open("data_prod/dfm/{}-words.txt", "w") as f:
+    with open("data_prod/dfm/{}-words.txt".format(args.name), "w") as f:
         for item in words:
             f.write("%s\n" % item)
