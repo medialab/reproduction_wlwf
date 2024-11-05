@@ -21,8 +21,6 @@ from utils import (
     RANDOM_SEED,
 )
 
-random.seed(a=RANDOM_SEED)
-
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "input_path",
@@ -44,12 +42,15 @@ parser.add_argument(
     type=int,
     default=DEFAULT_SAVE_SIZE,
 )
-parser.add_argument("--sample", action="store_true")
+parser.add_argument(
+    "--small",
+    help=("run the script on one week of data"),
+    action="store_true",
+)
 args = parser.parse_args()
 embeddings_path = os.path.join(
     args.embeddings_folder, "tweets_sentence-camembert-large.npz"
 )
-
 
 hdbscan_model = HDBSCAN(
     min_cluster_size=3,
@@ -133,23 +134,23 @@ max_index, embeddings = load_embeddings(
     docs.shape[0],
 )
 
-if args.sample:
+print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
+
+if args.small:
+    random.seed(a=RANDOM_SEED)
     indices = random.choices(range(len(docs)), k=1000)
     docs = docs[indices]
     embeddings = embeddings[indices]
 
     topic_model.fit(docs, embeddings)
     topic_model.save(
-        os.path.join(args.output_folder, "sample"),
+        os.path.join(args.output_folder, "small"),
         serialization="safetensors",
         save_ctfidf=True,
         save_embedding_model=SBERT_NAME,
     )
 
 else:
-    print(
-        "Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__)
-    )
     topic_model.fit(docs, embeddings)
 
     # Save model
