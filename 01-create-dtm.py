@@ -31,9 +31,6 @@ from tqdm import tqdm
 from utils import vectorizer, count_nb_files, clean_text, existing_dir_path
 
 
-####################################
-# creating matrix for French MPs (députés)
-####################################
 def preprocess(root, nb_files):
     counter_all = 0
     counter_original = 0
@@ -78,9 +75,21 @@ if __name__ == "__main__":
         help="""Name of the output files. For example, if the name is 'congress',
         the output files will be 'congress-dtm-indices.txt', 'congress-dtm-pointers.txt', etc.""",
     )
+    parser.add_argument(
+        "--vocab",
+        help="""file in .txt with one token per line.
+        By default, the vocabulary will be infered from the csv files.
+        """,
+        required=False,
+        type=argparse.FileType("r"),
+    )
     args = parser.parse_args()
 
     nb_files = count_nb_files(args.folder)
+
+    if args.vocab:
+        vectorizer.vocabulary = [term.strip() for term in args.vocab]
+
     X = vectorizer.fit_transform(preprocess(args.folder, nb_files))
 
     # checking words
