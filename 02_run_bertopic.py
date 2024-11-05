@@ -68,11 +68,14 @@ umap_model = UMAP(
     random_state=RANDOM_SEED,
 )
 
+if args.small:
+    vectorizer.min_df = 3
+
 topic_model = BERTopic(
     vectorizer_model=vectorizer,
     hdbscan_model=hdbscan_model,
     umap_model=umap_model,
-    nr_topics=100,
+    nr_topics=10 if args.small else 100,
     # Hyperparameters
     top_n_words=10,
     verbose=True,
