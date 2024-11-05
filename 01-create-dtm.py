@@ -21,7 +21,6 @@ we use in the analysis.
 """
 
 import glob
-import sys
 import numpy as np
 import casanova
 import argparse
