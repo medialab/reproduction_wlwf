@@ -12,9 +12,14 @@
 #           var/lda-ouput/*
 #===============================================================================
 
+if (!dir.exists(Sys.getenv("R_LIBS_USER"))) {
+dir.create(path = Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
+}
+
+# install to local user library path
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
-    install.packages(pkg)
+    install.packages(pkg, lib = Sys.getenv("R_LIBS_USER"), repos = "https://cran.rstudio.com/")
   }
 }
 
