@@ -24,6 +24,7 @@ install_if_missing <- function(pkg) {
 }
 
 packages <- c(
+  "argparse",
   "cvTools",
   "ggdendro",
   "ggplot2",
