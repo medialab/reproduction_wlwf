@@ -20,12 +20,10 @@ we use in the analysis.
 
 """
 
-import glob
 import numpy as np
 import casanova
 import argparse
 from unidecode import unidecode
-from tqdm import tqdm
 
 from utils import (
     vectorizer,
