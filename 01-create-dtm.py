@@ -43,7 +43,7 @@ def preprocess(root, nb_files, write_party):
     if write_party:
         group_names_file = open("data_prod/dfm/supporter-users-list.txt", "w")
 
-    tar, compressed, loop = iter_on_files(root, nb_files)
+    tar, loop, compressed = iter_on_files(root, nb_files)
 
     for file in loop:
         if compressed:
