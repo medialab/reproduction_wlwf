@@ -105,7 +105,6 @@ if (!dir.exists("data_prod/topics/lda-output")) {
              recursive = TRUE)
 }
 
-results <- 1:100
 # saving output
 save(results, file='data_prod/topics/lda-output/lda-media-results.Rdata')
 
