@@ -99,6 +99,11 @@ dtm <- dtm[cs>0,]
 results <- posterior(lda.fit, dtm,
     control=list(verbose=10L, iter=1000))
 
+# create repertory if necessary
+if (!dir.exists("data_prod/topics/lda_output")) {
+  dir.create("data_prod/topics/lda_output",
+             recursive = TRUE)
+}
 # saving output
 save(results, file='data_prod/topics/lda-output/lda-media-results.Rdata')
 
