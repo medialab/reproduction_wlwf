@@ -100,10 +100,12 @@ results <- posterior(lda.fit, dtm,
     control=list(verbose=10L, iter=1000))
 
 # create repertory if necessary
-if (!dir.exists("data_prod/topics/lda_output")) {
-  dir.create("data_prod/topics/lda_output",
+if (!dir.exists("data_prod/topics/lda-output")) {
+  dir.create("data_prod/topics/lda-output",
              recursive = TRUE)
 }
+
+results <- 1:100
 # saving output
 save(results, file='data_prod/topics/lda-output/lda-media-results.Rdata')
 
