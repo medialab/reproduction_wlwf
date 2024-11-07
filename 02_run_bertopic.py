@@ -56,7 +56,7 @@ hdbscan_model = HDBSCAN(
     min_cluster_size=3,
     metric="euclidean",
     cluster_selection_method="eom",
-    prediction_data=False,
+    prediction_data=True,
 )
 
 umap_model = UMAP(
@@ -79,6 +79,7 @@ topic_model = BERTopic(
     # Hyperparameters
     top_n_words=10,
     verbose=True,
+    calculate_probabilities=True,
 )
 
 

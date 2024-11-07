@@ -27,14 +27,35 @@ import argparse
 from unidecode import unidecode
 from tqdm import tqdm
 
-from utils import vectorizer, count_nb_files, clean_text, existing_dir_path
+from utils import (
+    vectorizer,
+    count_nb_files,
+    clean_text,
+    existing_dir_path,
+    iter_on_files,
+    grep_group_name,
+)
 
 
-def preprocess(root, nb_files):
+def preprocess(root, nb_files, write_party):
     counter_all = 0
     counter_original = 0
-    loop = tqdm(glob.iglob(root + "/**/*.csv", recursive=True), total=nb_files)
-    for filename in loop:
+    if write_party:
+        group_names_file = open("data_prod/dfm/supporter-users-list.txt", "w")
+
+    tar, compressed, loop = iter_on_files(root, nb_files)
+
+    for file in loop:
+        if compressed:
+            filename = file.name
+        else:
+            filename = file
+
+        loop.set_description(filename)
+
+        if write_party:
+            group_names_file.write("%s\n" % grep_group_name(filename))
+
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
         rt_pos = reader.headers.retweeted_id
@@ -55,6 +76,8 @@ def preprocess(root, nb_files):
 
         # yield the text of all tweets of the day, remove last character - which is a space
         yield file_text[:-1]
+    if write_party:
+        group_names_file.close()
     print(
         "nb of tweets: {}, nb of original tweets: {}".format(
             counter_all, counter_original
@@ -82,6 +105,11 @@ if __name__ == "__main__":
         required=False,
         type=argparse.FileType("r"),
     )
+    parser.add_argument(
+        "--party",
+        help="Write the party of each csv file inferred from csv file path",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     nb_files = count_nb_files(args.folder)
@@ -89,7 +117,7 @@ if __name__ == "__main__":
     if args.vocab:
         vectorizer.vocabulary = [term.strip() for term in args.vocab]
 
-    X = vectorizer.fit_transform(preprocess(args.folder, nb_files))
+    X = vectorizer.fit_transform(preprocess(args.folder, nb_files, args.party))
 
     # checking words
     words = vectorizer.get_feature_names_out()
