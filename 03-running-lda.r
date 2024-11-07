@@ -214,88 +214,88 @@ save(results, file='data_prod/topics/lda-output/lda-media-results.Rdata')
 # #### SUPPORTER PUBLICS     ####
 # #################################
 #
-load("data_prod/topics/lda_results-twokenizer.Rdata")
-
-## preparing  matrix
-
-nb_fls <- as.numeric(scan("data_prod/dfm/supporter-nb_files.txt"))
-
-ind <- scan("data_prod/dfm/supporter-dtm-indices.txt")
-pointers <- scan("data_prod/dfm/supporter-dtm-pointers.txt")
-values <- scan("data_prod/dfm/supporter-dtm-values.txt")
-words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
-#users <- scan("data_prod/dfm/supporter-list.txt", what='character')
-
-X <- sparseMatrix(j=ind, p=pointers, x=values,
-	dims=c(nb_fls, 
-	       length(words)), index1=FALSE)
-
-dimnames(X)[[2]] <- words
-
-mat <- as.simple_triplet_matrix(X)
-dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
-
-# sanity check
-rs <- col_sums(dtm)
-tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
-tmp <- tmp[order(tmp$rs),]
-tail(tmp,n=100)
-
-# #################
-# ## LR
-# #################
-#
-lr <- grep('lr', users)
-dtm2 <- dtm[lr,]
-
-## getting posterior estimates
-results <- posterior(lda.fit, dtm2,
-    control=list(verbose=1L, iter=500))
-
-# saving output
-save(results, file='data_prod/topics/lda-output/lda-lr-results.Rdata')
-
-# #################
-# ## MAJORITY
-# #################
-#
-majority <- grep('majority', users)
-dtm2 <- dtm[majority,]
-
-## getting posterior estimates
-results <- posterior(lda.fit, dtm2,
-                     control=list(verbose=1L, iter=500))
-
-# saving output
-save(results, file='data_prod/topics/lda-output/lda-majority-results.Rdata')
-
-# #################
-# ## NUPES
-# #################
-#
-nupes <- grep('nupes', users)
-dtm2 <- dtm[nupes,]
-
-## getting posterior estimates
-results <- posterior(lda.fit, dtm2,
-                     control=list(verbose=1L, iter=500))
-
-# saving output
-save(results, file='data_prod/topics/lda-output/lda-nupes-results.Rdata')
-
-# #################
-# ## RN
-# #################
-#
-rn <- grep('rn', users)
-dtm2 <- dtm[rn,]
-
-## getting posterior estimates
-results <- posterior(lda.fit, dtm2,
-                     control=list(verbose=1L, iter=500))
-
-# saving output
-save(results, file='data_prod/topics/lda-output/lda-rn-results.Rdata')
+# load("data_prod/topics/lda_results-twokenizer.Rdata")
+# 
+# ## preparing  matrix
+# 
+# nb_fls <- as.numeric(scan("data_prod/dfm/supporter-nb_files.txt"))
+# 
+# ind <- scan("data_prod/dfm/supporter-dtm-indices.txt")
+# pointers <- scan("data_prod/dfm/supporter-dtm-pointers.txt")
+# values <- scan("data_prod/dfm/supporter-dtm-values.txt")
+# words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
+# #users <- scan("data_prod/dfm/supporter-list.txt", what='character')
+# 
+# X <- sparseMatrix(j=ind, p=pointers, x=values,
+# 	dims=c(nb_fls, 
+# 	       length(words)), index1=FALSE)
+# 
+# dimnames(X)[[2]] <- words
+# 
+# mat <- as.simple_triplet_matrix(X)
+# dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
+# 
+# # sanity check
+# rs <- col_sums(dtm)
+# tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
+# tmp <- tmp[order(tmp$rs),]
+# tail(tmp,n=100)
+# 
+# # #################
+# # ## LR
+# # #################
+# #
+# lr <- grep('lr', users)
+# dtm2 <- dtm[lr,]
+# 
+# ## getting posterior estimates
+# results <- posterior(lda.fit, dtm2,
+#     control=list(verbose=1L, iter=500))
+# 
+# # saving output
+# save(results, file='data_prod/topics/lda-output/lda-lr-results.Rdata')
+# 
+# # #################
+# # ## MAJORITY
+# # #################
+# #
+# majority <- grep('majority', users)
+# dtm2 <- dtm[majority,]
+# 
+# ## getting posterior estimates
+# results <- posterior(lda.fit, dtm2,
+#                      control=list(verbose=1L, iter=500))
+# 
+# # saving output
+# save(results, file='data_prod/topics/lda-output/lda-majority-results.Rdata')
+# 
+# # #################
+# # ## NUPES
+# # #################
+# #
+# nupes <- grep('nupes', users)
+# dtm2 <- dtm[nupes,]
+# 
+# ## getting posterior estimates
+# results <- posterior(lda.fit, dtm2,
+#                      control=list(verbose=1L, iter=500))
+# 
+# # saving output
+# save(results, file='data_prod/topics/lda-output/lda-nupes-results.Rdata')
+# 
+# # #################
+# # ## RN
+# # #################
+# #
+# rn <- grep('rn', users)
+# dtm2 <- dtm[rn,]
+# 
+# ## getting posterior estimates
+# results <- posterior(lda.fit, dtm2,
+#                      control=list(verbose=1L, iter=500))
+# 
+# # saving output
+# save(results, file='data_prod/topics/lda-output/lda-rn-results.Rdata')
 
 # #################################
 # #### GENERAL PUBLIC            ####
