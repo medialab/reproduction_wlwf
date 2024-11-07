@@ -65,39 +65,39 @@ library(topicmodels)
 # #### MEDIA ARTICLES ####
 # ########################
 #
-# load("data_prod/topics/lda_results-twokenizer.Rdata")
-# #
-# # ## preparing  matrix
-# nb_fls <- as.numeric(scan("data_prod/dfm/media-nb_files.txt"))
-# ind <- scan("data_prod/dfm/media-dtm-indices.txt")
-# pointers <- scan("data_prod/dfm/media-dtm-pointers.txt")
-# values <- scan("data_prod/dfm/media-dtm-values.txt")
-# words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
-# 
-# X <- sparseMatrix(j=ind,
-#                   p=pointers,
-#                   x=values,
-# 	dims=c(nb_fls,
-# 	  length(words)), index1=FALSE)
-# 
-# dimnames(X)[[2]] <- words
-# #
-# mat <- as.simple_triplet_matrix(X)
-# dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
-# 
-# # # sanity check
-# rs <- col_sums(dtm)
-# tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
-# tmp <- tmp[order(tmp$rs),]
-# tail(tmp,n=100)
-# 
-# # removing empty rows
-# cs <- row_sums(dtm)
-# dtm <- dtm[cs>0,]
-# 
-# ## getting posterior estimates
-# results <- posterior(lda.fit, dtm,
-#     control=list(verbose=10L, iter=1000))
+load("data_prod/topics/lda_results-twokenizer.Rdata")
+#
+# ## preparing  matrix
+nb_fls <- as.numeric(scan("data_prod/dfm/media-nb_files.txt"))
+ind <- scan("data_prod/dfm/media-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/media-dtm-pointers.txt")
+values <- scan("data_prod/dfm/media-dtm-values.txt")
+words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
+
+X <- sparseMatrix(j=ind,
+                  p=pointers,
+                  x=values,
+	dims=c(nb_fls,
+	  length(words)), index1=FALSE)
+
+dimnames(X)[[2]] <- words
+#
+mat <- as.simple_triplet_matrix(X)
+dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
+
+# # sanity check
+rs <- col_sums(dtm)
+tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
+tmp <- tmp[order(tmp$rs),]
+tail(tmp,n=100)
+
+# removing empty rows
+cs <- row_sums(dtm)
+dtm <- dtm[cs>0,]
+
+## getting posterior estimates
+results <- posterior(lda.fit, dtm,
+    control=list(verbose=10L, iter=1000))
 
 # create repertory if necessary
 if (!dir.exists("data_prod/topics/lda_output")) {
