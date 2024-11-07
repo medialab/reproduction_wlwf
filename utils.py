@@ -467,11 +467,20 @@ def count_nb_files(folder):
     return count
 
 
-def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
-    counter_all = 0
-    counter_original = 0
-    counter_threads = 0
+def grep_group_name(filename):
+    # We search for 'LREM' before searching for 'LR'
+    for group in ["majority", "lrem", "lr", "rn", "nupes"]:
+        if group in filename.lower():
+            group_name = group
+            if group_name == "lrem":
+                group_name = "majority"
+            return group_name
+    return ""
+
+
+def iter_on_files(root, nb_files):
     compressed = False
+    tar = None
 
     _, file_extension = os.path.splitext(root)
     if file_extension:
@@ -495,6 +504,15 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
             total=nb_files,
             desc="Read csv files",
         )
+    return tar, loop, compressed
+
+
+def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=False):
+    counter_all = 0
+    counter_original = 0
+    counter_threads = 0
+
+    tar, compressed, loop = iter_on_files(root, nb_files)
 
     for file in loop:
         if compressed:
@@ -504,12 +522,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False):
 
         loop.set_description(filename)
 
-        group_name = ""
-        # We search for 'LREM' before searching for 'LR'
-        for group in ["LREM", "LR", "RN", "NUPES"]:
-            if group in filename:
-                group_name = group
-                break
+        group_name = grep_group_name(filename)
 
         thread_ids = dict()
         threads = dict()
