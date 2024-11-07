@@ -11,8 +11,15 @@ from transformers import CamembertTokenizer
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 
-SBERT_NAME = "dangvantuan/sentence-camembert-large"
-EMB_DIMENSION = 1024
+GROUPS = [
+    "majority",
+    "lr",
+    "rn",
+    "nupes",
+]  # MPs tweets should be stored in {input_folder}/{group}/YYYYMMDD.csv, e.g. data_source/lr/20221224.csv
+SBERT_NAME = "dangvantuan/sentence-camembert-large"  # Sentence-BERT for French tweets
+EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
+AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
@@ -469,7 +476,7 @@ def count_nb_files(folder):
 
 def grep_group_name(filename):
     # We search for 'LREM' before searching for 'LR'
-    for group in ["majority", "lrem", "lr", "rn", "nupes"]:
+    for group in GROUPS:
         if group in filename.lower():
             group_name = group
             if group_name == "lrem":
