@@ -26,10 +26,10 @@ library(topicmodels)
 if (!file.exists("data_prod/topics/lda_results-twokenizer.Rdata")) {
 cat("run topic model on aggregated tweets / day by Deputies from the National Assembly")
 # preparing Congress matrix
-nb_fls <- as.numeric(scan("data_prod/dfm/congress-nb_files.txt"))
-ind <- scan("data_prod/dfm/congress-dtm-indices.txt")
-pointers <- scan("data_prod/dfm/congress-dtm-pointers.txt")
-values <- scan("data_prod/dfm/congress-dtm-values.txt")
+nb_fls <- as.numeric(scan("data_prod/dfm/congress-nb-files.txt"))
+ind <- scan("data_prod/dfm/congress-day-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/congress-day-dtm-pointers.txt")
+values <- scan("data_prod/dfm/congress-day-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
@@ -69,10 +69,10 @@ cat("apply initial topic model on aggregated tweets / day from IPG Medias")
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 #
 # ## preparing  matrix
-nb_fls <- as.numeric(scan("data_prod/dfm/media-nb_files.txt"))
-ind <- scan("data_prod/dfm/media-dtm-indices.txt")
-pointers <- scan("data_prod/dfm/media-dtm-pointers.txt")
-values <- scan("data_prod/dfm/media-dtm-values.txt")
+nb_fls <- as.numeric(scan("data_prod/dfm/media-nb-files.txt"))
+ind <- scan("data_prod/dfm/media-day-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/media-day-dtm-pointers.txt")
+values <- scan("data_prod/dfm/media-day-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 
 X <- sparseMatrix(j=ind,
@@ -252,11 +252,11 @@ load("data_prod/topics/lda_results-twokenizer.Rdata")
 
 ## preparing  matrix
 
-nb_fls <- as.numeric(scan("data_prod/dfm/supporter-nb_files.txt"))
+nb_fls <- as.numeric(scan("data_prod/dfm/supporter-nb-files.txt"))
 
-ind <- scan("data_prod/dfm/supporter-dtm-indices.txt")
-pointers <- scan("data_prod/dfm/supporter-dtm-pointers.txt")
-values <- scan("data_prod/dfm/supporter-dtm-values.txt")
+ind <- scan("data_prod/dfm/supporter-day-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/supporter-day-dtm-pointers.txt")
+values <- scan("data_prod/dfm/supporter-day-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 users <- scan("data_prod/dfm/supporter-users-list.txt", what='character')
 
@@ -280,7 +280,7 @@ tail(tmp,n=100)
 # #################
 #
 if (!file.exists("data_prod/topics/lda-output/lda-lr_supporters-results.Rdata")) {
-  
+
 cat("lr supporters")
 
 lr <- grep('lr', users)
@@ -304,7 +304,7 @@ save(results, file='data_prod/topics/lda-output/lda-lr_supporters-results.Rdata'
 # # #################
 # #
 if (!file.exists("data_prod/topics/lda-output/lda-majority_supporters-results.Rdata")) {
-  
+
 cat("majority supporters")
 majority <- grep('majority', users)
 dtm2 <- dtm[majority,]
@@ -320,7 +320,7 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 }
 save(results, file='data_prod/topics/lda-output/lda-majority_supporters-results.Rdata')
 }
-# 
+#
 # # #################
 # # ## NUPES
 # # #################
@@ -376,11 +376,11 @@ cat("apply initial topic model to aggregated tweets / day from general public")
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
 ## preparing  matrix
-nb_fls <- as.numeric(scan("data_prod/dfm/general-nb_files.txt"))
+nb_fls <- as.numeric(scan("data_prod/dfm/general-nb-files.txt"))
 
-ind <- scan("data_prod/dfm/general-dtm-indices.txt")
-pointers <- scan("data_prod/dfm/general-dtm-pointers.txt")
-values <- scan("data_prod/dfm/general-dtm-values.txt")
+ind <- scan("data_prod/dfm/general-day-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/general-day-dtm-pointers.txt")
+values <- scan("data_prod/dfm/general-day-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
@@ -415,17 +415,17 @@ save(results, file='data_prod/topics/lda-output/lda-general-results.Rdata')
 # #################################
 #
 if (!file.exists("data_prod/topics/lda-output/lda-attentive-results.Rdata")) {
-  
+
 cat("apply initial topic model to aggregated tweets / day from attentive public")
 
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
 ## preparing  matrix
-nb_fls <- as.numeric(scan("data_prod/dfm/attentive-nb_files.txt"))
+nb_fls <- as.numeric(scan("data_prod/dfm/attentive-nb-files.txt"))
 
-ind <- scan("data_prod/dfm/attentive-dtm-indices.txt")
-pointers <- scan("data_prod/dfm/attentive-dtm-pointers.txt")
-values <- scan("data_prod/dfm/attentive-dtm-values.txt")
+ind <- scan("data_prod/dfm/attentive-day-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/attentive-day-dtm-pointers.txt")
+values <- scan("data_prod/dfm/attentive-day-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,

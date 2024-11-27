@@ -29,10 +29,10 @@ library(grid)
 # DATA
 #===============================================================================
 ## preparing Congress matrix
-nb_fls <- as.numeric(scan("data_prod/dfm/nb_files.txt"))
-ind <- scan("data_prod/dfm/congress-dtm-indices.txt")
-pointers <- scan("data_prod/dfm/congress-dtm-pointers.txt")
-values <- scan("data_prod/dfm/congress-dtm-values.txt")
+nb_fls <- as.numeric(scan("data_prod/dfm/congress-nb-files.txt"))
+ind <- scan("data_prod/dfm/congress-day-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/congress-day-dtm-pointers.txt")
+values <- scan("data_prod/dfm/congress-day-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,

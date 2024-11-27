@@ -153,7 +153,7 @@ for (k in 1:K){
 ###############################################################################
 
 # getting list of dates
-fls <- scan("data_prod/dfm/partis-dates-list.txt", what = "character", sep = "\n") # liste des partis-dates préalablement extraites des noms de fichier
+fls <- scan("data_prod/dfm/congress-party-dates-list.txt", what = "character", sep = "\n") # liste des partis-dates préalablement extraites des noms de fichier
 
 dates <- fls |>
   str_extract("\\d{4}-\\d{2}-\\d{2}")

@@ -26,6 +26,7 @@ we use in the analysis.
 """
 
 import io
+import os
 import random
 import numpy as np
 import casanova
@@ -58,6 +59,12 @@ def sort_row_data(X):
         X.data[X.indptr[i] : X.indptr[i + 1]] = np.take_along_axis(
             X.data[X.indptr[i] : X.indptr[i + 1]], ind, axis=0
         )
+
+
+def grep_date(filename):
+    head, date = os.path.split(filename)
+    head, partyname = os.path.split(head)
+    return os.path.join(partyname, date)
 
 
 def group_by_file_and_user(root, nb_files, public, random_tweets=False):
@@ -145,6 +152,7 @@ def group_by_file(root, nb_files, write_party, public):
     counter_all = 0
     if write_party:
         group_names_file = open("data_prod/dfm/{}-party-list.txt".format(public), "w")
+        dates_file = open("data_prod/dfm/{}-party-dates-list.txt".format(public), "w")
 
     tar, loop, compressed = iter_on_files(root, nb_files)
 
@@ -158,6 +166,7 @@ def group_by_file(root, nb_files, write_party, public):
 
         if write_party:
             group_names_file.write("%s\n" % grep_group_name(filename))
+            dates_file.write("%s\n" % grep_date(filename))
 
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
@@ -180,8 +189,8 @@ def group_by_file(root, nb_files, write_party, public):
         group_names_file.close()
 
 
-def export_dfm_matrix(args, X, words, granularity):
-    save_pattern = args.name + "-" + granularity
+def export_dfm_matrix(public, X, granularity):
+    save_pattern = public + "-" + granularity
 
     np.savetxt(
         "data_prod/dfm/{}-dtm-indices.txt".format(save_pattern),
@@ -199,89 +208,71 @@ def export_dfm_matrix(args, X, words, granularity):
         fmt="%.0f",
     )
 
-    ## words
-    if granularity == "day":
-        with open("data_prod/dfm/{}-nb_files.txt".format(args.name), "w") as f:
-            f.write(str(nb_files))
-        with open("data_prod/dfm/{}-words.txt".format(args.name), "w") as f:
-            for item in words:
-                f.write("%s\n" % item)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "public",
+        choices=["congress", "media", "supporter", "attentive", "general"],
+        help="""Name of the publics. For example, if the public is 'congress',
+        the output files will be 'congress-day-dtm-indices.txt', etc.""",
+    )
+
     parser.add_argument(
         "folder",
-        help="Path to a folder containing all input csv files",
+        help="Path to a folder containing tweets files for the chosen public, in csv format",
         type=existing_dir_path,
-    )
-    parser.add_argument(
-        "name",
-        help="""Name of the output files. For example, if the name is 'congress',
-        the output files will be 'congress-dtm-indices.txt', 'congress-dtm-pointers.txt', etc.""",
-    )
-    parser.add_argument(
-        "--vocab",
-        help="""file in .txt with one token per line.
-        By default, the vocabulary will be infered from the csv files.
-        """,
-        required=False,
-        type=argparse.FileType("r"),
-    )
-    parser.add_argument(
-        "--party",
-        help="Write the party of each csv file inferred from csv file path",
-        action="store_true",
-    )
-    parser.add_argument(
-        "--granularity",
-        choices=["day", "user", "tweet"],
-        default=["day", "user", "tweet"],
-        nargs="*",
-        help="""Group documents by day, by user per day, or by tweets. By default, compute all granularities.
-        You can choose several values separated by a space, e.g. --granularity day user
-        If day is not one of the chosen value, a vocabulary should be passed using the --vocab flag.
-        """,
     )
 
     args = parser.parse_args()
 
     nb_files = count_nb_files(args.folder)
 
-    if "day" not in args.granularity and not args.vocab:
-        message = "Consider running the script with '--granularity day' level or providing a --vocab file before "
-        "creating the document-term matrix with a different granularity"
-        raise argparse.ArgumentError(None, message)
+    vocab_file_path = "data_prod/dfm/congress-words.txt"
+    public_is_congress = args.public == "congress"
+    if not public_is_congress:
+        if os.path.isfile(vocab_file_path):
+            with open(vocab_file_path, "r") as f:
+                vectorizer.vocabulary = [term.strip() for term in f]
 
-    if args.vocab:
-        vectorizer.vocabulary = [term.strip() for term in args.vocab]
-
-    if "day" in args.granularity:
-        # print("Compute dtm matrix at day granularity")
-        X = vectorizer.fit_transform(
-            group_by_file(args.folder, nb_files, args.party, args.name)
+    print("Compute dtm matrix at day granularity")
+    X = vectorizer.fit_transform(
+        group_by_file(
+            args.folder,
+            nb_files,
+            args.public in ["congress", "supporters"],
+            args.public,
         )
-        if not args.vocab:
-            sort_row_data(X)
-        export_dfm_matrix(args, X, vectorizer.get_feature_names_out(), "day")
+    )
+    if public_is_congress:
+        sort_row_data(X)
 
-    if "user" in args.granularity:
-        random_tweets = "tweet" in args.granularity
-        # print("Compute dtm matrix at user per day granularity")
+        words = vectorizer.get_feature_names_out()
+        with open(vocab_file_path, "w") as f:
+            for item in words:
+                f.write("%s\n" % item)
+
+    with open("data_prod/dfm/{}-nb-files.txt".format(args.public), "w") as f:
+        f.write(str(nb_files))
+
+    export_dfm_matrix(args.public, X, "day")
+
+    if args.public in ["congress", "media"]:
+        print("Compute dtm matrix at user per day granularity")
         X = vectorizer.transform(
             group_by_file_and_user(
-                args.folder, nb_files, args.name, random_tweets=random_tweets
+                args.folder, nb_files, args.public, random_tweets=public_is_congress
             )
         )
-        export_dfm_matrix(args, X, vectorizer.get_feature_names_out(), "userday")
+        export_dfm_matrix(args.public, X, "userday")
 
-    if "tweet" in args.granularity:
+    if public_is_congress:
+        print("Compute dtm matrix at tweet granularity")
         X = vectorizer.transform(
             (
                 row[2]
-                for row in casanova.reader(
-                    "data_prod/dfm/{}-rs-tweet-list.csv".format(args.name)
-                )
+                for row in casanova.reader("data_prod/dfm/congress-rs-tweet-list.csv")
             )
         )
-        export_dfm_matrix(args, X, vectorizer.get_feature_names_out(), "rs")
+        export_dfm_matrix(args.public, X, "rs")
