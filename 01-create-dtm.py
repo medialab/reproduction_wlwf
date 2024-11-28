@@ -45,6 +45,7 @@ from utils import (
 )
 
 ORIGINAL_TWEET_COUNT = 0
+STORE_PATH = os.path.join("data_prod", "dfm")
 
 
 def sort_row_data(X):
@@ -63,16 +64,24 @@ def sort_row_data(X):
 
 def grep_date(filename):
     head, date = os.path.split(filename)
+    if "-" not in date:
+        dashed_date = date[:4] + "-" + date[4:6] + "-" + date[6:]
+    else:
+        dashed_date = date
     head, partyname = os.path.split(head)
-    return os.path.join(partyname, date)
+    return os.path.join(partyname, dashed_date)
+
+
+def generate_path(file):
+    return os.path.join(STORE_PATH, file)
 
 
 def group_by_file_and_user(root, nb_files, public, random_tweets=False):
     # Preprocess tweets from 'one file (per party if relevant) per day' to 'one document per user per file'
-    names_file = open("data_prod/dfm/{}-userday-user-list.txt".format(public), "w")
+    names_file = open(generate_path("{}-userday-user-list.txt".format(public)), "w")
     if random_tweets:
         random_tweets_file = open(
-            "data_prod/dfm/{}-rs-tweet-list.csv".format(public), "w"
+            generate_path("{}-rs-tweet-list.csv".format(public)), "w"
         )
         random.seed(RANDOM_SEED)
         random_tweet_indices = sorted(
@@ -151,8 +160,8 @@ def group_by_file(root, nb_files, write_party, public):
     # Preprocess tweets from 'one file (per party if relevant) per day' to 'one document per file'
     counter_all = 0
     if write_party:
-        group_names_file = open("data_prod/dfm/{}-party-list.txt".format(public), "w")
-        dates_file = open("data_prod/dfm/{}-party-dates-list.txt".format(public), "w")
+        group_names_file = open(generate_path("{}-party-list.txt".format(public)), "w")
+        dates_file = open(generate_path("{}-party-dates-list.txt".format(public)), "w")
 
     tar, loop, compressed = iter_on_files(root, nb_files)
 
@@ -193,17 +202,17 @@ def export_dfm_matrix(public, X, granularity):
     save_pattern = public + "-" + granularity
 
     np.savetxt(
-        "data_prod/dfm/{}-dtm-indices.txt".format(save_pattern),
+        generate_path("{}-dtm-indices.txt".format(save_pattern)),
         X.indices,
         fmt="%.0f",
     )
     np.savetxt(
-        "data_prod/dfm/{}-dtm-pointers.txt".format(save_pattern),
+        generate_path("{}-dtm-pointers.txt".format(save_pattern)),
         X.indptr,
         fmt="%.0f",
     )
     np.savetxt(
-        "data_prod/dfm/{}-dtm-values.txt".format(save_pattern),
+        generate_path("{}-dtm-values.txt".format(save_pattern)),
         X.data,
         fmt="%.0f",
     )
@@ -229,7 +238,7 @@ if __name__ == "__main__":
 
     nb_files = count_nb_files(args.folder)
 
-    vocab_file_path = "data_prod/dfm/congress-words.txt"
+    vocab_file_path = generate_path("congress-words.txt")
     public_is_congress = args.public == "congress"
     if not public_is_congress:
         if os.path.isfile(vocab_file_path):
@@ -253,7 +262,7 @@ if __name__ == "__main__":
             for item in words:
                 f.write("%s\n" % item)
 
-    with open("data_prod/dfm/{}-nb-files.txt".format(args.public), "w") as f:
+    with open(generate_path("{}-nb-files.txt".format(args.public)), "w") as f:
         f.write(str(nb_files))
 
     export_dfm_matrix(args.public, X, "day")
@@ -272,7 +281,7 @@ if __name__ == "__main__":
         X = vectorizer.transform(
             (
                 row[2]
-                for row in casanova.reader("data_prod/dfm/congress-rs-tweet-list.csv")
+                for row in casanova.reader(generate_path("congress-rs-tweet-list.csv"))
             )
         )
         export_dfm_matrix(args.public, X, "rs")

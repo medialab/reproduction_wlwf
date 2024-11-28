@@ -470,7 +470,7 @@ def custom_tokenizer(document):
 def count_nb_files(folder):
     count = 0
     for r, d, files in os.walk(folder):
-        count += len(files)
+        count += len([f for f in files if f.endswith(".csv")])
     return count
 
 
