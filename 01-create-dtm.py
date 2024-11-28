@@ -49,10 +49,7 @@ STORE_PATH = os.path.join("data_prod", "dfm")
 
 
 def sort_row_data(X):
-    """Sort indices and data in a fixed order,
-    so that the order remains the same if --vocab is provided when we re-run
-    the script.
-    """
+    """Sort indices and data in a fixed order"""
     for i in range(len(X.indptr) - 1):
         row = X.indices[X.indptr[i] : X.indptr[i + 1]]
         ind = np.argsort(row)
