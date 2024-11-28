@@ -52,7 +52,7 @@ supporters
 ...
 ```
 
-The csv files should have the following columns:
+The csv files should have the following columns: `id`, `local_time`, `text`, `user_screen_name`, `user_id`, `retweeted_id`
 ```
 id                  local_time          text                 user_screen_name user_id             retweeted_id
 1587218214638985216 2022-11-01T00:01:26 RT @UEFrance: 🆕 Es… trudigoz         347374931           1587030788331159553
