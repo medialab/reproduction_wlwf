@@ -519,7 +519,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=F
     counter_original = 0
     counter_threads = 0
 
-    tar, compressed, loop = iter_on_files(root, nb_files)
+    tar, loop, compressed = iter_on_files(root, nb_files)
 
     for file in loop:
         if compressed:
