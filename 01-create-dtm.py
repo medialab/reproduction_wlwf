@@ -268,7 +268,7 @@ if __name__ == "__main__":
         print("Compute dtm matrix at user per day granularity")
         X = vectorizer.transform(
             group_by_file_and_user(
-                args.folder, nb_files, args.public, random_tweets=public_is_congress
+                args.folder, nb_files, args.public, random_tweets=True
             )
         )
         export_dfm_matrix(args.public, X, "userday")
