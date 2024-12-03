@@ -3,6 +3,7 @@ import json
 import random
 import argparse
 
+from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
 from umap import UMAP
 from bertopic import BERTopic
@@ -146,7 +147,7 @@ if args.small:
     docs = docs[indices]
     embeddings = embeddings[indices]
 
-    topic_model.fit(docs, embeddings)
+    topics, probs = topic_model.fit_transform(docs, embeddings)
     topic_model.save(
         os.path.join(args.output_folder, "small"),
         serialization="safetensors",
@@ -155,7 +156,7 @@ if args.small:
     )
 
 else:
-    topic_model.fit(docs, embeddings)
+    topics, probs = topic_model.fit_transform(docs, embeddings)
 
     # Save model
     topic_model.save(
@@ -164,3 +165,16 @@ else:
         save_ctfidf=True,
         save_embedding_model=SBERT_NAME,
     )
+
+new_topics = topic_model.reduce_outliers(
+    docs, topics, probabilities=probs, strategy="probabilities", threshold=0.3
+)
+topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
+
+print(topic_model.get_topic_info())
+
+for i, row in topic_model.get_topic_info().iterrows():
+    topic = row["Topic"]
+    top_list = topic_model.get_topic(topic)
+    top_words, top_ctfidf = zip(*top_list)
+    draw_topic_keywords(topic, top_words, top_ctfidf, top_ctfidf)
