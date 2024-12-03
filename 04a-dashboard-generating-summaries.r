@@ -15,8 +15,8 @@
 
 # PACKAGES
 #===============================================================================
-if (!require("pacman")) install.packages("pacman")
-pacman::p_load("topicmodels", "reshape", "ggplot2", "gtable", "gridExtra", "scales", "ggdendro", "ggthemes", "slam", "Matrix", "tm", "tidyverse", "khroma")
+# if (!require("pacman")) install.packages("pacman")
+# pacman::p_load("topicmodels", "reshape", "ggplot2", "gtable", "gridExtra", "scales", "ggdendro", "ggthemes", "slam", "Matrix", "tm", "tidyverse", "khroma")
 
 library(topicmodels)
 library(reshape)
@@ -97,7 +97,7 @@ f.scores <- apply(scores, 1, function(x)
 
 n.topics <- rep(seq(1, K, 1), each=num.words)
 
-# construction d'un df des mots les plus sépcifiques pour chaque Topic
+# construction d'un df des mots les plus spécifiques pour chaque Topic
 info.df <- data.frame(
     topic = n.topics,
     word = c(words),
@@ -190,7 +190,6 @@ df |>
   aes(x = date, y = prop, color = party) +
   geom_line() +
   scale_x_date(date_breaks = "month", date_labels = "%Y-%b") +
-  khroma::scale_color_bright() +
   labs(color = "",
        x = "",
        y = "Score moyen") +
@@ -416,40 +415,40 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 # tweets <- tweets[-todelete,]
 # results$topics <- results$topics[-todelete,]
 #
-# K <- 100
-# rs <- list()
-#
-# for (k in 1:K){
-#   choices <- tail(order(results$topics[,k]),n=6)
-#   rs[[k]] <- tweets[choices,]
-#   rs[[k]]$topic <- k
-# }
-# rs <- do.call(rbind, rs)
-#
-# # function to display embedded tweet
-# tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
-#     txt <- paste0('<blockquote class="twitter-tweet" data-cards="hidden" data-conversation="none" width="450"><p>',
-#         text, '</p> ', name, " (@", screen_name,
-#         ") <a href='https://twitter.com/", screen_name,
-#         '/status/', id_str, "'>",
-#         dt, '</a></blockquote>')
-#     if (js){
-#         txt <- paste0(txt,
-#             ' <script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>')
-#     }
-#     return(txt)
-# }
-#
-# # preparing embed
-# rs$embed <- NA
-# for (i in 1:nrow(rs)){
-#
-#   rs$embed[i] <- tw.embed(rs$text[i], rs$screen_name[i], rs$screen_name[i], rs$id_str[i],
-#     "", "")
-#
-# }
-#
-# save(rs, file="data_prod/dashboard/rs-tweets.rdata")
+K <- 100
+rs <- list()
+
+for (k in 1:K){
+  choices <- tail(order(results$topics[,k]),n=6)
+  rs[[k]] <- tweets[choices,]
+  rs[[k]]$topic <- k
+}
+rs <- do.call(rbind, rs)
+
+# function to display embedded tweet
+tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
+    txt <- paste0('<blockquote class="twitter-tweet" data-cards="hidden" data-conversation="none" width="450"><p>',
+        text, '</p> ', name, " (@", screen_name,
+        ") <a href='https://twitter.com/", screen_name,
+        '/status/', id_str, "'>",
+        dt, '</a></blockquote>')
+    if (js){
+        txt <- paste0(txt,
+            ' <script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>')
+    }
+    return(txt)
+}
+
+# preparing embed
+rs$embed <- NA
+for (i in 1:nrow(rs)){
+
+  rs$embed[i] <- tw.embed(rs$text[i], rs$screen_name[i], rs$screen_name[i], rs$id_str[i],
+    "", "")
+
+}
+
+save(rs, file="data_prod/dashboard/rs-tweets.rdata")
 #
 #
 # ###############################################################################
@@ -460,7 +459,13 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 # pointers <- scan("data/dfm/media-rs-dtm-pointers.txt")
 # values <- scan("data/dfm/media-rs-dtm-values.txt")
 # words <- scan("data/dfm/congress-words.txt", what="character", sep="\n")
-# tweets <- read.csv("data/dfm/media-tweets-random-sample.csv", stringsAsFactors=F, colClasses="character")
+# # Lit et concatène tous les fichiers dans un seul data frame
+if (!dir.exists("data_temp")) {
+  dir.create("data_temp",
+             recursive = TRUE)
+}
+
+tweets <- data.table::fread("data_temp/all_media_IPG_tweets.csv")
 #
 # X <- sparseMatrix(j=ind, p=pointers, x=values,
 #   dims=c(nrow(tweets), length(words)), index1=FALSE)
@@ -519,6 +524,8 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 # media_rs <- rs
 # save(media_rs, file="dashboard/media-rs-tweets.rdata")
 #
+# file.remove("data_temp/all_media_IPG_tweets.csv",
+#             "data_temp/all_deputesXVI_tweets.csv")
 # ###############################################################################
 # ### F) MCs using each topic the most
 # ###############################################################################
