@@ -157,8 +157,9 @@ def group_by_file(root, nb_files, write_party, public):
     # Preprocess tweets from 'one file (per party if relevant) per day' to 'one document per file'
     counter_all = 0
     if write_party:
-        group_names_file = open(generate_path("{}-party-list.txt".format(public)), "w")
-        dates_file = open(generate_path("{}-party-dates-list.txt".format(public)), "w")
+        group_names_file = open(
+            generate_path("{}-day-party-list.txt".format(public)), "w"
+        )
 
     tar, loop, compressed = iter_on_files(root, nb_files)
 
@@ -171,8 +172,7 @@ def group_by_file(root, nb_files, write_party, public):
         loop.set_description(filename)
 
         if write_party:
-            group_names_file.write("%s\n" % grep_group_name(filename))
-            dates_file.write("%s\n" % grep_date(filename))
+            group_names_file.write("%s\n" % grep_date(filename))
 
         reader = casanova.reader(filename)
         text_pos = reader.headers.text
