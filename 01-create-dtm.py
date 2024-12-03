@@ -273,12 +273,13 @@ if __name__ == "__main__":
         )
         export_dfm_matrix(args.public, X, "userday")
 
-    if public_is_congress:
         print("Compute dtm matrix at tweet granularity")
         X = vectorizer.transform(
             (
                 row[2]
-                for row in casanova.reader(generate_path("congress-rs-tweet-list.csv"))
+                for row in casanova.reader(
+                    generate_path("{}-rs-tweet-list.csv".format(args.public))
+                )
             )
         )
         export_dfm_matrix(args.public, X, "rs")
