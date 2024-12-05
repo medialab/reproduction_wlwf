@@ -13,7 +13,6 @@
 #  Data Out:
 #           LDA output
 #===============================================================================
-
 # PACKAGES
 #===============================================================================
 library(slam)
@@ -21,10 +20,11 @@ library(Matrix)
 library(tm)
 library(topicmodels)
 
+#===============================================================================
 # DATA
 #===============================================================================
 if (!file.exists("data_prod/topics/lda_results-twokenizer.Rdata")) {
-cat("run topic model on aggregated tweets / day by Deputies from the National Assembly")
+cat("run topic model on aggregated tweets / party / day of Deputies from the National Assembly")
 # preparing Congress matrix
 nb_fls <- as.numeric(scan("data_prod/dfm/congress-nb-files.txt"))
 ind <- scan("data_prod/dfm/congress-day-dtm-indices.txt")
@@ -47,7 +47,8 @@ tail(sort(rs),n=100)
 cs <- row_sums(dtm)
 dtm <- dtm[cs>0,]
 
-MAIN: CONGRESS
+#===============================================================================
+# MAIN: CONGRESS
 # ===============================================================================
 # running regular LDA
 lda.fit <- LDA(dtm, k=100, method="Gibbs",
@@ -56,6 +57,7 @@ lda.fit <- LDA(dtm, k=100, method="Gibbs",
 save(lda.fit, file="data_prod/topics/lda_results-twokenizer.Rdata")
 }
 
+#===============================================================================
 # OTHER GROUPS
 # ===============================================================================
 
@@ -111,92 +113,93 @@ save(results, file='data_prod/topics/lda-output/lda-media-results.Rdata')
 }
 
 # ########################################
-# #### MEDIA ARTICLES (RANDOM SAMPLE) ####
+# #### MEDIA TWEETS (RANDOM SAMPLE) ####
 # ########################################
-# # if (!file.exists("data_prod/topics/lda-output/lda-media-rs-results.Rdata")) {
-# cat("apply initial topic model to individual media tweets")
-#
-# load("data_prod/topics/lda_results-twokenizer.Rdata")
-#
-# ind <- scan("data/dfm/media-rs-dtm-indices.txt")
-# pointers <- scan("data/dfm/media-rs-dtm-pointers.txt")
-# values <- scan("data/dfm/media-rs-dtm-values.txt")
-# words <- scan("data/dfm/congress-words.txt", what="character", sep="\n")
-# tweets <- read.csv("data/tweets/media-tweets-random-sample.csv", stringsAsFactors=F, colClasses="character")
-#
-# X <- sparseMatrix(j=ind, p=pointers, x=values,
-#     dims=c(nrow(tweets), length(words)), index1=FALSE)
-# dimnames(X)[[2]] <- words
-#
-# # deleting empty rows
-# todelete <- which(rowSums(X)==0)
-# X <- X[-todelete,]
-# tweets <- tweets[-todelete,]
-#
-# mat <- as.simple_triplet_matrix(X)
-# dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
-#
-# # sanity check
-# rs <- col_sums(dtm)
-# tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
-# tmp <- tmp[order(tmp$rs),]
-#
-# ## getting posterior estimates
-# results <- posterior(lda.fit, dtm,
-#     control=list(verbose=10L, iter=1000))
-#
-# # saving output
-# if (!dir.exists("data_prod/topics/lda-output")) {
-#   dir.create("data_prod/topics/lda-output",
-#              recursive = TRUE)
-# }
-# save(results, file='data_prod/topics/lda-output/lda-media-rs-results.Rdata')
-# }
+if (!file.exists("data_prod/topics/lda-output/lda-media-rs-results.Rdata")) {
+cat("apply initial topic model to individual media tweets")
+
+load("data_prod/topics/lda_results-twokenizer.Rdata")
+
+ind <- scan("data_prod/dfm/media-rs-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/media-rs-dtm-pointers.txt")
+values <- scan("data_prod/dfm/media-rs-dtm-values.txt")
+words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
+tweets <- read.csv("data_prod/dfm/media-rs-tweet-list.csv", stringsAsFactors=F, colClasses="character")
+
+X <- sparseMatrix(j=ind, p=pointers, x=values,
+    dims=c(nrow(tweets), length(words)), index1=FALSE)
+dimnames(X)[[2]] <- words
+
+# deleting empty rows
+todelete <- which(rowSums(X)==0)
+X <- X[-todelete,]
+tweets <- tweets[-todelete,]
+
+mat <- as.simple_triplet_matrix(X)
+dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
+
+# sanity check
+rs <- col_sums(dtm)
+tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
+tmp <- tmp[order(tmp$rs),]
+
+## getting posterior estimates
+results <- posterior(lda.fit, dtm,
+    control=list(verbose=10L, iter=1000))
+
+# saving output
+if (!dir.exists("data_prod/topics/lda-output")) {
+  dir.create("data_prod/topics/lda-output",
+             recursive = TRUE)
+}
+save(results, file='data_prod/topics/lda-output/lda-media-rs-results.Rdata')
+}
 #
 # #################################
 # #### RANDOM SAMPLE OF TWEETS ####
 # #################################
-# # if (!file.exists("data_prod/topics/lda-output/lda-mcs-results.Rdata")) {
-# cat("apply initial topic model to random sample of tweets")
-# load("data_prod/topics/lda_results-twokenizer.Rdata")
-#
-# ## preparing  matrix
-# ind <- scan("data/dfm/rs-dtm-indices.txt")
-# pointers <- scan("data/dfm/rs-dtm-pointers.txt")
-# values <- scan("data/dfm/rs-dtm-values.txt")
-# words <- scan("data/dfm/congress-words.txt", what="character", sep="\n")
-# tweets <- read.csv("data/tweets/tweets-random-sample.csv", stringsAsFactors=F, colClasses="character")
-#
-# X <- sparseMatrix(j=ind, p=pointers, x=values,
-# 	dims=c(nrow(tweets), length(words)), index1=FALSE)
-# dimnames(X)[[2]] <- words
-#
-# # deleting empty rows
-# todelete <- which(rowSums(X)==0)
-# X <- X[-todelete,]
-# tweets <- tweets[-todelete,]
-#
-# mat <- as.simple_triplet_matrix(X)
-# dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
-#
-# # sanity check
-# rs <- col_sums(dtm)
-# tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
-# tmp <- tmp[order(tmp$rs),]
-#
-# ## getting posterior estimates
-# results <- posterior(lda.fit, dtm,
-#     control=list(verbose=10L, iter=1000))
-#
-# # saving output
-# if (!dir.exists("data_prod/topics/lda-output")) {
-#   dir.create("data_prod/topics/lda-output",
-#              recursive = TRUE)
-# }
+if (!file.exists("data_prod/topics/lda-output/lda-mcs-results.Rdata")) {
+cat("apply initial topic model to random sample of tweets")
+load("data_prod/topics/lda_results-twokenizer.Rdata")
 
-# save(results, file='data_prod/topics/lda-output/lda-rs-results.Rdata')
-# }
-#
+## preparing  matrix
+##### mettre congress-rs à la place de rs ou mcs...
+ind <- scan("data_prod/dfm/congress-rs-dtm-indices.txt")
+pointers <- scan("data_prod/dfm/congress-rs-dtm-pointers.txt")
+values <- scan("data_prod/dfm/congress-rs-dtm-values.txt")
+words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
+tweets <- read.csv("data_prod/dfm/congress-rs-tweet-list.csv", stringsAsFactors=F, colClasses="character")
+
+X <- sparseMatrix(j=ind, p=pointers, x=values,
+	dims=c(nrow(tweets), length(words)), index1=FALSE)
+dimnames(X)[[2]] <- words
+
+# deleting empty rows
+todelete <- which(rowSums(X)==0)
+X <- X[-todelete,]
+tweets <- tweets[-todelete,]
+
+mat <- as.simple_triplet_matrix(X)
+dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
+
+# sanity check
+rs <- col_sums(dtm)
+tmp <- data.frame(word=Terms(dtm),rs=rs,stringsAsFactors=F)
+tmp <- tmp[order(tmp$rs),]
+
+## getting posterior estimates
+results <- posterior(lda.fit, dtm,
+    control=list(verbose=10L, iter=1000))
+
+# saving output
+if (!dir.exists("data_prod/topics/lda-output")) {
+  dir.create("data_prod/topics/lda-output",
+             recursive = TRUE)
+}
+
+save(results, file='data_prod/topics/lda-output/lda-rs-results.Rdata')
+}
+
 # ########################
 # #### INDIVIDUAL MCS ####
 # ########################
@@ -258,7 +261,7 @@ ind <- scan("data_prod/dfm/supporter-day-dtm-indices.txt")
 pointers <- scan("data_prod/dfm/supporter-day-dtm-pointers.txt")
 values <- scan("data_prod/dfm/supporter-day-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
-users <- scan("data_prod/dfm/supporter-users-list.txt", what='character')
+users <- scan("data_prod/dfm/supporter-day-party-list.txt", what='character')
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
 	dims=c(nb_fls,
