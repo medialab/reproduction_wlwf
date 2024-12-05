@@ -131,11 +131,8 @@ def group_by_file_and_user(root, nb_files, public, random_tweets=False):
                 row_text = unidecode(clean_text(row[text_pos].replace("\n", "")))
                 row_user_id = int(row[user_id_pos])
 
-                user_text = users[row_user_id]["text"]
-                screen_names = users[row_user_id]["screen_names"]
-
-                user_text += row_text + " "
-                screen_names[row[user_sn_pos]] = None
+                users[row_user_id]["text"] += row_text + " "
+                users[row_user_id]["screen_names"][row[user_sn_pos]] = None
 
         for user_id, user_values in users.items():
             names_file.write(
