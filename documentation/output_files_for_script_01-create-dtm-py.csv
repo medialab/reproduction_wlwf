@@ -1,0 +1,14 @@
+files,congress,media,supporter,attentive,general
+vocabulary,congress-words.txt,,,,
+day matrix values,congress-day-dtm-values.txt,media-day-dtm-values.txt,supporter-day-dtm-values.txt,attentive-day-dtm-values.txt,general-day-dtm-values.txt
+day matrix indices,congress-day-dtm-indices.txt,media-day-dtm-indices.txt,supporter-day-dtm-indices.txt,attentive-day-dtm-indices.txt,general-day-dtm-indices.txt
+day matrix pointers,congress-day-dtm-pointers.txt,media-day-dtm-pointers.txt,supporter-day-dtm-pointers.txt,attentive-day-dtm-pointers.txt,general-day-dtm-pointers.txt
+list of rows for day matrix,congress-day-party-list.txt,,supporter-day-party-list.txt,,
+user per day matrix values,congress-userday-dtm-values.txt,media-userday-dtm-values.txt,,,
+user per day matrix indices,congress-userday-dtm-indices.txt,media-userday-dtm-indices.txt,,,
+user per day matrix pointers,congress-userday-dtm-pointers.txt,media-userday-dtm-pointers.txt,,,
+list of rows for user per day matrix,congress-userday-user-list.txt,media-userday-user-list.txt,,,
+random tweets matrix values,congress-rs-dtm-values.txt,media-rs-dtm-values.txt,,,
+random tweets matrix indices,congress-rs-dtm-indices.txt,media-rs-dtm-indices.txt,,,
+random tweets matrix pointers,congress-rs-dtm-pointers.txt,media-rs-dtm-pointers.txt,,,
+list of rows for random tweets matrix,congress-rs-tweet-list.csv,media-rs-tweet-list.csv,,,

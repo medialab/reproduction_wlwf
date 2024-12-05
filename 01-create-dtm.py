@@ -244,7 +244,7 @@ if __name__ == "__main__":
         group_by_file(
             args.folder,
             nb_files,
-            args.public in ["congress", "supporters"],
+            args.public in ["congress", "supporter"],
             args.public,
         )
     )
