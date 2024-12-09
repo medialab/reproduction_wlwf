@@ -134,6 +134,9 @@ def group_by_file_and_user(root, nb_files, public, random_tweets=False):
                 users[row_user_id]["text"] += row_text + " "
                 users[row_user_id]["screen_names"][row[user_sn_pos]] = None
 
+        if not compressed:
+            filestream.close()
+
         for user_id, user_values in users.items():
             names_file.write(
                 "{} {} {}\n".format(
@@ -147,6 +150,8 @@ def group_by_file_and_user(root, nb_files, public, random_tweets=False):
     names_file.close()
     if random_tweets:
         random_tweets_file.close()
+    if compressed:
+        tar.close()
 
 
 def group_by_file(root, nb_files, write_party, public):
@@ -163,15 +168,17 @@ def group_by_file(root, nb_files, write_party, public):
     for file in loop:
         if compressed:
             filename = file.name
+            filestream = io.TextIOWrapper(tar.extractfile(file))
         else:
             filename = file
+            filestream = open(file)
 
         loop.set_description(filename)
 
         if write_party:
             group_names_file.write("%s\n" % grep_date(filename))
 
-        reader = casanova.reader(filename)
+        reader = casanova.reader(filestream)
         text_pos = reader.headers.text
         rt_pos = reader.headers.retweeted_id
         loop.set_description(filename)
@@ -187,6 +194,11 @@ def group_by_file(root, nb_files, write_party, public):
 
         # yield the text of all tweets of the day, remove last character - which is a space
         yield file_text[:-1]
+        if not compressed:
+            filestream.close()
+
+    if compressed:
+        tar.close()
 
     if write_party:
         group_names_file.close()
