@@ -26,6 +26,7 @@ install_if_missing <- function(pkg) {
 packages <- c(
   "argparse",
   "cvTools",
+  'data.table',
   "ggdendro",
   "ggplot2",
   "grid",
@@ -34,6 +35,7 @@ packages <- c(
   "ggthemes",
   "Matrix",
   "reshape",
+  "scales",
   "slam",
   "scales",
   "shiny",
