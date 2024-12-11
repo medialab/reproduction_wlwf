@@ -24,7 +24,7 @@ library(topicmodels)
 # DATA
 #===============================================================================
 if (!file.exists("data_prod/topics/lda_results-twokenizer.Rdata")) {
-cat("run topic model on aggregated tweets / party / day of Deputies from the National Assembly")
+cat("run topic model on aggregated tweets / party / day of Deputies from the National Assembly\n")
 # preparing Congress matrix
 nb_fls <- as.numeric(scan("data_prod/dfm/congress-nb-files.txt"))
 ind <- scan("data_prod/dfm/congress-day-dtm-indices.txt")
@@ -66,7 +66,7 @@ save(lda.fit, file="data_prod/topics/lda_results-twokenizer.Rdata")
 # ########################
 #
 if (!file.exists("data_prod/topics/lda-output/lda-media-results.Rdata")) {
-cat("apply initial topic model on aggregated tweets / day from IPG Medias")
+cat("apply initial topic model on aggregated tweets / day from IPG Medias\n")
 
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 #
@@ -116,7 +116,7 @@ save(results, file='data_prod/topics/lda-output/lda-media-results.Rdata')
 # #### MEDIA TWEETS (RANDOM SAMPLE) ####
 # ########################################
 if (!file.exists("data_prod/topics/lda-output/lda-media-rs-results.Rdata")) {
-cat("apply initial topic model to individual media tweets")
+cat("apply initial topic model to a random sample of individual media tweets\n")
 
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
@@ -158,8 +158,8 @@ save(results, file='data_prod/topics/lda-output/lda-media-rs-results.Rdata')
 # #################################
 # #### RANDOM SAMPLE OF TWEETS ####
 # #################################
-if (!file.exists("data_prod/topics/lda-output/lda-mcs-results.Rdata")) {
-cat("apply initial topic model to random sample of tweets")
+if (!file.exists("data_prod/topics/lda-output/lda-rs-results.Rdata")) {
+cat("apply initial topic model to a random sample of deputies' tweets\n")
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
 ## preparing  matrix
@@ -204,7 +204,7 @@ save(results, file='data_prod/topics/lda-output/lda-rs-results.Rdata')
 # #### INDIVIDUAL MCS ####
 # ########################
 # if (!file.exists("data_prod/topics/lda-output/lda-mcs-results.Rdata")) {
-# cat("apply initial topic model to individual tweets from deputies")
+# cat("apply initial topic model to all individual tweets from deputies\n")
 # load("data_prod/topics/lda_results-twokenizer.Rdata")
 #
 # ## preparing  matrix
@@ -249,7 +249,7 @@ if (!all(file.exists("data_prod/topics/lda-output/lda-lr_supporters-results.Rdat
                  "data_prod/topics/lda-output/lda-nupes_supporters-results.Rdata",
                  "data_prod/topics/lda-output/lda-rn_supporters-results.Rdata")
     )) {
-cat("apply initial topic model on aggregated tweets / day by supporters of each political group")
+cat("apply initial topic model on aggregated tweets / day by supporters of each political group\n")
 #
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
@@ -284,7 +284,7 @@ tail(tmp,n=100)
 #
 if (!file.exists("data_prod/topics/lda-output/lda-lr_supporters-results.Rdata")) {
 
-cat("lr supporters")
+cat("lr supporters\n")
 
 lr <- grep('lr', users)
 dtm2 <- dtm[lr,]
@@ -308,7 +308,7 @@ save(results, file='data_prod/topics/lda-output/lda-lr_supporters-results.Rdata'
 # #
 if (!file.exists("data_prod/topics/lda-output/lda-majority_supporters-results.Rdata")) {
 
-cat("majority supporters")
+cat("majority supporters\n")
 majority <- grep('majority', users)
 dtm2 <- dtm[majority,]
 
@@ -329,7 +329,7 @@ save(results, file='data_prod/topics/lda-output/lda-majority_supporters-results.
 # # #################
 # #
 if (!file.exists("data_prod/topics/lda-output/lda-nupes_supporters-results.Rdata")) {
-cat("nupes supporters")
+cat("nupes supporters\n")
 
 nupes <- grep('nupes', users)
 dtm2 <- dtm[nupes,]
@@ -352,7 +352,7 @@ save(results, file='data_prod/topics/lda-output/lda-nupes_supporters-results.Rda
 # # #################
 # #
 if (!file.exists("data_prod/topics/lda-output/lda-rn_supporters-results.Rdata")) {
-cat("rn supporters")
+cat("rn supporters\n")
 rn <- grep('rn', users)
 dtm2 <- dtm[rn,]
 
@@ -374,7 +374,7 @@ save(results, file='data_prod/topics/lda-output/lda-rn_supporters-results.Rdata'
 #
 if (!file.exists("data_prod/topics/lda-output/lda-general-results.Rdata")) {
 
-cat("apply initial topic model to aggregated tweets / day from general public")
+cat("apply initial topic model to aggregated tweets / day from general public\n")
 
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
@@ -419,7 +419,7 @@ save(results, file='data_prod/topics/lda-output/lda-general-results.Rdata')
 #
 if (!file.exists("data_prod/topics/lda-output/lda-attentive-results.Rdata")) {
 
-cat("apply initial topic model to aggregated tweets / day from attentive public")
+cat("apply initial topic model to aggregated tweets / day from attentive public\n")
 
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
