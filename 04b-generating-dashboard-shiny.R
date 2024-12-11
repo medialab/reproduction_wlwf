@@ -42,9 +42,13 @@ ui <- fluidPage(
       # )
     ),
  fluidRow(
-    checkboxGroupInput("partys", "Afficher :",
-                       choices = c("majority", "lr", "rn", "nupes"), #qois_long |> distinct(parti) |> pull(),
-                       selected = c("majority", "lr", "rn", "nupes"), #qois_long |> distinct(parti) |> pull()
+    checkboxGroupInput("acteurs", "Afficher :",
+                       choices = c(
+                                   "dep. majo.", "dep. lr", "dep. nupes", "dep. rn", 
+                                   "medias", 
+                                   "sup. majo.", "sup. lr", "sup. nupes", "sup. rn", 
+                                   "pub. attentif", "pub. general"), #qois_long |> distinct(parti) |> pull(),
+                       selected = c("dep. majo.", "dep. lr", "dep. nupes", "dep. rn"), #qois_long |> distinct(parti) |> pull()
                        inline = TRUE
     )
   ),
@@ -55,12 +59,12 @@ ui <- fluidPage(
 
 # time serie des topics
 
-plot_ts  <- function(df, checked_partys, selected_topic){
+plot_ts  <- function(df, checked_actors, selected_topic){
 
   df |>
-    filter(party %in% {{checked_partys}}) |>
+    filter(actor %in% {{checked_actors}}) |>
     ggplot() +
-    aes(x = date, y = prop, color = party, group = party) +
+    aes(x = date, y = prop, color = actor, group = actor) +
     geom_line() +
     scale_x_date(#date_breaks = "month",
                  breaks = c(seq(ymd("2022-06-20"), ymd("2023-03-14"), by = "1 month"), ymd("2022-06-20"), ymd("2023-03-14")),
@@ -69,13 +73,23 @@ plot_ts  <- function(df, checked_partys, selected_topic){
                  limits = c(ymd("2022-06-20"), ymd("2023-03-14")),
                 # expand = expansion(c(0,0))
                  ) +
-    scale_color_manual(values = c("lr" = "darkblue",
-                                  "majority" = "orange",
-                                  "nupes" = "red",
-                                  "rn" = "purple")) +
+    scale_color_manual(values = c(
+                                  "dep. majo." = "orange",
+                                  "dep. lr" = "blue",
+                                  "dep. nupes" = "red",
+                                  "dep. rn" = "purple",
+                                  "medias" = "black", 
+                                  "sup. majo." = "darkorange", 
+                                  "sup. lr" = "darkblue", 
+                                  "sup. nupes" = "darkred", 
+                                  "sup. rn" = "purple4", 
+                                  "pub. attentif" = "forestgreen", 
+                                  "pub. general" = "lightgrey"
+                                  )) +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
     labs(color = "",
          x = "",
-         y = "Score moyen") +
+         y = "% d'attention accordée au topic") +
   #  ylim(0,1) +
     theme_clean() +
     theme(axis.text.x = element_text(size = rel(0.8)))+
@@ -89,27 +103,20 @@ server <- function(input, output){
     read_csv(file_name)
   })
   selected_topic <- reactive(input$topic)
-  checked_partys <- reactive(input$partys)
+  checked_partys <- reactive(input$acteurs)
 
  output$topic_ts <- renderPlot({
     plot_ts(df(), checked_partys(), selected_topic())
     }, res = 96
               )
-
+df_brushed <- reactive({
+  df() |> select(-topic)
+})
  output$brushed_data <- renderTable(
    {
      brushedPoints(df(), input$plot_brush)
    }
  )
-
-    # avec dygraph
-  # output$topic_timeseries <- renderPlot({
-  #   selected_topic_scores <- topic_scores[[input$selected_topic]]
-  #   filtered_scores <- selected_topic_scores[, input$actors, drop = FALSE]
-  #
-  #   dygraph(filtered_scores, main = paste("Évolution des scores pour le topic", input$selected_topic)) %>%
-  #     dyOptions(stackedGraph = TRUE)
-  #})
 
   # Image des mots spécifiques du topic
   output$topwords_image <- renderImage({
