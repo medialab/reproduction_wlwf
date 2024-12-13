@@ -14,7 +14,9 @@ library(tidyverse)
 
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
 # load("data_prod/dashboard/qois.rdata")  # topic_scores
-
+# representative tweets
+load("data_prod/dashboard/congress-rs-tweets.rdata")
+load("data_prod/dashboard/media-rs-tweets.rdata")
 # qois_long <- qois |>
 #   select(topic, starts_with("prop_")) |>
 #   pivot_longer(cols = starts_with("prop"),
@@ -31,8 +33,8 @@ ui <- fluidPage(
       )
     ),
  fluidRow(
-        column(8, plotOutput("topic_ts", height = "500px",
-                             brush = brushOpts("plot_brush"),
+        column(8, plotOutput("topic_ts", height = "500px"#,
+                             #brush = brushOpts("plot_brush"),
                              )),
         column(4, imageOutput("topwords_image"))
       #,
@@ -51,10 +53,14 @@ ui <- fluidPage(
                        selected = c("dep. majo.", "dep. lr", "dep. nupes", "dep. rn"), #qois_long |> distinct(parti) |> pull()
                        inline = TRUE
     )
-  ),
+   ),
+ # fluidRow(
+ #   tableOutput("brushed_data")
+ # )
  fluidRow(
-   tableOutput("brushed_data")
- )
+   column(6, htmlOutput("congress_tweets")),
+   column(6, htmlOutput("media_tweets"))
+   )#,
 )
 
 # time serie des topics
@@ -69,8 +75,8 @@ plot_ts  <- function(df, checked_actors, selected_topic){
     scale_x_date(#date_breaks = "month",
                  breaks = c(seq(ymd("2022-06-20"), ymd("2023-03-14"), by = "1 month"), ymd("2022-06-20"), ymd("2023-03-14")),
                  date_minor_breaks = "2 weeks",
-                 date_labels = "%y-%b-%d",
-                 limits = c(ymd("2022-06-20"), ymd("2023-03-14")),
+                 date_labels = "%d-%b-%y",
+                 limits = c(ymd("2022-06-20"), ymd("2023-03-14"))
                 # expand = expansion(c(0,0))
                  ) +
     scale_color_manual(values = c(
@@ -109,17 +115,17 @@ server <- function(input, output){
     plot_ts(df(), checked_partys(), selected_topic())
     }, res = 96
               )
-df_brushed <- reactive({
-  df() |> select(-topic)
-})
- output$brushed_data <- renderTable(
-   {
-     brushedPoints(df(), input$plot_brush)
-   }
- )
+#df_brushed <- reactive({
+#  df() |> select(-topic)
+#})
+# output$brushed_data <- renderTable(
+#   {
+#     brushedPoints(df(), input$plot_brush)
+#   }
+# )
 
   # Image des mots spécifiques du topic
-  output$topwords_image <- renderImage({
+output$topwords_image <- renderImage({
     list(src = file.path("data_prod/dashboard/files/img", paste0("words-plot-", input$topic, ".png")),
          contentType = 'image/png',
          alt = "Mots spécifiques",
@@ -128,21 +134,42 @@ df_brushed <- reactive({
          )
   }, deleteFile = FALSE)
 
-  # Affichage des tweets les plus représentatifs
-  # output$tweets_mostrep <- renderUI({
-  #   tweets_for_topic <- tweets[[input$selected_topic]]
-  #
-  #   tweet_html <- lapply(tweets_for_topic, function(tweet) {
-  #     tags$div(
-  #       class = "tweet",
-  #       tags$img(src = tweet$profile_image_url, class = "tweet-profile"),
-  #       tags$div(class = "tweet-text", tweet$text),
-  #       tags$div(class = "tweet-timestamp", tweet$created_at)
-  #     )
-  #   })
-  #
-  #   do.call(tagList, tweet_html)
-  # })
+# Affichage des tweets les plus représentatifs
+# congress_tweets_data <- reactive({
+#   load("data_prod/dashboard/congress-rs-tweets.rdata") # Charge les données, ex. `tweets_topic_data`
+#   congress_rs # Remplacez par le nom de l'objet chargé
+# })
+  # Mettre à jour les topics dans le selectInput
+#  observe({
+#    updateSelectInput(session, "topic",
+#                      choices = unique(congress_tweets_data()$topic))
+#  })
+  
+  # Générer les tweets HTML pour le topic sélectionné
+  output$congress_tweets <- renderUI({
+    req(input$topic) # Attendre que l'utilisateur sélectionne un topic
+    selected_congress_tweets <- reactive({
+      congress_rs |> filter(topic == input$topic)
+                                })
+    
+    # Organiser les tweets en deux colonnes
+    HTML(#paste(
+      selected_congress_tweets()$embed#, collapse = "<br><br>")
+      )
+  })
+  
+  output$media_tweets <- renderUI({
+    req(input$topic) # Attendre que l'utilisateur sélectionne un topic
+    selected_media_tweets <- reactive({
+      media_rs |> filter(topic == input$topic)
+    })
+    
+    # Organiser les tweets en deux colonnes
+    HTML(#paste(
+      selected_media_tweets()$embed#, collapse = "<br><br>")
+    )
+  })
+  
 }
 
 # Run the application

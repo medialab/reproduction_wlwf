@@ -490,8 +490,9 @@ qois <- qois |>
 save(qois, file="data_prod/dashboard/qois.rdata")
 #
 # ###############################################################################
-# ### D) Representative tweets
+# ### D) Representative tweets ----
 # ###############################################################################
+### >> Deputies ----
 cat("selecting representative deputies' tweets for each topic\n")
 #
 suppressPackageStartupMessages(library(slam))
@@ -521,9 +522,9 @@ tweets <- tweets[-duplicated,]
 results$topics <- results$topics[-duplicated,]
 
 # deleting weird tweets
-todelete <- grep('xss', tweets$text)
-tweets <- tweets[-todelete,]
-results$topics <- results$topics[-todelete,]
+#todelete <- grep('xss', tweets$text)
+#tweets <- tweets[-todelete,]
+#results$topics <- results$topics[-todelete,]
 #
 K <- 100
 rs <- list()
@@ -557,14 +558,14 @@ for (i in 1:nrow(rs)){
     "", "")
 
 }
-
-save(rs, file="data_prod/dashboard/rs-tweets.rdata")
+congress_rs <- rs
+save(congress_rs, file="data_prod/dashboard/congress-rs-tweets.rdata")
 #
 #
 # ###############################################################################
-# ### D) Representative media tweets
+# ### D) Representative media tweets ----
 # ###############################################################################
-#
+### >> Medias ----
 cat("selecting representative medias tweets for each topic\n")
 
 ind <- scan("data_prod/dfm/media-rs-dtm-indices.txt")
@@ -597,9 +598,9 @@ tweets <- tweets[-duplicated,]
 results$topics <- results$topics[-duplicated,]
 
 # deleting weird tweets
-todelete <- grep('xss', tweets$text)
-tweets <- tweets[-todelete,]
-results$topics <- results$topics[-todelete,]
+#todelete <- grep('xss', tweets$text)
+#tweets <- tweets[-todelete,]
+#results$topics <- results$topics[-todelete,]
 
 K <- 100
 rs <- list()
@@ -635,7 +636,7 @@ for (i in 1:nrow(rs)){
 }
 
 media_rs <- rs
-save(media_rs, file="dashboard/media-rs-tweets.rdata")
+save(media_rs, file="data_prod/dashboard/media-rs-tweets.rdata")
 #
 # file.remove("data_temp/all_media_IPG_tweets.csv",
 #             "data_temp/all_deputesXVI_tweets.csv")
