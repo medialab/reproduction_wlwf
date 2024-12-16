@@ -266,7 +266,6 @@
 2eur
 2f
 2h
-2h matin
 2h30
 2m
 2nd
@@ -292,12 +291,10 @@
 3e
 3e circonscription
 3eme
-3eme annee
 3eme circonscription
 3eme college
 3eme edition
 3h
-3h matin
 4000eur
 400eur
 40eme
@@ -311,11 +308,9 @@
 4e
 4e circonscription
 4eme
-4eme annee
 4eme circonscription
 4g
 4h
-4h matin
 4v
 5000eur
 500eur
@@ -375,7 +370,6 @@
 6eme republique
 6erepublique
 6h
-6h matin
 6h30
 700eur
 78e
@@ -442,7 +436,6 @@
 9eur
 9h
 9h 12h
-9h matin
 9h00
 9h30
 @20minutes
@@ -519,6 +512,7 @@
 @an_defense @assembleenat
 @an_defense @tgassilloud
 @an_defense audition
+@an_defense auditionne
 @an_devdur
 @an_devdur @assembleenat
 @an_droitsfemmes
@@ -589,9 +583,7 @@
 @assembleenat afin
 @assembleenat apres-midi
 @assembleenat audition
-@assembleenat aujourd'hui
 @assembleenat autour
-@assembleenat avons
 @assembleenat bravo
 @assembleenat cadre
 @assembleenat circonscription
@@ -613,7 +605,6 @@
 @assembleenat interroge
 @assembleenat loi
 @assembleenat majorite
-@assembleenat matin
 @assembleenat ministre
 @assembleenat occasion
 @assembleenat plaisir
@@ -698,7 +689,6 @@
 @bfmtv emission
 @bfmtv evoquer
 @bfmtv gouvernement
-@bfmtv matin
 @bfmtv parler
 @bfmtv reagir
 @bfmtv serai
@@ -918,12 +908,9 @@
 @deputesre @gouvernementfr
 @deputesre @olivierdussopt
 @deputesre @renaissance
-@deputesre avons
 @deputesre deputesre
-@deputesre france
 @deputesre heureux
 @deputesre lcp
-@deputesre matin
 @deputesre rencontre
 @deputesre retrouvez
 @deputesre sommes
@@ -995,12 +982,11 @@
 @emmanuelmacron @gdarmanin
 @emmanuelmacron @gouvernementfr
 @emmanuelmacron annonce
-@emmanuelmacron avons
 @emmanuelmacron clair
 @emmanuelmacron elu
+@emmanuelmacron emmanuelmacron
 @emmanuelmacron engage
 @emmanuelmacron fixe
-@emmanuelmacron france
 @emmanuelmacron gouvernement
 @emmanuelmacron lors
 @emmanuelmacron majorite
@@ -1116,7 +1102,6 @@
 @franceculture
 @francediplo
 @franceinfo
-@franceinfo aujourd'hui
 @franceinfo canal
 @franceinfo demain
 @franceinfo parler
@@ -1160,7 +1145,6 @@
 @gdarmanin @olivierdussopt
 @gdarmanin agir
 @gdarmanin annonce
-@gdarmanin avons
 @gdarmanin ministre
 @gdarmanin raison
 @gdarrieussecq
@@ -1206,7 +1190,6 @@
 @groupern_off @mlp_officiel
 @groupern_off @rnational_off
 @groupern_off assemblee
-@groupern_off avons
 @groupern_off commission
 @groupern_off defendre
 @groupern_off depose
@@ -1235,8 +1218,8 @@
 @herveberville
 @herveberville secretaire
 @horizons_an
+@horizons_an @assembleenat
 @horizons_an @horizonsleparti
-@horizons_an avons
 @horizonsjeunes
 @horizonsleparti
 @horizonsleparti @horizons_an
@@ -1273,6 +1256,7 @@
 @issylesmoul
 @j_bardella
 @j_bardella @mlp_officiel
+@j_bardella j_bardella
 @j_bardella presidence
 @j_bardella president
 @j_denormandie
@@ -1383,7 +1367,6 @@
 @larem_an
 @larem_an @assembleenat
 @larem_an @auroreberge
-@larem_an avons
 @laremparis
 @latribune
 @laualexandre12
@@ -1405,6 +1388,7 @@
 @lci @tf1info
 @lcp
 @lcp emission
+@lcp partir
 @ldh_fr
 @le_crif
 @le_figaro
@@ -1775,6 +1759,7 @@
 @republicains_an @assembleenat
 @republicains_an @lesrep_senat
 @republicains_an @lesrepublicains
+@republicains_an @oliviermarleix
 @restosducoeur
 @rev_parti
 @revolrene
@@ -1802,7 +1787,6 @@
 @rnational_off @mlp_officiel
 @rnational_off assemblee
 @rnational_off autour
-@rnational_off avons
 @rnational_off bouches-du-rhone
 @rnational_off bravo
 @rnational_off commission
@@ -1904,7 +1888,6 @@
 @socialistesan @borisvallaud
 @socialistesan @partisocialiste
 @socialistesan @senateursps
-@socialistesan avons
 @socialistesan socialistesan
 @solidarite_gouv
 @solidaritefemme
@@ -2032,6 +2015,7 @@
 @xavierbertrand
 @xrfrance
 @yaelbraunpivet
+@yaelbraunpivet @assembleenat
 @yaelbraunpivet @auroreberge
 @yaelbraunpivet presidente
 @yaelmenache
@@ -2301,12 +2285,13 @@ accompagner agriculteurs
 accompagner eleves
 accompagner enfants
 accompagner entreprises
+accompagner face
 accompagner familles
 accompagner femmes
-accompagner francais
 accompagner jeunes
 accompagner personnes
 accompagner projets
+accompagner quotidien
 accompagner transition
 accompagner vers
 accompagner victimes
@@ -2323,7 +2308,6 @@ accomplissement
 accomplissent
 accord
 accord cooperation
-accord france
 accord gouvernement
 accord historique
 accord libre-echange
@@ -2360,7 +2344,6 @@ accueil hier
 accueil jeunes
 accueil lors
 accueil marche
-accueil matin
 accueil migrants
 accueil nouveaux
 accueil occasion
@@ -2384,22 +2367,20 @@ accueillerai
 accueilli
 accueilli assemblee
 accueilli hier
-accueilli matin
 accueillie
 accueillies
 accueillir
 accueillir @assembleenat
 accueillir assemblee
-accueillir aujourd'hui
 accueillir dignement
 accueillir eleves
 accueillir enfants
 accueillir jeunes
-accueillir matin
 accueillir migrants
 accueillir ministre
 accueillir nouveau
 accueillir nouveaux
+accueillir personnes
 accueillis
 accueillons
 accueils
@@ -2424,26 +2405,31 @@ acharnement
 acharnes
 achat
 achat adopte
-achat avons
+achat assemblee
+achat baisse
 achat climat
 achat compatriotes
 achat concitoyens
 achat deputes
 achat ecologie
 achat face
-achat francais
 achat francaises
 achat gouvernement
 achat inflation
 achat loi
 achat menages
 achat mesures
+achat plein
 achat priorite
 achat projet
+achat proteger
 achat retraites
+achat retrouvez
 achat salaries
 achat sante
 achat securite
+achat sommes
+achat travail
 achat vehicule
 achat velo
 achat vote
@@ -2503,7 +2489,6 @@ acteurs terrain
 acteurs territoire
 actif
 actifs
-actifs francais
 actifs opposes
 actifs retraites
 actifs veulent
@@ -2524,9 +2509,6 @@ action etat
 action exterieure
 action faveur
 action forte
-action francais
-action francaise
-action france
 action gouvernement
 action groupe
 action majorite
@@ -2674,7 +2656,6 @@ adopte @assembleenat
 adopte amendement
 adopte article
 adopte assemblee
-adopte aujourd'hui
 adopte avis
 adopte commission
 adopte definitivement
@@ -2903,8 +2884,8 @@ agee
 agees
 agen
 agence
+agence developpement
 agence financement
-agence francaise
 agence nationale
 agence pole
 agences
@@ -2953,7 +2934,6 @@ agir concretement
 agir ensemble
 agir face
 agir faveur
-agir francais
 agir interet
 agir pouvoir
 agir proteger
@@ -3023,7 +3003,6 @@ agriculteurs agricultrices
 agriculteurs artisans
 agriculteurs eleveurs
 agriculteurs face
-agriculteurs francais
 agriculteurs producteurs
 agricultrice
 agricultrices
@@ -3034,7 +3013,7 @@ agriculture agriculteurs
 agriculture alimentation
 agriculture biologique
 agriculture demain
-agriculture francaise
+agriculture face
 agriculture locale
 agriculture occasion
 agriculture paysanne
@@ -3062,8 +3041,6 @@ aide entreprises
 aide etat
 aide exceptionnelle
 aide financiere
-aide francais
-aide france
 aide humanitaire
 aide internationale
 aide millions
@@ -3088,7 +3065,6 @@ aider face
 aider familles
 aider femmes
 aider financierement
-aider francais
 aider jeunes
 aider menages
 aider personnes
@@ -3122,13 +3098,10 @@ ailes
 aille
 aillent
 ailleurs
-ailleurs france
 aimais
 aimait
 aiment
-aiment france
 aimer
-aimer france
 aimeraient
 aimerais
 aimerait
@@ -3233,7 +3206,6 @@ alfortville
 alger
 algerie
 algerie combats
-algerie francaise
 algerien
 algerienne
 algeriens
@@ -3250,7 +3222,6 @@ aligner
 alignes
 alimentaire
 alimentaire @mfesneau
-alimentaire france
 alimentaire pays
 alimentaires
 alimentation
@@ -3288,7 +3259,6 @@ allegorie
 allegrement
 allemagne
 allemagne espagne
-allemagne france
 allemand
 allemande
 allemandes
@@ -3373,7 +3343,6 @@ also
 alstom
 alternance
 alternance dont
-alternance france
 alternant
 alternants
 alternatif
@@ -3394,14 +3363,11 @@ amateurs
 amazon
 amazonie
 ambassade
-ambassade france
 ambassadeur
-ambassadeur france
 ambassadeur ukraine
 ambassadeurs
 ambassadrice
 ambassadrice armenie
-ambassadrice france
 ambassadrices
 ambiance
 ambiance chaleureuse
@@ -3417,7 +3383,6 @@ ambitieux
 ambition
 ambition commune
 ambition ecologique
-ambition france
 ambitions
 ambroise
 ambroise croizat
@@ -3441,7 +3406,6 @@ ameliorer acces
 ameliorer accompagnement
 ameliorer attractivite
 ameliorer conditions
-ameliorer francais
 ameliorer pouvoir
 ameliorer prise
 ameliorer protection
@@ -3467,7 +3431,6 @@ amendement afin
 amendement amendement
 amendement appel
 amendement augmenter
-amendement avons
 amendement collegue
 amendement commission
 amendement defendu
@@ -3499,8 +3462,8 @@ amendement vote
 amendements
 amendements adoptes
 amendements amendements
-amendements avons
 amendements commission
+amendements defendre
 amendements deposes
 amendements deputes
 amendements dont
@@ -3567,7 +3530,6 @@ amis famille
 amis riches
 amitie
 amitie @assembleenat
-amitie france
 amitie franco-allemande
 amitie parlementaire
 amitie pays
@@ -3581,10 +3543,8 @@ amortir
 amortisseur
 amortisseur electricite
 amour
-amour france
 amour pays
 amoureux
-amoureux france
 amoureux nature
 amoxicilline
 amp
@@ -3607,7 +3567,6 @@ an debut
 an demi
 an dernier
 an etat
-an france
 an loi
 an president
 an prison
@@ -3698,49 +3657,10 @@ anne-marie
 anne-sophie
 anne_hidalgo
 annecy
-annee
-annee annee
-annee annonce
-annee assemblee
-annee avons
-annee belle
-annee bravo
-annee commence
-annee consecutive
-annee derniere
-annee difficile
-annee ecoulee
-annee enfants
-annee ensemble
-annee europeenne
-annee femmes
-annee francais
-annee france
-annee gouvernement
-annee lutte
-annee medecine
-annee milliards
-annee millions
-annee nouvelle
-annee occasion
-annee passee
-annee personnes
-annee plaisir
-annee pleine
-annee prochaine
-annee record
-annee reforme
-annee retrouvez
-annee riche
-annee scolaire
-annee sommes
-annee souhaite
-annee venir
 annees
 annees bravo
 annees cotisation
 annees engagement
-annees france
 annees gouvernement
 annees passees
 annees precedentes
@@ -3766,17 +3686,16 @@ annoncant
 annonce
 annonce @elisabeth_borne
 annonce @emmanuelmacron
-annonce aujourd'hui
 annonce creation
 annonce deces
 annonce deputes
+annonce elisabeth
 annonce fermeture
 annonce fin
 annonce gouvernement
 annonce hausse
 annonce hier
 annonce lancement
-annonce matin
 annonce mesures
 annonce milliards
 annonce millions
@@ -3863,7 +3782,6 @@ antiraciste
 antisemite
 antisemites
 antisemitisme
-antisemitisme france
 antisemitisme racisme
 antisionisme
 antisocial
@@ -3957,9 +3875,9 @@ appelle chacun
 appelle collegues
 appelle democratie
 appelle deputes
-appelle francais
 appelle gouvernement
 appelle grande
+appelle greve
 appelle liberation
 appelle mobilisation
 appelle responsabilite
@@ -4040,7 +3958,6 @@ apprennent
 apprenons
 apprenti
 apprentis
-apprentis france
 apprentissage
 apprentissages
 appretait
@@ -4067,8 +3984,8 @@ approuver
 approvisionnement
 approvisionnement electrique
 approvisionnement energetique
-approvisionnement francais
 approvisionnement gaz
+approvisionnement produits
 approvisionnements
 approximations
 appui
@@ -4082,7 +3999,6 @@ apres-midi
 apres-midi @assembleenat
 apres-midi assemblee
 apres-midi assiste
-apres-midi avons
 apres-midi collegue
 apres-midi collegues
 apres-midi commission
@@ -4147,7 +4063,6 @@ arenh
 argent
 argent contribuable
 argent etat
-argent francais
 argent magique
 argent public
 argent retraites
@@ -4174,7 +4089,6 @@ arme feu
 arme nucleaire
 armee
 armee air
-armee francaise
 armee israelienne
 armee russe
 armee terre
@@ -4189,7 +4103,6 @@ armenienne
 armeniens
 armer
 armes
-armes france
 arminarefi
 armistice
 armistice novembre
@@ -4244,11 +4157,9 @@ arrivants
 arrive
 arrive assemblee
 arrive bientot
-arrive france
 arrive pouvoir
 arrivee
 arrivee deputes
-arrivee france
 arrivee pouvoir
 arrivees
 arrivent
@@ -4375,8 +4286,6 @@ assemblee adopte
 assemblee ailleurs
 assemblee amendement
 assemblee assemblee
-assemblee aujourd'hui
-assemblee avons
 assemblee bataille
 assemblee bravo
 assemblee circonscription
@@ -4392,16 +4301,15 @@ assemblee depute
 assemblee deputes
 assemblee face
 assemblee fin
-assemblee francais
 assemblee generale
 assemblee gouvernement
 assemblee groupe
 assemblee hier
+assemblee jeudi
 assemblee lieu
 assemblee loi
 assemblee macronie
 assemblee majorite
-assemblee matin
 assemblee ministre
 assemblee mobilisation
 assemblee nationale
@@ -4453,8 +4361,8 @@ assise
 assises
 assises nationales
 assistais
+assistais ceremonie
 assistais hier
-assistais matin
 assistanat
 assistance
 assistant
@@ -4465,11 +4373,9 @@ assistantes maternelles
 assistants
 assistants parlementaires
 assiste
-assiste aujourd'hui
 assiste ceremonie
 assiste hier
 assiste inauguration
-assiste matin
 assiste remise
 assiste reunion
 assiste voeux
@@ -4477,7 +4383,6 @@ assistee
 assister
 assister ceremonie
 assister inauguration
-assister matin
 assister premiere
 assister remise
 assister voeux
@@ -4493,7 +4398,6 @@ association amis
 association anciens
 association commercants
 association departementale
-association francaise
 association maires
 association nationale
 association oeuvre
@@ -4671,7 +4575,6 @@ attentats terroristes
 attente
 attentes
 attentes concitoyens
-attentes francais
 attentif
 attentifs
 attention
@@ -4805,7 +4708,6 @@ audition conjointe
 audition general
 audition huis
 audition m.
-audition matin
 audition ministre
 audition ministres
 audition mme
@@ -4817,8 +4719,6 @@ audition syndicats
 auditionnais
 auditionnait
 auditionne
-auditionne aujourd'hui
-auditionne matin
 auditionne ministre
 auditionnee
 auditionner
@@ -4826,10 +4726,8 @@ auditionnerons
 auditionnes
 auditionnions
 auditionnons
-auditionnons matin
 auditions
 auditions acteurs
-auditions aujourd'hui
 auditions cadre
 auditions commission
 auditions mission
@@ -4864,7 +4762,6 @@ augmentations
 augmentations salaire
 augmentations salaires
 augmente
-augmente annee
 augmente milliards
 augmente salaire
 augmente salaires
@@ -4898,112 +4795,6 @@ augure
 auguste
 auj
 aujourd
-aujourd'hui
-aujourd'hui 14h
-aujourd'hui 15h
-aujourd'hui 1er
-aujourd'hui @assembleenat
-aujourd'hui @elisabeth_borne
-aujourd'hui @pole_emploi
-aujourd'hui aliaksandr
-aujourd'hui aliaksei
-aujourd'hui allee
-aujourd'hui amendement
-aujourd'hui andrei
-aujourd'hui assemblee
-aujourd'hui autour
-aujourd'hui avons
-aujourd'hui bravo
-aujourd'hui cadre
-aujourd'hui celebrons
-aujourd'hui ceremonie
-aujourd'hui circonscription
-aujourd'hui collegue
-aujourd'hui collegues
-aujourd'hui commence
-aujourd'hui commission
-aujourd'hui conseil
-aujourd'hui cotes
-aujourd'hui debat
-aujourd'hui debute
-aujourd'hui demain
-aujourd'hui deplacement
-aujourd'hui depute
-aujourd'hui deputes
-aujourd'hui devant
-aujourd'hui ecole
-aujourd'hui eleves
-aujourd'hui elus
-aujourd'hui ensemble
-aujourd'hui equipe
-aujourd'hui face
-aujourd'hui femmes
-aujourd'hui fete
-aujourd'hui francais
-aujourd'hui france
-aujourd'hui gouvernement
-aujourd'hui grace
-aujourd'hui grand
-aujourd'hui grande
-aujourd'hui greve
-aujourd'hui groupe
-aujourd'hui hemicycle
-aujourd'hui heureux
-aujourd'hui hier
-aujourd'hui hommage
-aujourd'hui honneur
-aujourd'hui inauguration
-aujourd'hui internationale
-aujourd'hui jusqu'
-aujourd'hui lancement
-aujourd'hui lieu
-aujourd'hui lors
-aujourd'hui manifestation
-aujourd'hui marche
-aujourd'hui ministre
-aujourd'hui mondiale
-aujourd'hui nouveau
-aujourd'hui nouvelle
-aujourd'hui occasion
-aujourd'hui ouvre
-aujourd'hui paris
-aujourd'hui partir
-aujourd'hui partout
-aujourd'hui pays
-aujourd'hui permanence
-aujourd'hui personnes
-aujourd'hui plaisir
-aujourd'hui plusieurs
-aujourd'hui politique
-aujourd'hui premier
-aujourd'hui premiere
-aujourd'hui pres
-aujourd'hui present
-aujourd'hui presentation
-aujourd'hui presente
-aujourd'hui president
-aujourd'hui projet
-aujourd'hui proposition
-aujourd'hui question
-aujourd'hui rapport
-aujourd'hui rassemblement
-aujourd'hui reforme
-aujourd'hui rencontre
-aujourd'hui rendons
-aujourd'hui retour
-aujourd'hui retraite
-aujourd'hui reunion
-aujourd'hui rue
-aujourd'hui seance
-aujourd'hui serai
-aujourd'hui situation
-aujourd'hui sommes
-aujourd'hui soutien
-aujourd'hui tour
-aujourd'hui travail
-aujourd'hui visite
-aujourd'hui vote
-aujourd'hui yauhen
 aulnay
 aulnay-sous-bois
 aumone
@@ -5016,7 +4807,6 @@ aupres collegues
 aupres concitoyens
 aupres elus
 aupres enfants
-aupres francais
 aupres gouvernement
 aupres habitants
 aupres jeunes
@@ -5196,6 +4986,7 @@ auxquelles
 auxquelles confrontes
 auxquelles face
 auxquels
+auxquels face
 av
 avaient
 avaient alerte
@@ -5225,7 +5016,6 @@ avancer debat
 avancer dossiers
 avancer droits
 avancer ensemble
-avancer france
 avancer pays
 avancer projets
 avancer recherche
@@ -5251,10 +5041,9 @@ avenir appartient
 avenir commun
 avenir energetique
 avenir enfants
+avenir europe
 avenir famille
 avenir filiere
-avenir francais
-avenir france
 avenir gauche
 avenir institutionnel
 avenir jeunes
@@ -5266,6 +5055,7 @@ avenir systeme
 avenir territoire
 avenir territoires
 avenir transports
+avenir travail
 avent1
 avent1 souvenir
 aventure
@@ -5309,7 +5099,6 @@ avis commission
 avis conseil
 avis defavorable
 avis favorable
-avis francais
 avis gouvernement
 avis majorite
 avis politique
@@ -5319,122 +5108,6 @@ avocat
 avocat franco-palestinien
 avocate
 avocats
-avons
-avons aborde
-avons aborder
-avons accueilli
-avons adopte
-avons adopter
-avons adresse
-avons agi
-avons alerte
-avons annonce
-avons appris
-avons assiste
-avons aucun
-avons aucune
-avons auditionne
-avons aujourd'hui
-avons avance
-avons besoin
-avons celebre
-avons cesse
-avons chance
-avons choisi
-avons choix
-avons coeur
-avons collectivement
-avons commemore
-avons commence
-avons commun
-avons construit
-avons cree
-avons debattu
-avons decide
-avons defendu
-avons demande
-avons depose
-avons deposee
-avons devoir
-avons discute
-avons discuter
-avons donne
-avons droit
-avons echange
-avons echanger
-avons echanges
-avons ecrit
-avons egalement
-avons elu
-avons elus
-avons empeche
-avons enfin
-avons ensemble
-avons ensuite
-avons entendu
-avons evoque
-avons evoquer
-avons examine
-avons gagne
-avons hate
-avons honneur
-avons inaugure
-avons interpelle
-avons jusqu'
-avons lance
-avons majorite
-avons matin
-avons mene
-avons montre
-avons moyens
-avons notamment
-avons objectif
-avons obtenu
-avons occasion
-avons organise
-avons partage
-avons participe
-avons perdu
-avons permis
-avons peur
-avons place
-avons plaisir
-avons point
-avons porte
-avons pose
-avons pourtant
-avons presente
-avons propose
-avons propositions
-avons protege
-avons raison
-avons rappele
-avons reaffirme
-avons recu
-avons recus
-avons rejete
-avons remis
-avons remporte
-avons rencontre
-avons rendu
-avons repondu
-avons responsabilite
-avons reuni
-avons reussi
-avons role
-avons signe
-avons solutions
-avons souhaite
-avons soutenu
-avons su
-avons tant
-avons tenu
-avons travaille
-avons vecu
-avons visite
-avons vote
-avons voter
-avons voulu
 avortement
 avortement constitution
 avorter
@@ -5580,7 +5253,6 @@ banniere
 bannir
 banque
 banque alimentaire
-banque france
 banques
 banques alimentaires
 banquet
@@ -5718,7 +5390,6 @@ battu
 battue
 battues
 battus
-battus france
 battus liberte
 baume
 bayonne
@@ -5798,7 +5469,6 @@ belgique
 belle
 belle action
 belle ambiance
-belle annee
 belle assemblee
 belle association
 belle avancee
@@ -5819,7 +5489,6 @@ belle equipe
 belle exposition
 belle fete
 belle fin
-belle france
 belle grande
 belle heureuse
 belle idee
@@ -5939,7 +5608,6 @@ besoin aide
 besoin budget
 besoin eux
 besoin financement
-besoin france
 besoin moyens
 besoin plan
 besoin reforme
@@ -5950,7 +5618,6 @@ besoin urgent
 besoin voiture
 besoins
 besoins essentiels
-besoins francais
 besoins sante
 besoins specifiques
 besoins territoire
@@ -6034,7 +5701,6 @@ big
 bilan
 bilan action
 bilan activite
-bilan annee
 bilan carbone
 bilan catastrophique
 bilan mandat
@@ -6105,7 +5771,6 @@ bleu_gironde
 bleue
 bleues
 bleuet
-bleuet france
 bleus
 bloc
 bloc bourgeois
@@ -6529,7 +6194,6 @@ budget dedie
 budget defense
 budget education
 budget etat
-budget france
 budget gouvernement
 budget hausse
 budget hauteur
@@ -6544,6 +6208,7 @@ budget sante
 budget secu
 budget securite
 budget transports
+budget vote
 budgetaire
 budgetaires
 budgets
@@ -6820,7 +6485,6 @@ captivite
 capture
 captures
 car
-car avons
 car etat
 car eux
 car gouvernement
@@ -6840,7 +6504,6 @@ caraibes
 caravane
 carbone
 carbone frontieres
-carbone ici
 carburant
 carburants
 carcassonne
@@ -7022,7 +6685,6 @@ celebrant
 celebration
 celebrations
 celebre
-celebre aujourd'hui
 celebree
 celebrent
 celebrer
@@ -7030,7 +6692,6 @@ celebrer fete
 celebres
 celebrions
 celebrons
-celebrons aujourd'hui
 celine
 celine quatennens
 celinecalvez
@@ -7144,7 +6805,6 @@ ceremonie departementale
 ceremonie emouvante
 ceremonie hommage
 ceremonie installation
-ceremonie matin
 ceremonie memoire
 ceremonie nationale
 ceremonie naturalisation
@@ -7181,7 +6841,6 @@ certains amendements
 certains collegues
 certains deputes
 certains elus
-certains francais
 certains groupes
 certains medias
 certains membres
@@ -7274,6 +6933,7 @@ chalonnaise
 chambery
 chambre
 chambre agriculture
+chambre commerce
 chambre enregistrement
 chambre metiers
 chambres
@@ -7285,9 +6945,7 @@ champagne-ardenne
 champetre
 champigny-sur-marne
 champion
-champion france
 championnat
-championnat france
 championnats
 championne
 championne europe
@@ -7297,7 +6955,6 @@ champs
 champs elysees
 champs-elysees
 chance
-chance france
 chance passer
 chance pouvoir
 chance visiter
@@ -7568,7 +7225,6 @@ chocolats
 chocs
 choeur
 choisi
-choisi france
 choisie
 choisir
 choisir avenir
@@ -7583,11 +7239,10 @@ choisy-le-roi
 choix
 choix clair
 choix electeurs
-choix francais
-choix france
 choix gouvernement
 choix politique
 choix politiques
+choix responsabilite
 choix societe
 chomage
 chomage baisse
@@ -7610,7 +7265,6 @@ choquer
 choques
 chorale
 chose
-chose faite
 chose simple
 chose sure
 choses
@@ -7670,7 +7324,6 @@ ciment
 cimetiere
 cimetieres
 cinema
-cinema francais
 cinglant
 cinglante
 cinq
@@ -7685,8 +7338,6 @@ circonscription
 circonscription afin
 circonscription agenda
 circonscription assemblee
-circonscription aujourd'hui
-circonscription avons
 circonscription belle
 circonscription bouches-du-rhone
 circonscription bravo
@@ -7695,11 +7346,11 @@ circonscription cotes
 circonscription echanger
 circonscription echanges
 circonscription essonne
-circonscription francais
+circonscription etablis
+circonscription etranger
 circonscription herault
 circonscription hier
 circonscription marne
-circonscription matin
 circonscription nord
 circonscription occasion
 circonscription paris
@@ -7711,10 +7362,12 @@ circonscription samedi
 circonscription seine-et-marne
 circonscription semaine
 circonscription serai
+circonscription souhaite
 circonscription travail
 circonscription vendredi
 circonscription visite
 circonscription vote
+circonscription week-end
 circonscription yvelines
 circonscriptiona
 circonscriptions
@@ -7760,7 +7413,6 @@ citoyens citoyennes
 citoyens demain
 citoyens elus
 citoyens engages
-citoyens francais
 city
 civaux
 civil
@@ -7860,8 +7512,6 @@ climate
 climaticide
 climaticides
 climatique
-climatique avons
-climatique france
 climatique gouvernement
 climatique politique
 climatique reforme
@@ -7970,8 +7620,6 @@ coeur discussions
 coeur echanges
 coeur engagement
 coeur enjeux
-coeur francais
-coeur france
 coeur paris
 coeur politique
 coeur politiques
@@ -8010,7 +7658,6 @@ col blanc
 col roule
 colere
 colere face
-colere francais
 colere gronde
 colere monte
 colere peuple
@@ -8084,7 +7731,6 @@ collegues @republicains_an
 collegues @rnational_off
 collegues amis
 collegues assemblee
-collegues avons
 collegues commission
 collegues confiance
 collegues conseillers
@@ -8141,7 +7787,6 @@ combat essentiel
 combat face
 combat feministe
 combat femmes
-combat france
 combat idees
 combat justice
 combat liberte
@@ -8152,6 +7797,7 @@ combat porte
 combat quotidien
 combat reforme
 combat relache
+combat valeurs
 combat violences
 combatif
 combatifs
@@ -8170,6 +7816,7 @@ combattantes
 combattants
 combattants liberte
 combattants memoire
+combattants morts
 combattants victimes
 combattent
 combattons
@@ -8249,12 +7896,10 @@ commemore
 commemorer
 commemorions
 commemorons
-commemorons aujourd'hui
 commencait
 commencant
 commence
 commence assemblee
-commence aujourd'hui
 commence tot
 commence travailler
 commencee
@@ -8316,7 +7961,6 @@ commission @assembleenat
 commission affaires
 commission amendement
 commission assemblee
-commission avons
 commission culture
 commission defense
 commission developpement
@@ -8326,7 +7970,6 @@ commission europeenne
 commission finances
 commission hemicycle
 commission lois
-commission matin
 commission mixte
 commission nationale
 commission permanente
@@ -8346,7 +7989,6 @@ communaute
 communaute agglomeration
 communaute communes
 communaute educative
-communaute francaise
 communaute internationale
 communaute juive
 communaute kurde
@@ -8357,7 +7999,6 @@ communautes communes
 communaux
 commune
 commune ainsi
-commune avons
 commune bravo
 commune dynamique
 commune habitants
@@ -8369,7 +8010,6 @@ communes
 communes circonscription
 communes departements
 communes face
-communes france
 communes habitants
 communes rurales
 communes territoire
@@ -8606,11 +8246,10 @@ concours lepine
 concret
 concrete
 concretement
-concretement francais
 concretes
 concretes ameliorer
 concretes efficaces
-concretes francais
+concretes face
 concretisation
 concretise
 concretiser
@@ -8711,7 +8350,6 @@ confiance assemblee
 confiance avenir
 confiance citoyens
 confiance elus
-confiance francais
 confiance gouvernement
 confiance honore
 confiance institutions
@@ -8891,7 +8529,7 @@ conseillere regionale
 conseilleres
 conseillers
 conseillers departementaux
-conseillers francais
+conseillers etranger
 conseillers municipaux
 conseillers numeriques
 conseillers quartier
@@ -8986,7 +8624,6 @@ constituer
 constitues
 constitution
 constitution droit
-constitution francaise
 constitutionnalisation
 constitutionnalisation droit
 constitutionnalisation ivg
@@ -9041,7 +8678,7 @@ consultation publique
 consultations
 consulte
 consulter
-consulter ici
+consulter recevoir
 consultes
 consultez
 contact
@@ -9090,7 +8727,6 @@ continuant
 continuation
 continue
 continue assemblee
-continue aujourd'hui
 continue baisser
 continue battre
 continue combat
@@ -9098,7 +8734,6 @@ continue defendre
 continue demain
 continue jusqu'
 continue lutte
-continue matin
 continue mobilisation
 continue porter
 continue rendez
@@ -9108,6 +8743,7 @@ continue travail
 continue travailler
 continuellement
 continuent
+continuent battre
 continuer
 continuer agir
 continuer avancer
@@ -9278,7 +8914,6 @@ cooperatif
 cooperation
 cooperation economique
 cooperation europeenne
-cooperation france
 cooperation franco-allemande
 cooperation internationale
 cooperation matiere
@@ -9393,8 +9028,6 @@ cotes armor
 cotes artisans
 cotes assemblee
 cotes associations
-cotes aujourd'hui
-cotes avons
 cotes benevoles
 cotes camarades
 cotes celles
@@ -9413,7 +9046,6 @@ cotes etat
 cotes familles
 cotes femmes
 cotes forces
-cotes francais
 cotes grevistes
 cotes habitants
 cotes jeunes
@@ -9423,7 +9055,6 @@ cotes madame
 cotes maire
 cotes maires
 cotes marine
-cotes matin
 cotes militants
 cotes ministre
 cotes mme
@@ -9442,6 +9073,7 @@ cotes retrouvez
 cotes salaries
 cotes sapeurs-pompiers
 cotes soignants
+cotes soutenir
 cotes syndicats
 cotes terrain
 cotes travailleurs
@@ -9483,7 +9115,6 @@ coupable condamne
 coupables
 coupe
 coupe football
-coupe france
 coupe qatar
 coupe rugby
 coupe-gorge
@@ -9784,7 +9415,6 @@ croient
 croirait
 croire
 croire croire
-croire francais
 croisade
 croise
 croise doigts
@@ -9854,15 +9484,12 @@ culture
 culture @rimaabdulmalak
 culture compromis
 culture education
-culture francaise
-culture france
 culture patrimoine
 culture scientifique
 culture sport
 culture traditions
 culturel
 culturelle
-culturelle francaise
 culturelles
 culturelles education
 culturels
@@ -9990,10 +9617,8 @@ debat ait
 debat amendements
 debat apaise
 debat assemblee
-debat aujourd'hui
 debat autour
 debat avenir
-debat avons
 debat budget
 debat budgetaire
 debat commence
@@ -10005,7 +9630,6 @@ debat direct
 debat face
 debat fin
 debat fond
-debat francais
 debat gouvernement
 debat hemicycle
 debat hier
@@ -10014,7 +9638,6 @@ debat immigration
 debat important
 debat lieu
 debat loi
-debat matin
 debat national
 debat necessaire
 debat organise
@@ -10039,7 +9662,6 @@ debats @assembleenat
 debats amendements
 debats assemblee
 debats autour
-debats avons
 debats budget
 debats budgetaires
 debats commission
@@ -10055,6 +9677,7 @@ debats reforme
 debats retraites
 debats riches
 debats seance
+debats vote
 debattent
 debattions
 debattons
@@ -10089,7 +9712,6 @@ debout
 debrancher
 debrief
 debut
-debut annee
 debut annees
 debut aout
 debut apres-midi
@@ -10115,7 +9737,6 @@ debut soiree
 debut travaux
 debutait
 debute
-debute aujourd'hui
 debute examen
 debutent
 debuter
@@ -10268,12 +9889,11 @@ decouvrant
 decouvre
 decouvrent
 decouvrez
-decouvrez aujourd'hui
+decouvrez @pole_emploi
 decouvrez essentiel
 decouvrir
 decouvrir assemblee
 decouvrir histoire
-decouvrir ici
 decouvrir lieu
 decouvrir metiers
 decouvrir nouveaux
@@ -10327,6 +9947,7 @@ defend interets
 defend pouvoir
 defendaient
 defendais
+defendais amendement
 defendait
 defendant
 defende
@@ -10351,8 +9972,6 @@ defendre droit
 defendre droits
 defendre face
 defendre force
-defendre francais
-defendre france
 defendre idees
 defendre interet
 defendre interets
@@ -10363,7 +9982,9 @@ defendre modele
 defendre motion
 defendre pays
 defendre peuple
+defendre politique
 defendre pouvoir
+defendre programme
 defendre projet
 defendre proposition
 defendre propositions
@@ -10400,8 +10021,6 @@ defense assemblee
 defense droits
 defense europeenne
 defense forces
-defense francais
-defense france
 defense hopital
 defense interets
 defense nationale
@@ -10524,11 +10143,11 @@ delation
 delegation
 delegation @an_defense
 delegation @an_droitsfemmes
+delegation assemblee
 delegation collectivites
 delegation commission
 delegation deputes
 delegation droits
-delegation francaise
 delegation outre-mer
 delegation parlementaire
 delegation parlementaires
@@ -10600,35 +10219,39 @@ demain 18h30
 demain 20h
 demain 7h40
 demain 7h45
+demain 7h50
+demain 8h
+demain 8h10
+demain 8h13
 demain 8h15
 demain 8h20
 demain 8h30
 demain 9h
 demain @bfmtv
 demain @cnews
+demain @sudradio
 demain apres-midi
 demain assemblee
 demain aura
 demain commission
 demain cotes
-demain devons
 demain dimanche
 demain direct
 demain ensemble
 demain face
-demain france
 demain grand
 demain hemicycle
 demain invite
+demain invitee
 demain jeudi
 demain lors
 demain lundi
 demain marche
 demain mardi
-demain matin
 demain matinale
 demain mercredi
 demain midi
+demain paris
 demain partir
 demain partout
 demain place
@@ -10657,7 +10280,6 @@ demande efforts
 demande etat
 demande explications
 demande forte
-demande francais
 demande gouvernement
 demande gvt
 demande legitime
@@ -10747,7 +10369,6 @@ democratie
 democratie bfmtv
 democratie debat
 democratie democratie
-democratie francaise
 democratie gouvernement
 democratie lcp
 democratie liberte
@@ -10828,7 +10449,6 @@ departement @ca_ginesy
 departement alpes-maritimes
 departement ardeche
 departement aude
-departement avons
 departement nord
 departement region
 departement seine-saint-denis
@@ -10844,6 +10464,7 @@ departementalisation
 departementaux
 departementaux regionaux
 departements
+departements etat
 departements regions
 departs
 departs anticipes
@@ -10925,7 +10546,6 @@ deposant
 depose
 depose amendement
 depose amendements
-depose aujourd'hui
 depose collegue
 depose gerbe
 depose motion
@@ -10993,8 +10613,6 @@ depute elu
 depute engage
 depute europeen
 depute extreme-droite
-depute francais
-depute france
 depute gauche
 depute groupe
 depute haguenaule
@@ -11034,6 +10652,7 @@ deputee assemblee
 deputee circonscription
 deputee eelv
 deputee europeenne
+deputee insoumise
 deputee lfi
 deputee lrem
 deputee macroniste
@@ -11064,7 +10683,6 @@ deputes actifs
 deputes adoptent
 deputes assemblee
 deputes avaient
-deputes avons
 deputes bords
 deputes commission
 deputes communistes
@@ -11080,13 +10698,12 @@ deputes engages
 deputes etaient
 deputes europeens
 deputes extreme
-deputes francais
-deputes france
 deputes gauche
 deputes gouvernement
 deputes groupe
 deputes groupes
 deputes insoumis
+deputes insoumise
 deputes lfi
 deputes lfi-nupes
 deputes lr
@@ -11139,7 +10756,6 @@ derives
 derives sectaires
 dernier
 dernier article
-dernier avons
 dernier conseil
 dernier livre
 dernier mandat
@@ -11152,7 +10768,6 @@ dernier rapport
 dernier recours
 dernier vote
 derniere
-derniere annee
 derniere assemblee
 derniere ceremonie
 derniere commission
@@ -11357,7 +10972,6 @@ detracteurs
 detresse
 detricoter
 detriment
-detriment francais
 detruire
 detruisant
 detruisent
@@ -11368,6 +10982,7 @@ detruites
 detruits
 dette
 dette impots
+dette milliards
 dette publique
 dettes
 deuil
@@ -11393,7 +11008,6 @@ devant cour
 devant deputes
 devant electeurs
 devant eux
-devant francais
 devant gare
 devant justice
 devant lycee
@@ -11475,59 +11089,6 @@ devoir soutenir
 devoir travailler
 devoir vigilance
 devoirs
-devons
-devons absolument
-devons accelerer
-devons accompagner
-devons agir
-devons aider
-devons ameliorer
-devons apporter
-devons assurer
-devons avancer
-devons batir
-devons battre
-devons changer
-devons collectivement
-devons combattre
-devons construire
-devons continuer
-devons defendre
-devons desormais
-devons donner
-devons encourager
-devons engager
-devons face
-devons francais
-devons garantir
-devons hauteur
-devons laisser
-devons loin
-devons lutter
-devons mener
-devons mobiliser
-devons oublier
-devons porter
-devons poursuivre
-devons pouvoir
-devons preparer
-devons preserver
-devons proteger
-devons redonner
-devons reformer
-devons rendre
-devons renforcer
-devons repondre
-devons rester
-devons retrouver
-devons saisir
-devons sortir
-devons soutenir
-devons tant
-devons tirer
-devons travailler
-devons trouver
-devons vite
 devore
 devoue
 devouee
@@ -11625,7 +11186,6 @@ difficultes auxquelles
 difficultes economiques
 difficultes face
 difficultes financieres
-difficultes francais
 difficultes liees
 difficultes quotidien
 difficultes recrutement
@@ -11665,7 +11225,6 @@ dimanche janvier
 dimanche juillet
 dimanche marche
 dimanche mars
-dimanche matin
 dimanche novembre
 dimanche octobre
 dimanche partir
@@ -11695,7 +11254,6 @@ diop
 diplomate
 diplomates
 diplomatie
-diplomatie francaise
 diplomatie parlementaire
 diplomatique
 diplomatiques
@@ -11721,9 +11279,7 @@ direct demain
 direct discours
 direct fabien
 direct facebook
-direct france
 direct hemicycle
-direct ici
 direct invite
 direct lcp
 direct matinale
@@ -11848,7 +11404,6 @@ dispense
 dispo
 disponibilite
 disponible
-disponible ici
 disponible site
 disponibles
 disposant
@@ -11932,7 +11487,6 @@ dividendes verses
 divise
 divisee
 diviser
-diviser francais
 divises
 division
 divisionnaire
@@ -12034,9 +11588,9 @@ donne
 donne avis
 donne confiance
 donne force
-donne france
 donne impression
 donne lecons
+donne liberte
 donne lieu
 donne majorite
 donne mandat
@@ -12056,7 +11610,6 @@ donner
 donner avis
 donner droit
 donner force
-donner francais
 donner lecons
 donner lieu
 donner moyens
@@ -12087,19 +11640,15 @@ dons
 dont
 dont acte
 dont action
-dont avons
 dont beneficie
 dont beneficient
 dont besoin
 dont certains
 dont courage
-dont devons
 dont enfants
 dont engagement
 dont etat
 dont femmes
-dont francais
-dont france
 dont gouvernement
 dont honneur
 dont membre
@@ -12121,6 +11670,8 @@ dont rapporteure
 dont role
 dont seule
 dont sommes
+dont traite
+dont veulent
 dont victime
 dont victimes
 dordogne
@@ -12137,7 +11688,7 @@ dors
 dort
 dos
 dos dos
-dos francais
+dos pauvres
 dos salaries
 dos travailleurs
 dose
@@ -12204,7 +11755,6 @@ drame terrible
 drames
 drancy
 drapeau
-drapeau francais
 drapeau tricolore
 drapeaux
 drastique
@@ -12234,8 +11784,6 @@ droit enfants
 droit europeen
 droit femmes
 droit fondamental
-droit francais
-droit france
 droit greve
 droit humain
 droit information
@@ -12272,8 +11820,6 @@ droite droite
 droite extreme
 droite extreme-droite
 droite forte
-droite francaise
-droite france
 droite gauche
 droite gouvernement
 droite ligne
@@ -12416,7 +11962,6 @@ ecarter
 ecarts
 echange
 echange acteurs
-echange aujourd'hui
 echange autour
 echange constructif
 echange convivialite
@@ -12426,11 +11971,11 @@ echange fructueux
 echange hier
 echange important
 echange interessant
-echange matin
 echange nombreux
 echange partage
 echange passionnant
 echange problematiques
+echange representants
 echange riche
 echange situation
 echange sujet
@@ -12456,6 +12001,7 @@ echanger eleves
 echanger elus
 echanger enjeux
 echanger ensemble
+echanger equipes
 echanger etudiants
 echanger eux
 echanger habitants
@@ -12463,7 +12009,6 @@ echanger hier
 echanger jeunes
 echanger maire
 echanger maires
-echanger matin
 echanger militants
 echanger ministre
 echanger nombreux
@@ -12484,10 +12029,9 @@ echangerons
 echanges
 echanges acteurs
 echanges actualite
+echanges association
 echanges associations
-echanges aujourd'hui
 echanges autour
-echanges avons
 echanges chaleureux
 echanges commercants
 echanges constructifs
@@ -12507,7 +12051,6 @@ echanges instructifs
 echanges interessants
 echanges jeunes
 echanges lors
-echanges matin
 echanges ministre
 echanges nombreux
 echanges nourris
@@ -12519,6 +12062,7 @@ echanges president
 echanges projets
 echanges qualite
 echanges rencontres
+echanges representants
 echanges riches
 echanges stimulants
 echangions
@@ -12567,8 +12111,8 @@ ecocides
 ecoeurant
 ecoeure
 ecole
-ecole aujourd'hui
 ecole college
+ecole ecole
 ecole egalite
 ecole elementaire
 ecole formation
@@ -12581,7 +12125,6 @@ ecole jean
 ecole jules
 ecole lieu
 ecole maternelle
-ecole matin
 ecole musique
 ecole nationale
 ecole primaire
@@ -12605,13 +12148,13 @@ ecologie radicale
 ecologie_gouv
 ecologique
 ecologique @christophebechu
-ecologique avons
 ecologique bravo
 ecologique coeur
 ecologique cohesion
 ecologique democratique
 ecologique economique
 ecologique energetique
+ecologique face
 ecologique gouvernement
 ecologique social
 ecologique sociale
@@ -12638,12 +12181,12 @@ economie @brunolemaire
 economie circulaire
 economie energie
 economie finances
-economie francaise
 economie genoux
 economie guerre
 economie locale
 economie pays
 economie reelle
+economie resiste
 economie russe
 economie sociale
 economie_gouv
@@ -12690,7 +12233,6 @@ ecoutees
 ecoutent
 ecouter
 ecouter echanger
-ecouter francais
 ecouter revendications
 ecoutes
 ecoutez
@@ -12818,7 +12360,6 @@ effort important
 effort national
 effort travail
 efforts
-efforts francais
 effraie
 effrayant
 effrayante
@@ -12920,7 +12461,6 @@ electriciens
 electricite
 electricite chere
 electricite entreprises
-electricite france
 electricite gaz
 electricite hiver
 electricite marche
@@ -13015,7 +12555,6 @@ eloquence
 elsa
 elsafaucillon
 elu
-elu aujourd'hui
 elu defaut
 elu depute
 elu local
@@ -13043,7 +12582,6 @@ elus accueil
 elus acteurs
 elus agents
 elus associations
-elus avons
 elus benevoles
 elus cadres
 elus circonscription
@@ -13059,7 +12597,6 @@ elus doivent
 elus engages
 elus entreprises
 elus etaient
-elus francais
 elus gauche
 elus groupe
 elus habitants
@@ -13159,12 +12696,10 @@ emmene
 emmenee
 emmener
 emmerder
-emmerder francais
 emotion
 emotion apprenant
 emotion fierte
 emotion lors
-emotion matin
 emotion particuliere
 emotion suite
 emotions
@@ -13200,8 +12735,6 @@ emploi
 emploi emploi
 emploi entreprises
 emploi formation
-emploi france
-emploi ici
 emploi industriel
 emploi insertion
 emploi jeunes
@@ -13217,7 +12750,6 @@ emploient
 emplois
 emplois crees
 emplois directs
-emplois france
 emplois industriels
 emplois menaces
 emplois pourvus
@@ -13306,12 +12838,10 @@ energetique alimentaire
 energetique batiments
 energetique ecologique
 energetique entreprises
-energetique francais
-energetique francaise
-energetique france
 energetique gouvernement
 energetique inflation
 energetique logements
+energetique mesures
 energetique pays
 energetique retrouvez
 energetique transition
@@ -13320,9 +12850,7 @@ energie
 energie alimentation
 energie atomique
 energie augmentation
-energie aujourd'hui
 energie avenir
-energie avons
 energie bouclier
 energie chere
 energie climat
@@ -13333,8 +12861,6 @@ energie entreprises
 energie etat
 energie explosent
 energie fossile
-energie francais
-energie france
 energie gouvernement
 energie hausse
 energie inflation
@@ -13368,7 +12894,6 @@ enfant situation
 enfants
 enfants adolescents
 enfants atteints
-enfants avons
 enfants danger
 enfants doivent
 enfants dont
@@ -13384,8 +12909,6 @@ enfants face
 enfants famille
 enfants familles
 enfants femmes
-enfants francais
-enfants france
 enfants handicapes
 enfants jeunes
 enfants juifs
@@ -13452,7 +12975,6 @@ engagement faille
 engagement faveur
 engagement femmes
 engagement fort
-engagement france
 engagement gouvernement
 engagement jeune
 engagement jeunes
@@ -13553,7 +13075,6 @@ enlever
 ennemi
 ennemie
 ennemis
-ennemis france
 ennemis republique
 enonce
 enorme
@@ -13609,7 +13130,6 @@ enseignantes
 enseignants
 enseignants aesh
 enseignants eleves
-enseignants france
 enseignants parents
 enseignants personnels
 enseignants premier
@@ -13617,7 +13137,6 @@ enseigne
 enseignement
 enseignement agricole
 enseignement formation
-enseignement francais
 enseignement pro
 enseignement professionnel
 enseignement scolaire
@@ -13633,7 +13152,6 @@ ensemble agents
 ensemble allons
 ensemble assemblee
 ensemble avenir
-ensemble avons
 ensemble benevoles
 ensemble chere
 ensemble collegues
@@ -13643,8 +13161,8 @@ ensemble construisons
 ensemble continuons
 ensemble defendre
 ensemble defis
+ensemble demain
 ensemble deputes
-ensemble devons
 ensemble elus
 ensemble equipe
 ensemble equipes
@@ -13653,8 +13171,6 @@ ensemble faisons
 ensemble ferons
 ensemble filiere
 ensemble forces
-ensemble francais
-ensemble france
 ensemble gauche
 ensemble gouvernement
 ensemble groupe
@@ -13664,6 +13180,7 @@ ensemble loin
 ensemble maires
 ensemble membres
 ensemble mesures
+ensemble mobilises
 ensemble nupes
 ensemble organisations
 ensemble partenaires
@@ -13708,7 +13225,6 @@ entendez
 entendons
 entendre
 entendre attentes
-entendre francais
 entendre parler
 entendre raison
 entendre voix
@@ -13733,7 +13249,6 @@ enthousiaste
 enthousiastes
 enthoven_r
 entier
-entier ici
 entier soutien
 entiere
 entierement
@@ -13781,7 +13296,6 @@ entrepreneurs
 entrepris
 entreprise
 entreprise familiale
-entreprise francaise
 entreprise privee
 entreprise publique
 entreprise salaries
@@ -13798,7 +13312,6 @@ entreprises doivent
 entreprises dont
 entreprises face
 entreprises francaises
-entreprises france
 entreprises gouvernement
 entreprises innovantes
 entreprises locales
@@ -13818,7 +13331,6 @@ entretenir lien
 entretenu
 entretenue
 entretien
-entretien matin
 entretiennent
 entretiens
 entretient
@@ -13834,7 +13346,6 @@ envers
 envers animaux
 envers femmes
 envers forces
-envers francais
 envers peuple
 envies
 environ
@@ -13936,14 +13447,17 @@ equipage
 equipages
 equipe
 equipe accueil
+equipe belle
 equipe benevoles
+equipe bravo
 equipe campagne
+equipe direction
 equipe dirigeante
 equipe dynamique
 equipe educative
 equipe enseignante
 equipe feminine
-equipe france
+equipe foot
 equipe gagne
 equipe moi-meme
 equipe municipale
@@ -14019,14 +13533,13 @@ escrocs
 escroquerie
 escroqueries
 espace
-espace france
 espace numerique
 espace public
+espace services
 espaces
 espaces naturels
 espaces verts
 espagne
-espagne france
 espagne italie
 espagne portugal
 espagnol
@@ -14124,6 +13637,7 @@ etage
 etages
 etaient
 etaient greve
+etaient mobilises
 etaient nombreux
 etaient presentes
 etaient presents
@@ -14152,7 +13666,6 @@ etat agit
 etat aider
 etat ame
 etat associations
-etat aujourd'hui
 etat aupres
 etat catastrophe
 etat catastrophique
@@ -14178,8 +13691,6 @@ etat entreprises
 etat esprit
 etat etat
 etat face
-etat francais
-etat france
 etat gouvernement
 etat hausse
 etat investit
@@ -14218,7 +13729,6 @@ etats generaux
 etats membres
 etats unis
 etats-unis
-etats-unis france
 etau
 etc.
 eteindre
@@ -14242,10 +13752,10 @@ etienne
 etiez
 etiez nombreux
 etions
-etions aujourd'hui
+etions cotes
 etions engages
 etions hier
-etions matin
+etions marche
 etions millions
 etions nombreux
 etions presents
@@ -14275,7 +13785,6 @@ etrangeres @mincolonna
 etrangeres assemblee
 etrangers
 etrangers delinquants
-etrangers france
 etrangers situation
 etrangles
 etrangleurs
@@ -14338,14 +13847,12 @@ eurodeputes
 eurois
 europe
 europe affaires
-europe avons
 europe centrale
 europe defense
 europe doivent
 europe ecologie
 europe face
 europe forte
-europe france
 europe nations
 europe nord
 europe sociale
@@ -14358,7 +13865,6 @@ europeen energie
 europeenne
 europeenne droits
 europeenne face
-europeenne france
 europeennes
 europeennes assemblee
 europeens
@@ -14386,6 +13892,7 @@ euros moyenne
 euros net
 euros nets
 euros retraite
+euros selon
 euros seront
 euros soutenir
 euros supplementaires
@@ -14395,13 +13902,9 @@ eut
 euthanasie
 eux
 eux accueil
-eux avons
 eux bfmtv
 eux engagement
 eux eux
-eux francais
-eux france
-eux matin
 eux memes
 eux seuls
 eux travail
@@ -14546,7 +14049,6 @@ excedentaire
 excedes
 excel
 excellence
-excellence francaise
 excellence recherche
 excellence savoir-faire
 excellent
@@ -14558,7 +14060,6 @@ excellent president
 excellent thread
 excellent travail
 excellente
-excellente annee
 excellente deputee
 excellente initiative
 excellente intervention
@@ -14690,19 +14191,16 @@ explication
 explication vote
 explications
 explications claires
-explications ici
 explicite
 explicitement
 expliquais
 expliquait
 expliquant
 explique
-explique ici
 explique reforme
 expliquee
 expliquent
 expliquer
-expliquer francais
 expliquer reforme
 expliquer role
 expliquez
@@ -14809,7 +14307,6 @@ extreme gauche
 extreme gravite
 extreme-droite
 extreme-droite droite
-extreme-droite france
 extreme-droite menace
 extreme-droite raciste
 extreme-droite tue
@@ -14834,7 +14331,6 @@ fabricant
 fabrication
 fabrice
 fabrique
-fabrique france
 fabrique loi
 fabriquer
 fabriques
@@ -14847,6 +14343,7 @@ face acte
 face agresseur
 face agression
 face aleas
+face assemblee
 face attaque
 face attaques
 face augmentation
@@ -14886,7 +14383,6 @@ face extreme-droite
 face face
 face flambee
 face fleau
-face francais
 face gouvernement
 face grande
 face grands
@@ -15024,7 +14520,6 @@ faisons face
 faisons reculer
 faisons sorte
 faisons vivre
-faite
 faits
 faits divers
 faits graves
@@ -15139,7 +14634,6 @@ faveur acces
 faveur droits
 faveur egalite
 faveur emploi
-faveur francais
 faveur inscription
 faveur motion
 faveur pouvoir
@@ -15177,7 +14671,6 @@ federale
 federation
 federation chasseurs
 federation departementale
-federation francaise
 federation nationale
 federation russie
 federations
@@ -15194,6 +14687,7 @@ felicitations ensemble
 felicitations equipe
 felicitations equipes
 felicitations eux
+felicitations jeunes
 felicitations joueurs
 felicitations laureats
 felicitations nouveau
@@ -15232,14 +14726,12 @@ femme-homme
 femmes
 femmes @assembleenat
 femmes assemblee
-femmes avons
 femmes ayant
 femmes battent
 femmes bravo
 femmes carrieres
 femmes chambre
 femmes courageuses
-femmes devons
 femmes disposer
 femmes doivent
 femmes dont
@@ -15249,10 +14741,10 @@ femmes egalite
 femmes enfants
 femmes engagees
 femmes entier
+femmes face
 femmes femmes
 femmes filles
 femmes francaises
-femmes france
 femmes gouvernement
 femmes grandes
 femmes hommes
@@ -15298,7 +14790,6 @@ feriez
 fermant
 ferme
 ferme fessenheim
-ferme france
 ferme porte
 ferme yeux
 ferme-usine
@@ -15358,7 +14849,6 @@ festivites
 fetait
 fete
 fete associations
-fete aujourd'hui
 fete foraine
 fete huma
 fete humanite
@@ -15461,7 +14951,6 @@ fieres
 fiers
 fierte
 fierte emotion
-fierte france
 fierte honneur
 fierte nationale
 fierte pays
@@ -15501,7 +14990,6 @@ filiere betteraviere
 filiere bois
 filiere equine
 filiere excellence
-filiere francaise
 filiere industrielle
 filiere nucleaire
 filiere viticole
@@ -15523,7 +15011,6 @@ fils
 filtre
 fin
 fin abondance
-fin annee
 fin annees
 fin aout
 fin apres-midi
@@ -15535,11 +15022,12 @@ fin decembre
 fin droit
 fin etat
 fin examen
+fin femmes
 fin fin
-fin france
 fin guerre
 fin histoire
 fin impunite
+fin inegalites
 fin injustice
 fin janvier
 fin jours
@@ -15619,6 +15107,7 @@ finances rectificative
 finances rectificatives
 finances securite
 finances souverainete
+finances vote
 financier
 financiere
 financierement
@@ -15808,7 +15297,6 @@ fontainebleau
 fonte
 foot
 football
-football francais
 footballeur
 footballeurs
 for
@@ -15926,7 +15414,6 @@ forte augmentation
 forte baisse
 forte emotion
 forte exclusion
-forte france
 forte hausse
 forte inflation
 forte mobilisation
@@ -16015,440 +15502,11 @@ frais inscription
 frais mandat
 fraises
 franc
-francais
-francais @assembleenat
-francais @bfmtv
-francais @cnews
-francais @deputesre
-francais @emmanuelmacron
-francais @larem_an
-francais @lesrepublicains
-francais @mlp_officiel
-francais @rnational_off
-francais acces
-francais agit
-francais aide
-francais aiment
-francais ainsi
-francais amerique
-francais annee
-francais annees
-francais annonce
-francais apprecieront
-francais argent
-francais arrivent
-francais assemblee
-francais assez
-francais attendent
-francais augmentation
-francais augmenter
-francais aujourd'hui
-francais auront
-francais avons
-francais ayant
-francais baisse
-francais belle
-francais besoin
-francais bfmtv
-francais bravo
-francais car
-francais chauffent
-francais choisi
-francais choix
-francais cnews
-francais coeur
-francais collegues
-francais commence
-francais comprennent
-francais compris
-francais confiance
-francais continue
-francais continuent
-francais cotes
-francais crise
-francais debat
-francais defendre
-francais demande
-francais demandent
-francais democratie
-francais deputes
-francais devons
-francais disent
-francais doivent
-francais donne
-francais dont
-francais droit
-francais dupes
-francais elu
-francais elus
-francais engagement
-francais ensemble
-francais entreprises
-francais est-ce
-francais estiment
-francais etablis
-francais etaient
-francais etat
-francais etranger
-francais etrangers
-francais europeen
-francais europeens
-francais eux
-francais face
-francais faisons
-francais favorables
-francais felicitations
-francais fierte
-francais fin
-francais force
-francais francais
-francais francaises
-francais france
-francais galerent
-francais gauche
-francais gouvernement
-francais grace
-francais grand
-francais grande
-francais groupe
-francais hausse
-francais heureux
-francais hier
-francais hommage
-francais honneur
-francais honte
-francais ici
-francais inflation
-francais lcp
-francais loi
-francais longtemps
-francais lors
-francais majoritairement
-francais matiere
-francais matin
-francais meritent
-francais mesures
-francais milliards
-francais ministre
-francais modestes
-francais mois
-francais morts
-francais moyen
-francais notamment
-francais nouvelle
-francais nupes
-francais occasion
-francais opposent
-francais opposes
-francais paient
-francais parlement
-francais particulierement
-francais partis
-francais pauvres
-francais payent
-francais payer
-francais pays
-francais pendant
-francais pensent
-francais peuple
-francais peuvent
-francais plaisir
-francais plein
-francais plutot
-francais point
-francais politique
-francais porte
-francais pourront
-francais pourtant
-francais pouvoir
-francais premiere
-francais present
-francais president
-francais prets
-francais priorite
-francais prix
-francais produits
-francais projet
-francais proteger
-francais puisse
-francais puissent
-francais raison
-francais referendum
-francais reforme
-francais refuse
-francais refusent
-francais regardent
-francais rejettent
-francais rencontre
-francais rendez
-francais reponse
-francais retour
-francais retraite
-francais retrouvez
-francais reunion
-francais rn
-francais rue
-francais savent
-francais semaine
-francais sens
-francais serai
-francais seraient
-francais seront
-francais seul
-francais seule
-francais situation
-francais soient
-francais sommes
-francais souffrent
-francais souhaite
-francais souhaitent
-francais sous
-francais soutenir
-francais soutien
-francais soutiennent
-francais souviendront
-francais subissent
-francais sujet
-francais surtout
-francais syndicats
-francais tant
-francais texte
-francais travail
-francais travaillent
-francais travailler
-francais veulent
-francais vivent
-francais vivre
-francais voici
-francais voient
-francais vote
-francais voulez
-francais voulons
-francais voulu
 francais-es
-francaise
-francaise assemblee
-francaise conseil
-francaise developpement
-francaise europeenne
-francaise matiere
-francaise resiste
-francaise ue
-francaise union
 francaises
-francaises francais
-france
-france 1er
-france 1ere
-france @assembleenat
-france @emmanuelmacron
-france @gdarmanin
-france @rnational_off
-france accueillir
-france afin
-france afrique
-france agir
-france ailleurs
-france algerie
-france allemagne
-france allez
-france an
-france annee
-france arret
-france assemblee
-france atteint
-france aujourd'hui
-france aura
-france aurait
-france autour
-france avons
-france belle
-france besoin
-france bfmtv
-france bleu
-france bravo
-france brule
-france budget
-france cadre
-france ceremonie
-france championne
-france chance
-france cher
-france coeur
-france commission
-france condamne
-france condamnee
-france connait
-france continue
-france continuer
-france cote
-france cotes
-france debat
-france debout
-france decide
-france defendre
-france demain
-france demande
-france deputes
-france deserts
-france desormais
-france devenue
-france devient
-france devons
-france devrait
-france dispose
-france doivent
-france donne
-france dont
-france drapeau
-france droit
-france echanges
-france emmanuel
-france enfants
-france engage
-france engagee
-france entiere
-france entreprises
-france espagne
-france etat
-france etranger
-france europe
-france face
-france felicitations
-france femme
-france femmes
-france fete
-france fiere
-france fin
-france forte
-france francais
-france france
-france fut
-france gagne
-france gouvernement
-france grace
-france grand
-france grande
-france hausse
-france hauteur
-france heureux
-france hier
-france hommage
-france honneur
-france ici
-france indigne
-france industrie
-france info
-france initiative
-france insoumise
-france inter
-france italie
-france janvier
-france jours
-france jusqu'
-france leader
-france leve
-france liberte
-france libre
-france lors
-france lutte
-france macron
-france magnifique
-france manque
-france marche
-france maroc
-france matin
-france medias
-france merite
-france metropolitaine
-france milliards
-france millions
-france mobilisation
-france morts
-france moyens
-france nation
-france nombre
-france nombreux
-france nouveau
-france nouvelle
-france occasion
-france oublions
-france paris
-france parler
-france particulierement
-france partie
-france partout
-france pays
-france pendant
-france pensees
-france personnes
-france peuple
-france plusieurs
-france politique
-france populaire
-france porte
-france pourrait
-france pourtant
-france pouvoir
-france premier
-france premiere
-france pres
-france present
-france presente
-france president
-france prix
-france projet
-france proteger
-france reforme
-france refuse
-france relance
-france rencontre
-france rendez
-france republique
-france reste
-france rester
-france retour
-france retrouve
-france retrouvez
-france rurale
-france selon
-france serai
-france serait
-france service
-france services
-france seul
-france seule
-france seulement
-france situation
-france sommes
-france sortir
-france souhaite
-france sous
-france soutenir
-france soutien
-france soutient
-france strategie
-france sujet
-france surtout
-france tant
-france taux
-france televisions
-france territoires
-france tient
-france travail
-france travaille
-france travers
-france tv
-france ue
-france ukraine
-france union
-france valeurs
-france vers
-france visite
-france vive
-france vivre
-france voici
-france vote
+francaises amerique
+francaises etranger
+francaises veulent
 france24_fr
 francebleu
 franceculture
@@ -16670,7 +15728,6 @@ gagner
 gagner bataille
 gagner battra
 gagner droite
-gagner france
 gagner gauche
 gagner guerre
 gagnera
@@ -16725,6 +15782,7 @@ garantir perennite
 garantir retraite
 garantir securite
 garantir souverainete
+garantir systeme
 garantira
 garantis
 garantissant
@@ -16787,8 +15845,6 @@ gauche ecologie
 gauche ecologistes
 gauche extreme
 gauche face
-gauche francaise
-gauche france
 gauche gouvernement
 gauche macronie
 gauche nupes
@@ -16871,8 +15927,6 @@ general agence
 general armee
 general budget
 general electric
-general francais
-general france
 general gaulle
 general gendarmerie
 general onu
@@ -17071,10 +16125,8 @@ gouvernement assume
 gouvernement attaque
 gouvernement aucune
 gouvernement augmenter
-gouvernement aujourd'hui
 gouvernement aura
 gouvernement aurait
-gouvernement avons
 gouvernement baisse
 gouvernement battu
 gouvernement bfmtv
@@ -17109,6 +16161,7 @@ gouvernement depute
 gouvernement deputes
 gouvernement devra
 gouvernement devrait
+gouvernement doivent
 gouvernement donne
 gouvernement dont
 gouvernement droit
@@ -17133,8 +16186,6 @@ gouvernement ferme
 gouvernement fin
 gouvernement force
 gouvernement forcer
-gouvernement francais
-gouvernement france
 gouvernement gauche
 gouvernement gouvernement
 gouvernement groupe
@@ -17161,7 +16212,6 @@ gouvernement macronistes
 gouvernement majorite
 gouvernement manque
 gouvernement matiere
-gouvernement matin
 gouvernement mene
 gouvernement ment
 gouvernement meprise
@@ -17251,6 +16301,7 @@ gouvernement sommes
 gouvernement souhaite
 gouvernement sourd
 gouvernement sous
+gouvernement soutenir
 gouvernement soutien
 gouvernement soutient
 gouvernement suite
@@ -17500,13 +16551,13 @@ grenier
 grenoble
 greta
 greve
-greve aujourd'hui
 greve demander
 greve droit
 greve eboueurs
 greve exiger
 greve faim
 greve generale
+greve insoumise
 greve janvier
 greve jours
 greve manifestation
@@ -17515,6 +16566,7 @@ greve medecins
 greve nationale
 greve reconductible
 greve reforme
+greve salaires
 greve salaries
 greve semaines
 greve soutenir
@@ -17571,21 +16623,22 @@ groupe @socialistesan
 groupe americain
 groupe amitie
 groupe assemblee
+groupe autour
 groupe democrate
+groupe depose
 groupe deputes
 groupe ecologiste
 groupe etude
 groupe etudes
-groupe france
 groupe gdr
 groupe horizons
 groupe insoumis
+groupe insoumise
 groupe lfi
 groupe lfi-nupes
 groupe lr
 groupe macroniste
 groupe majorite
-groupe matin
 groupe nupes
 groupe opposition
 groupe parlementaire
@@ -17640,10 +16693,8 @@ guerre
 guerre agression
 guerre algerie
 guerre civile
-guerre devons
 guerre dieu
 guerre europe
-guerre france
 guerre froide
 guerre menee
 guerre mondiale
@@ -17757,7 +16808,6 @@ haguenaule depute
 haha
 haies
 haine
-haine france
 haine juifs
 haine ligne
 haine place
@@ -17887,7 +16937,6 @@ hauteur vue
 hauteurs
 hauts
 hauts fonctionnaires
-hauts france
 hauts revenus
 hauts salaires
 hauts seine
@@ -17929,8 +16978,6 @@ hemicycle @assembleenat
 hemicycle amendement
 hemicycle apres-midi
 hemicycle assemblee
-hemicycle aujourd'hui
-hemicycle avons
 hemicycle collegue
 hemicycle collegues
 hemicycle commission
@@ -17946,7 +16993,6 @@ hemicycle hier
 hemicycle loi
 hemicycle lors
 hemicycle lundi
-hemicycle matin
 hemicycle premiere
 hemicycle projet
 hemicycle questions
@@ -18012,7 +17058,6 @@ heures enseignement
 heures heures
 heures heuresle
 heures jours
-heures matin
 heures permanence
 heures sombres
 heures sup
@@ -18023,7 +17068,6 @@ heuresle depute
 heureuse
 heureuse accueilli
 heureuse accueillir
-heureuse annee
 heureuse assister
 heureuse cotes
 heureuse echange
@@ -18058,7 +17102,6 @@ heureux fier
 heureux honore
 heureux inaugure
 heureux inaugurer
-heureux matin
 heureux nomme
 heureux partage
 heureux partager
@@ -18090,9 +17133,7 @@ hier apres-midi
 hier article
 hier assemblee
 hier assiste
-hier aujourd'hui
 hier autour
-hier avons
 hier cadre
 hier ceremonie
 hier collegue
@@ -18101,16 +17142,18 @@ hier commission
 hier conseil
 hier cotes
 hier debat
+hier demain
 hier deputes
 hier devant
+hier echange
 hier etions
 hier fete
 hier fin
-hier france
 hier gouvernement
 hier grand
 hier groupe
 hier hemicycle
+hier honneur
 hier inauguration
 hier interpelle
 hier invitation
@@ -18119,7 +17162,6 @@ hier invitee
 hier lieu
 hier lors
 hier marche
-hier matin
 hier midi
 hier ministre
 hier nouvelle
@@ -18150,7 +17192,6 @@ hisser
 histoire
 histoire commune
 histoire culture
-histoire france
 histoire pays
 histoire politique
 histoire repete
@@ -18162,7 +17203,6 @@ historiens
 historique
 historique assemblee
 historique bravo
-historique france
 historique pays
 historiquement
 historiques
@@ -18182,7 +17222,6 @@ homicide
 homicides
 hommage
 hommage appuye
-hommage aujourd'hui
 hommage celles
 hommage combattants
 hommage courage
@@ -18192,13 +17231,13 @@ hommage harkis
 hommage heros
 hommage hommes
 hommage justes
-hommage matin
 hommage memoire
 hommage morts
 hommage national
 hommage particulier
 hommage policiers
 hommage pompiers
+hommage president
 hommage rendu
 hommage samuel
 hommage soldats
@@ -18246,7 +17285,6 @@ honneur assister
 honneur cotes
 honneur engagement
 honneur fierte
-honneur france
 honneur nomme
 honneur nommee
 honneur occasion
@@ -18292,8 +17330,6 @@ honte assemblee
 honte bue
 honte deputes
 honte eux
-honte francais
-honte france
 honte gouvernement
 honte honte
 honte pays
@@ -18331,7 +17367,6 @@ hors
 hors commun
 hors controle
 hors etat
-hors france
 hors loi
 hors norme
 hors prix
@@ -18440,36 +17475,11 @@ ia
 ibis
 ibis batignolles
 iceberg
-ici
-ici agenda
-ici ailleurs
-ici assemblee
-ici aujourd'hui
-ici avons
-ici bravo
-ici communique
-ici debut
-ici demain
-ici fin
-ici france
-ici gouvernement
-ici hier
-ici intervention
-ici jours
-ici mois
-ici paris
-ici recevoir
-ici retrouvez
-ici rue
-ici semaine
-ici sommes
-ici soutien
 icone
 id
 ideal
 ideaux
 idee
-idee france
 idees
 idees extreme
 idees extreme-droite
@@ -18528,7 +17538,6 @@ iii
 ilan
 ilan halimi
 ile
-ile france
 ile-de-france
 iles
 ille-et-vilaine
@@ -18556,7 +17565,6 @@ illustres
 ilot
 image
 image deplorable
-image france
 imagerie
 images
 images deplacement
@@ -18610,7 +17618,6 @@ immigration asile
 immigration clandestine
 immigration darmanin
 immigration delinquance
-immigration france
 immigration illegale
 immigration incontrolee
 immigration insecurite
@@ -18712,7 +17719,6 @@ imposees
 imposent
 imposer
 imposer budget
-imposer francais
 imposer politique
 imposer projet
 imposer reforme
@@ -18726,7 +17732,6 @@ impossibles
 imposture
 impot
 impot fortune
-impot france
 impot garde
 impot mort
 impot revenu
@@ -18738,8 +17743,7 @@ impots charges
 impots cotisations
 impots dette
 impots entreprises
-impots francais
-impots france
+impots financer
 impots grandes
 impots production
 impots riches
@@ -18767,7 +17771,6 @@ impunite cesser
 in
 in europe
 in fine
-in france
 in paris
 ina
 inacceptable
@@ -18803,7 +17806,6 @@ inauguration foire
 inauguration locaux
 inauguration maison
 inauguration marche
-inauguration matin
 inauguration nouveau
 inauguration nouveaux
 inauguration nouvel
@@ -18811,6 +17813,7 @@ inauguration nouvelle
 inauguration officielle
 inauguration permanence
 inauguration place
+inauguration pole
 inauguration residence
 inauguration salle
 inauguration salon
@@ -18819,8 +17822,6 @@ inauguration travaux
 inauguration village
 inaugurations
 inaugure
-inaugure aujourd'hui
-inaugure matin
 inaugure permanence
 inauguree
 inaugurer
@@ -18943,9 +17944,9 @@ independamment
 independance
 independance audiovisuel
 independance energetique
-independance france
 independance justice
 independance medias
+independance pays
 independant
 independante
 independantes
@@ -19016,18 +18017,13 @@ industrie agroalimentaire
 industrie automobile
 industrie culturelle
 industrie defense
-industrie francaise
-industrie france
 industrie nucleaire
 industrie verte
 industriel
 industrielle
-industrielle francaise
-industrielle france
 industrielle numerique
 industrielles
 industriels
-industriels francais
 industries
 industries culturelles
 industries electriques
@@ -19087,7 +18083,6 @@ inflation augmentation
 inflation crise
 inflation energie
 inflation faible
-inflation france
 inflation galopante
 inflation gouvernement
 inflation hausse
@@ -19095,6 +18090,7 @@ inflation notamment
 inflation pouvoir
 inflation prix
 inflation produits
+inflation proteger
 inflation reduction
 inflation revalorisation
 inflation touche
@@ -19122,7 +18118,6 @@ information flash
 information mois
 information qualite
 informations
-informations ici
 informations mercredi
 informatique
 informatiques
@@ -19132,7 +18127,6 @@ informel
 informer
 informes
 infos
-infos ici
 infraction
 infractions
 infrastructure
@@ -19180,7 +18174,6 @@ injures
 injurieux
 injuste
 injuste brutale
-injuste francais
 injuste gouvernement
 injuste inefficace
 injuste injustifiee
@@ -19190,7 +18183,6 @@ injuste retraites
 injustement
 injustes
 injustice
-injustice faite
 injustice fiscale
 injustice reforme
 injustice sociale
@@ -19250,8 +18242,8 @@ inscriptions
 inscrire
 inscrire constitution
 inscrire droit
-inscrire ici
 inscrire ivg
+inscrire loi
 inscris
 inscrit
 inscrit constitution
@@ -19396,7 +18388,6 @@ integral
 integrale
 integralement
 integralite
-integralite ici
 integralite intervention
 integralite interview
 integralite passage
@@ -19468,8 +18459,6 @@ interet
 interet collectif
 interet commun
 interet concitoyens
-interet francais
-interet france
 interet general
 interet habitants
 interet national
@@ -19482,8 +18471,6 @@ interet territoire
 interets
 interets economiques
 interets financiers
-interets francais
-interets france
 interets nationaux
 interets partisans
 interets peuple
@@ -19537,9 +18524,9 @@ interpelle
 interpelle @brunolemaire
 interpelle @gdarmanin
 interpelle @papndiaye
-interpelle aujourd'hui
 interpelle gouvernement
 interpelle m.
+interpelle madame
 interpelle ministre
 interpellee
 interpellent
@@ -19560,11 +18547,9 @@ interrogation
 interrogations
 interroge
 interroge gouvernement
-interroge matin
 interroge ministre
 interroge premiere
 interrogeais
-interrogeais matin
 interrogeais ministre
 interrogee
 interrogent
@@ -19582,15 +18567,15 @@ interruptions
 intersyndical
 intersyndicale
 intervenais
+intervenais commission
 intervenais hier
-intervenais matin
 intervenant
 intervenants
 intervenir
+intervenir aupres
 intervention
 intervention @assembleenat
 intervention assemblee
-intervention aujourd'hui
 intervention aupres
 intervention collegue
 intervention commission
@@ -19599,9 +18584,7 @@ intervention debat
 intervention devant
 intervention hemicycle
 intervention hier
-intervention ici
 intervention lors
-intervention matin
 intervention nom
 intervention president
 intervention rapide
@@ -19611,7 +18594,6 @@ interventions
 intervenu
 intervenu commission
 intervenu hier
-intervenu matin
 intervenue
 intervenus
 interviendra
@@ -19624,7 +18606,6 @@ interview
 interview @lejdd
 interview complete
 interview donnee
-interview matin
 interview politique
 interviewee
 interviews
@@ -19734,10 +18715,8 @@ invite bfmtv
 invite decouvrir
 invite demain
 invite emission
-invite france
 invite grand
 invite lire
-invite matin
 invite matinale
 invite participer
 invite politique
@@ -19902,6 +18881,7 @@ janvier prochain
 janvier prochains
 janvier reforme
 janvier rue
+janvier vote
 janvier votez
 japon
 japonais
@@ -19983,7 +18963,6 @@ jeudi fevrier
 jeudi janvier
 jeudi juillet
 jeudi mars
-jeudi matin
 jeudi novembre
 jeudi octobre
 jeudi prochain
@@ -20014,8 +18993,6 @@ jeunes familles
 jeunes femmes
 jeunes filles
 jeunes formation
-jeunes francais
-jeunes france
 jeunes generations
 jeunes hommes
 jeunes insoumis
@@ -20043,7 +19020,6 @@ jeunes volontaires
 jeunesse
 jeunesse brisee
 jeunesse engage
-jeunesse france
 jeunesse mobilise
 jeunesse mobilisee
 jeunesse service
@@ -20135,15 +19111,14 @@ journees patrimoine
 jours
 jours adherer
 jours an
-jours annee
 jours arrestation
 jours assemblee
-jours avons
 jours debat
 jours debats
 jours deputes
 jours devant
 jours examen
+jours femmes
 jours feries
 jours formation
 jours gouvernement
@@ -20193,9 +19168,7 @@ juif
 juifs
 juifs dont
 juifs etaient
-juifs france
 juillet
-juillet avons
 juillet dernier
 juillet lors
 juillet ose
@@ -20243,7 +19216,6 @@ jusqu' eur
 jusqu' euros
 jusqu' fevrier
 jusqu' fin
-jusqu' ici
 jusqu' ira
 jusqu' janvier
 jusqu' jeudi
@@ -20270,9 +19242,7 @@ justice
 justice @e_dupondm
 justice climatique
 justice eric
-justice faite
 justice fiscale
-justice francaise
 justice laxiste
 justice pays
 justice penale
@@ -20407,7 +19377,6 @@ lance
 lance @emmanuelmacron
 lance alerte
 lance appel
-lance aujourd'hui
 lance campagne
 lance petition
 lance projet
@@ -20420,7 +19389,6 @@ lancement concertation
 lancement conseil
 lancement groupe
 lancement illuminations
-lancement matin
 lancement plan
 lancement saison
 lancement travaux
@@ -20434,7 +19402,6 @@ lanceur alerte
 lanceurs
 lanceurs alerte
 lancons
-lancons aujourd'hui
 land
 landais
 landaise
@@ -20447,7 +19414,6 @@ langage
 langage gouvernement
 langue
 langue bois
-langue francaise
 languedoc
 langues
 langues regionales
@@ -20458,7 +19424,6 @@ laporte
 laprovence
 lapsus
 laquelle
-laquelle avons
 laquelle participe
 laquelle sommes
 laquelle travaille
@@ -20614,7 +19579,6 @@ lepine
 lepoint
 lepopulaire_fr
 lequel
-lequel avons
 lequipe
 leroy
 lescure
@@ -20622,7 +19586,6 @@ lescure ministre
 lesechos
 lesquelles
 lesquels
-lesquels avons
 lesrepublicains
 let
 lettre
@@ -20655,7 +19618,6 @@ lez
 lfi
 lfi assemblee
 lfi eelv
-lfi france
 lfi nupes
 lfi ps
 lfi retire
@@ -20755,6 +19717,7 @@ liens
 liens amitie
 liens familiaux
 liens forts
+liens pays
 liens unissent
 lient
 lies
@@ -20763,7 +19726,6 @@ liesse grand
 lieu
 lieu accueil
 lieu assemblee
-lieu aujourd'hui
 lieu charge
 lieu culturel
 lieu debat
@@ -20772,7 +19734,6 @@ lieu emblematique
 lieu hemicycle
 lieu hier
 lieu janvier
-lieu matin
 lieu memoire
 lieu place
 lieu samedi
@@ -20850,7 +19811,6 @@ lire absolument
 lire article
 lire comprendre
 lire ecrire
-lire ici
 lire rapport
 lire relire
 lire tribune
@@ -20974,7 +19934,6 @@ loi asile
 loi assemblee
 loi assurance
 loi autorisant
-loi avons
 loi cadre
 loi changer
 loi claeys-leonetti
@@ -21004,9 +19963,6 @@ loi fin
 loi finance
 loi financement
 loi finances
-loi francais
-loi francaise
-loi france
 loi garantir
 loi gouvernement
 loi grand
@@ -21092,7 +20048,6 @@ lola
 lomme
 londres
 long
-long annee
 long campagne
 long etat
 long mandat
@@ -21271,7 +20226,7 @@ lukashenka delit
 lukashenka jeunesse
 lula
 lumiere
-lumiere faite
+lumiere drame
 lumieres
 lumineuse
 lumineuses
@@ -21287,7 +20242,6 @@ lundi fevrier
 lundi janvier
 lundi mardi
 lundi mars
-lundi matin
 lundi novembre
 lundi octobre
 lundi prochain
@@ -21388,7 +20342,6 @@ luz
 lvmh
 lycee
 lycee agricole
-lycee francais
 lycee jean
 lycee joliot-curie
 lycee polyvalent
@@ -21400,7 +20353,6 @@ lyceennes
 lyceens
 lyceens etudiants
 lycees
-lycees francais
 lycees pro
 lycees professionnels
 lynchage
@@ -21440,9 +20392,8 @@ macron amis
 macron annonce
 macron appelle
 macron aucune
-macron aujourd'hui
 macron aurait
-macron avons
+macron besoin
 macron bfmtv
 macron borne
 macron confirme
@@ -21454,13 +20405,10 @@ macron elisabeth
 macron elu
 macron face
 macron fin
-macron francais
-macron france
 macron gouvernement
 macron imposer
 macron lors
 macron majorite
-macron matin
 macron menace
 macron millions
 macron ministre
@@ -21476,6 +20424,7 @@ macron propose
 macron reelu
 macron reforme
 macron refuse
+macron rencontre
 macron retirer
 macron retraite
 macron retraites
@@ -21662,7 +20611,6 @@ maires communes
 maires conseillers
 maires departement
 maires elus
-maires france
 maires presidents
 maires ruraux
 mairie
@@ -21678,15 +20626,14 @@ maison brule
 maison centrale
 maison commune
 maison femmes
-maison france
 maison medicale
 maison peuple
 maison protection
 maison quartier
 maison retraite
 maison sante
+maison services
 maisons
-maisons france
 maitre
 maitres
 maitrisant
@@ -21722,10 +20669,8 @@ majorite agit
 majorite alternative
 majorite assemblee
 majorite autour
-majorite avons
 majorite deputes
 majorite droite
-majorite francais
 majorite gouvernement
 majorite lr
 majorite lrem
@@ -21818,6 +20763,7 @@ mandat assemblee
 mandat confie
 mandat depute
 mandat deputee
+mandat donne
 mandat macron
 mandat maire
 mandat precedent
@@ -21862,7 +20808,6 @@ manifestations pacifiques
 manifeste
 manifestement
 manifestent
-manifestent aujourd'hui
 manifester
 manifester droit
 manifester greve
@@ -21969,7 +20914,6 @@ marche flambeaux
 marche forcee
 marche janvier
 marche marche
-marche matin
 marche nocturne
 marche noel
 marche octobre
@@ -21995,13 +20939,13 @@ marchons
 marchons ensemble
 marcq-en-baroeul
 mardi
+mardi 8h15
 mardi decembre
 mardi dernier
 mardi fevrier
 mardi janvier
 mardi juillet
 mardi mars
-mardi matin
 mardi mercredi
 mardi novembre
 mardi octobre
@@ -22140,6 +21084,7 @@ master
 masterclass
 mat
 match
+match bravo
 match coupe
 match equipe
 match foot
@@ -22184,144 +21129,6 @@ matiere transition
 matieres
 matieres premieres
 matignon
-matin
-matin 10h30
-matin 1ere
-matin 7h40
-matin 7h45
-matin 7h50
-matin 8h10
-matin 8h15
-matin 8h20
-matin 8h30
-matin 9h
-matin @an_afcult
-matin @an_afeco
-matin @an_afetr
-matin @an_afsoc
-matin @an_defense
-matin @an_finances
-matin @assembleenat
-matin @bfmtv
-matin @franceinfo
-matin @franceinter
-matin @radiojfrance
-matin @sudradio
-matin ag
-matin allee
-matin amendement
-matin assemblee
-matin assistais
-matin assiste
-matin audition
-matin aupres
-matin autour
-matin avons
-matin bureau
-matin cadre
-matin centre
-matin ceremonie
-matin circonscription
-matin college
-matin collegue
-matin collegues
-matin commemoration
-matin commission
-matin conference
-matin congres
-matin conseil
-matin cotes
-matin debat
-matin defendre
-matin delegation
-matin deputes
-matin devant
-matin direct
-matin direction
-matin echange
-matin echanger
-matin echanges
-matin ecole
-matin eleves
-matin elus
-matin equipe
-matin equipes
-matin etions
-matin examen
-matin face
-matin forum
-matin france
-matin gouvernement
-matin grand
-matin groupe
-matin hemicycle
-matin hommage
-matin inauguration
-matin initiative
-matin interroge
-matin invitation
-matin invite
-matin invitee
-matin lancement
-matin lieu
-matin lors
-matin lycee
-matin madame
-matin maire
-matin mairie
-matin maison
-matin manifestation
-matin marche
-matin matinale
-matin micro
-matin midi
-matin militants
-matin ministere
-matin ministre
-matin nouveau
-matin nouvelle
-matin occasion
-matin paris
-matin parler
-matin participais
-matin participe
-matin partir
-matin permanence
-matin petit
-matin place
-matin plaisir
-matin plusieurs
-matin prefecture
-matin premiere
-matin presence
-matin present
-matin presente
-matin president
-matin projet
-matin proposition
-matin rassemblement
-matin rencontre
-matin rendez
-matin rendu
-matin rendue
-matin rentree
-matin representants
-matin retour
-matin reunion
-matin rue
-matin salon
-matin seance
-matin serai
-matin site
-matin sommes
-matin sous
-matin soutien
-matin suppleante
-matin table
-matin tenu
-matin visite
-matin voeux
-matin vote
 matinal
 matinale
 matinale @bfmtv
@@ -22334,7 +21141,6 @@ matinale @rmcinfo
 matinale @rtlfrance
 matinale @sudradio
 matinale cnews
-matinale france
 matinee
 matinee echanges
 matinee travail
@@ -22430,7 +21236,6 @@ media rendez
 median
 mediapart
 medias
-medias francais
 medias mains
 medias milliardaires
 mediateur
@@ -22580,12 +21385,10 @@ menages chauffant
 menages collectivites
 menages entreprises
 menages face
-menages francais
 menages modestes
 menant
 menard
 mendes
-mendes france
 mene
 mene bataille
 mene campagne
@@ -22641,7 +21444,6 @@ mentionne
 mentionner
 mentions
 mentir
-mentir francais
 menton
 mentor
 mentorat
@@ -22652,7 +21454,6 @@ mepris classe
 mepris democratie
 mepris droit
 mepris envers
-mepris francais
 mepris gouvernement
 mepris parlement
 mepris peuple
@@ -22687,7 +21488,6 @@ mercredi jeudi
 mercredi juillet
 mercredi ligne
 mercredi mars
-mercredi matin
 mercredi novembre
 mercredi octobre
 mercredi prochain
@@ -22728,7 +21528,6 @@ message clair
 message envoye
 message espoir
 message fort
-message francais
 message gouvernement
 message prive
 message soutien
@@ -22760,7 +21559,6 @@ mesures accompagnement
 mesures adoptees
 mesures ambitieuses
 mesures annoncees
-mesures avons
 mesures ciblees
 mesures concretes
 mesures doivent
@@ -22800,7 +21598,6 @@ metal
 metaux
 metavers
 meteo
-meteo france
 meteorologiques
 methanier
 methanisation
@@ -22952,7 +21749,6 @@ militants engages
 militants extreme
 militants extreme-droite
 militants federation
-militants france
 militants insoumis
 militants lr
 militants majorite
@@ -22978,13 +21774,11 @@ milliard eur
 milliard euros
 milliardaire
 milliardaires
-milliardaires francais
 milliardaires possedent
 milliards
 milliards actionnaires
 milliards aides
 milliards an
-milliards annee
 milliards benefices
 milliards budget
 milliards deficit
@@ -23005,7 +21799,6 @@ milliers emplois
 milliers enfants
 milliers euros
 milliers femmes
-milliers francais
 milliers jeunes
 milliers morts
 milliers personnes
@@ -23023,6 +21816,7 @@ million retraites
 millionnaire
 millionnaires
 millions
+millions aide
 millions chomeurs
 millions concitoyens
 millions demandeurs
@@ -23034,11 +21828,12 @@ millions euros
 millions familles
 millions femmes
 millions foyers
-millions francais
+millions francaises
 millions jeunes
 millions logements
 millions loges
 millions manifestants
+millions morts
 millions passoires
 millions pauvres
 millions personnes
@@ -23162,7 +21957,6 @@ ministre engage
 ministre enseignement
 ministre europe
 ministre fonction
-ministre francais
 ministre gouvernement
 ministre industrie
 ministre interieur
@@ -23252,7 +22046,6 @@ misogyne
 misogynes
 misogynie
 miss
-miss france
 missile
 missiles
 mission
@@ -23299,12 +22092,12 @@ mme.
 mn
 mo
 mobile
+mobile marche
 mobiles
 mobilier
 mobilisant
 mobilisation
 mobilisation acteurs
-mobilisation aujourd'hui
 mobilisation citoyenne
 mobilisation collective
 mobilisation continue
@@ -23316,7 +22109,6 @@ mobilisation etat
 mobilisation exceptionnelle
 mobilisation faille
 mobilisation forte
-mobilisation france
 mobilisation generale
 mobilisation gouvernement
 mobilisation historique
@@ -23325,8 +22117,8 @@ mobilisation intersyndicale
 mobilisation janvier
 mobilisation mars
 mobilisation massive
-mobilisation matin
 mobilisation nationale
+mobilisation paris
 mobilisation partout
 mobilisation paye
 mobilisation populaire
@@ -23350,7 +22142,6 @@ mobilisee
 mobilisee cotes
 mobilisees
 mobilisent
-mobilisent aujourd'hui
 mobiliser
 mobiliser moyens
 mobiliser reforme
@@ -23358,7 +22149,6 @@ mobiliser rue
 mobiliserons
 mobilises
 mobilises assurer
-mobilises aujourd'hui
 mobilises cotes
 mobilises defendre
 mobilises devant
@@ -23367,9 +22157,9 @@ mobilises hier
 mobilises jusqu'
 mobilises lutte
 mobilises lutter
-mobilises matin
 mobilises nuit
 mobilises partout
+mobilises place
 mobilises proteger
 mobilises reforme
 mobilises securite
@@ -23393,7 +22183,6 @@ modele
 modele agricole
 modele economique
 modele energetique
-modele francais
 modele repartition
 modele social
 modele societe
@@ -23427,18 +22216,15 @@ mohamed
 mohammad
 mohammed
 moi-meme
-moi-meme avons
 moi-meme sommes
 moindre
 moindre choses
 moine
 moines
 mois
-mois annee
 mois annees
 mois aout
 mois assemblee
-mois avons
 mois campagne
 mois combat
 mois debat
@@ -23451,8 +22237,6 @@ mois dernier
 mois election
 mois emprisonnement
 mois fevrier
-mois francais
-mois france
 mois gouvernement
 mois greve
 mois guerre
@@ -23608,7 +22392,6 @@ morin
 morning
 mort
 mort age
-mort france
 mort guerre
 mort homme
 mort iran
@@ -23633,7 +22416,8 @@ morts
 morts blesses
 morts chantiers
 morts dont
-morts france
+morts liberte
+morts pendant
 morts travail
 morvan
 mosaique
@@ -23816,7 +22600,6 @@ mutiles
 mutisme
 mutualisation
 mutualite
-mutualite francaise
 mutuel
 mutuelle
 mutuellement
@@ -23865,12 +22648,10 @@ nathalieloiseau
 nathalieoziol
 nation
 nation entiere
-nation francaise
 nation verte
 national
 national @rnational_off
 national assemblee
-national avons
 national financier
 national forets
 national international
@@ -23894,8 +22675,6 @@ nationale ainsi
 nationale amendement
 nationale apres-midi
 nationale assemblee
-nationale aujourd'hui
-nationale avons
 nationale belle
 nationale bfmtv
 nationale bravo
@@ -23928,8 +22707,6 @@ nationale face
 nationale felicitations
 nationale fin
 nationale forces
-nationale francais
-nationale france
 nationale gouvernement
 nationale grace
 nationale grand
@@ -23950,13 +22727,13 @@ nationale lundi
 nationale lutte
 nationale maison
 nationale majorite
-nationale matin
 nationale ministre
 nationale mise
 nationale nouveau
 nationale nouvelle
 nationale nupes
 nationale occasion
+nationale pays
 nationale pensee
 nationale peuple
 nationale plaisir
@@ -23991,6 +22768,7 @@ nationale soutient
 nationale suite
 nationale suivre
 nationale tant
+nationale tenu
 nationale texte
 nationale tiens
 nationale travail
@@ -24007,7 +22785,6 @@ nationalisme
 nationaliste
 nationalistes
 nationalite
-nationalite francaise
 nationaux
 nationaux europeens
 nationaux locaux
@@ -24226,7 +23003,6 @@ nombre deputes
 nombre eleves
 nombre enfants
 nombre etudiants
-nombre francais
 nombre personnes
 nombre places
 nombre suffisant
@@ -24258,7 +23034,6 @@ nombreux
 nombreux acteurs
 nombreux amendements
 nombreux amis
-nombreux aujourd'hui
 nombreux benevoles
 nombreux blesses
 nombreux citoyens
@@ -24274,12 +23049,10 @@ nombreux enfants
 nombreux enjeux
 nombreux evenements
 nombreux exposants
-nombreux francais
 nombreux habitants
 nombreux hier
 nombreux jeunes
 nombreux maires
-nombreux matin
 nombreux militants
 nombreux nombreuses
 nombreux pays
@@ -24297,6 +23070,7 @@ nomination tant
 nominations
 nommant
 nomme
+nomme co-rapporteur
 nomme president
 nomme rapporteur
 nomme vice-president
@@ -24399,7 +23173,6 @@ nouveau dispositif
 nouveau drame
 nouveau force
 nouveau format
-nouveau francais
 nouveau gouvernement
 nouveau groupe
 nouveau lieu
@@ -24454,13 +23227,13 @@ nouvel espace
 nouvel exemple
 nouvel outil
 nouvelle
-nouvelle annee
 nouvelle aquitaine
 nouvelle assemblee
 nouvelle attaque
-nouvelle aujourd'hui
 nouvelle aventure
 nouvelle baisse
+nouvelle belle
+nouvelle bravo
 nouvelle campagne
 nouvelle commission
 nouvelle composition
@@ -24478,8 +23251,6 @@ nouvelle etape
 nouvelle etude
 nouvelle facon
 nouvelle forme
-nouvelle francais
-nouvelle france
 nouvelle generation
 nouvelle gouvernement
 nouvelle hausse
@@ -24487,6 +23258,7 @@ nouvelle lecture
 nouvelle legislature
 nouvelle ligne
 nouvelle loi
+nouvelle lutte
 nouvelle mairie
 nouvelle maison
 nouvelle majorite
@@ -24548,7 +23320,6 @@ noyade
 noyer
 npa
 ns
-ns avons
 ns sommes
 nuages
 nuance
@@ -24556,8 +23327,6 @@ nuances
 nucleaire
 nucleaire energie
 nucleaire energies
-nucleaire francais
-nucleaire france
 nucleaire production
 nucleaire renouvelables
 nucleaires
@@ -24569,7 +23338,6 @@ nuit
 nuit @assembleenat
 nuit aout
 nuit assemblee
-nuit avons
 nuit derniere
 nuit hemicycle
 nuit vote
@@ -24596,7 +23364,6 @@ numerus clausus
 nunez
 nupes
 nupes assemblee
-nupes avons
 nupes depose
 nupes deputes
 nupes empeche
@@ -24859,7 +23626,6 @@ offerte
 offertes
 offerts
 office
-office francais
 office national
 office tourisme
 officiel
@@ -24990,7 +23756,6 @@ opposition
 opposition @rnational_off
 opposition alternative
 opposition assemblee
-opposition avons
 opposition carton
 opposition constructive
 opposition credible
@@ -24998,7 +23763,6 @@ opposition deputes
 opposition emmanuel
 opposition face
 opposition ferme
-opposition francais
 opposition gouvernement
 opposition macron
 opposition macronie
@@ -25013,6 +23777,7 @@ opposition responsable
 opposition rn
 opposition systematique
 opposition totale
+opposition vote
 oppositions
 oppositions doivent
 oppositions rn
@@ -25102,7 +23867,6 @@ organisations syndicales
 organisatrices
 organise
 organise association
-organise aujourd'hui
 organise comite
 organise reunion
 organisee
@@ -25162,7 +23926,6 @@ oser
 osez
 osons
 otage
-otage francais
 otages
 otan
 other
@@ -25188,7 +23951,6 @@ oublions victimes
 oublions visage
 oudea-castera
 ouest
-ouest france
 ouestfrance
 ouf
 ouganda
@@ -25247,9 +24009,9 @@ ouvrait
 ouvrant
 ouvrant voie
 ouvre
-ouvre aujourd'hui
 ouvre debat
 ouvre enfin
+ouvre nouvelle
 ouvre portes
 ouvre voie
 ouvrent
@@ -25324,7 +24086,6 @@ paix
 paix ame
 paix durable
 paix europe
-paix france
 paix justice
 paix liberte
 paix securite
@@ -25412,12 +24173,15 @@ parcequ'
 parceque
 parcourir
 parcours
-parcours aujourd'hui
+parcours aliaksandr
+parcours aliaksei
+parcours andrei
 parcours combattant
 parcours engagement
 parcours politique
 parcours professionnels
 parcours soins
+parcours yauhen
 parcoursup
 parcouru
 parcs
@@ -25454,19 +24218,16 @@ pari
 paribas
 paris
 paris assemblee
-paris aujourd'hui
-paris avons
 paris chere
 paris circonscription
 paris cotes
 paris defendre
 paris demain
-paris france
 paris hier
 paris janvier
 paris lors
 paris lyon
-paris matin
+paris marche
 paris occasion
 paris octobre
 paris partout
@@ -25492,7 +24253,6 @@ parlement
 parlement adopte
 parlement enfants
 parlement europeen
-parlement francais
 parlement gouvernement
 parlement reforme
 parlement ukrainien
@@ -25503,18 +24263,16 @@ parlementaire @fiassemblee
 parlementaire @franceinsoumise
 parlementaire @groupern_off
 parlementaire assemblee
-parlementaire aujourd'hui
-parlementaire avons
 parlementaire commence
 parlementaire commission
 parlementaire conseil
 parlementaire debut
 parlementaire deputes
 parlementaire droits
-parlementaire france
 parlementaire franco-allemande
 parlementaire gouvernement
 parlementaire groupe
+parlementaire insoumise
 parlementaire itinerante
 parlementaire janvier
 parlementaire jeudi
@@ -25536,11 +24294,9 @@ parlementaires
 parlementaires @assembleenat
 parlementaires alsaciens
 parlementaires assemblee
-parlementaires avons
 parlementaires deputes
 parlementaires elus
 parlementaires europeens
-parlementaires francais
 parlementaires groupe
 parlementaires groupes
 parlementaires maires
@@ -25557,7 +24313,6 @@ parler actualite
 parler avenir
 parler bataille
 parler fond
-parler francais
 parler loi
 parler mobilisation
 parler notamment
@@ -25611,7 +24366,6 @@ part ailleurs
 part entiere
 part etat
 part fiscale
-part france
 part gouvernement
 part majorite
 part ministre
@@ -25673,7 +24427,6 @@ parti dont
 parti droite
 parti extreme-droite
 parti fonde
-parti france
 parti gouvernement
 parti jours
 parti nouvelle
@@ -25685,9 +24438,9 @@ parti raciste
 parti renaissance
 parti socialiste
 participais
-participais aujourd'hui
+participais ceremonie
 participais hier
-participais matin
+participais inauguration
 participais reunion
 participait
 participant
@@ -25703,8 +24456,9 @@ participative
 participe
 participe activement
 participe assemblee
-participe aujourd'hui
+participe audition
 participe ceremonie
+participe ceremonies
 participe diner
 participe fete
 participe hier
@@ -25712,7 +24466,8 @@ participe inauguration
 participe lancement
 participe manifestation
 participe manifestations
-participe matin
+participe premiere
+participe remise
 participe reunion
 participe soiree
 participe table
@@ -25721,13 +24476,14 @@ participent activement
 participer
 participer assemblee
 participer ceremonie
+participer cotes
+participer debat
 participer effort
 participer evenement
 participer grande
 participer inauguration
 participer manifestation
 participer marche
-participer matin
 participer premiere
 participer remise
 participer reunion
@@ -25793,7 +24549,6 @@ partir 19h30
 partir 1er
 partir 8h30
 partir 9h
-partir aujourd'hui
 partir demain
 partir heures
 partir lundi
@@ -25818,8 +24573,11 @@ partition
 partons
 partout
 partout ailleurs
+partout cotes
+partout droit
 partout europe
-partout france
+partout gouvernement
+partout mobilisation
 partout pays
 partout territoire
 partout territoires
@@ -25847,7 +24605,6 @@ pass vaccinal
 passage
 passage emission
 passage force
-passage matin
 passage matinale
 passage stand
 passager
@@ -25938,7 +24695,6 @@ patrie
 patrie reconnaissante
 patrimoine
 patrimoine culturel
-patrimoine francais
 patrimoine historique
 patrimoine immateriel
 patrimoine industriel
@@ -25981,7 +24737,6 @@ pauperisation
 pause
 pause estivale
 pauvre
-pauvre france
 pauvres
 pauvres millions
 pauvres morts
@@ -26015,19 +24770,17 @@ pays ami
 pays arret
 pays assemblee
 pays attractif
-pays aujourd'hui
-pays avons
 pays basque
 pays besoin
 pays bloque
 pays bravo
 pays budget
 pays circonscription
+pays cotes
 pays debout
 pays democratie
 pays democratique
 pays developpement
-pays devons
 pays doivent
 pays dont
 pays droit
@@ -26041,21 +24794,20 @@ pays europeens
 pays eux
 pays face
 pays felicitations
-pays francais
-pays france
 pays gouvernement
+pays grace
 pays guerre
 pays jusqu'
 pays lequel
 pays liberte
 pays loire
 pays mars
-pays matin
 pays membres
 pays millions
 pays notamment
 pays ocde
 pays origine
+pays pays
 pays pendant
 pays peuple
 pays pouvoir
@@ -26139,6 +24891,7 @@ pele
 pellets
 pellets bois
 pen
+pen annonce
 pen deputes
 pen jordan
 pen rn
@@ -26180,8 +24933,6 @@ pendant crise
 pendant debats
 pendant deputes
 pendant examen
-pendant francais
-pendant france
 pendant gouvernement
 pendant guerre
 pendant heures
@@ -26352,6 +25103,7 @@ permanence lundi
 permanence mairie
 permanence mobile
 permanence parlementaire
+permanence rencontre
 permanence soins
 permanence vendredi
 permanences
@@ -26374,6 +25126,7 @@ permet financer
 permet jeunes
 permet lutter
 permet proteger
+permet vivre
 permets
 permettait
 permettant
@@ -26390,7 +25143,6 @@ permettre
 permettre acces
 permettre chacun
 permettre entreprises
-permettre francais
 permettre jeunes
 permettre suivre
 permettre vivre
@@ -26459,7 +25211,6 @@ personnes
 personnes accueillies
 personnes agees
 personnes an
-personnes annee
 personnes atteintes
 personnes ayant
 personnes besoin
@@ -26477,7 +25228,6 @@ personnes etrangeres
 personnes evacuees
 personnes exilees
 personnes fragiles
-personnes france
 personnes handicapees
 personnes hier
 personnes lgbt
@@ -26549,7 +25299,6 @@ petit effort
 petit feu
 petit fils
 petit geste
-petit matin
 petit nombre
 petit passage
 petit petit
@@ -26581,7 +25330,6 @@ petites villes
 petition
 petition @changefrance
 petition c3
-petition ici
 petition lancee
 petition signer
 petition taxer
@@ -26605,17 +25353,17 @@ petroliers
 peuple
 peuple armenien
 peuple assemblee
-peuple avons
 peuple bresilien
 peuple britannique
 peuple entier
-peuple francais
-peuple france
+peuple face
 peuple gagne
 peuple gouvernement
 peuple iranien
 peuple israelien
 peuple kurde
+peuple leve
+peuple lutte
 peuple palestinien
 peuple peuple
 peuple reforme
@@ -26800,8 +25548,6 @@ place ecole
 place etat
 place face
 place femmes
-place francais
-place france
 place gouvernement
 place grand
 place hemicycle
@@ -26882,7 +25628,6 @@ plaisir honneur
 plaisir inaugurer
 plaisir intervenir
 plaisir inviter
-plaisir matin
 plaisir parler
 plaisir partage
 plaisir partager
@@ -26912,7 +25657,6 @@ plan avenir
 plan economique
 plan energetique
 plan financement
-plan france
 plan gouvernement
 plan investissement
 plan lutte
@@ -27163,7 +25907,6 @@ polemiques
 poles
 poli
 police
-police francaise
 police gendarmerie
 police judiciaire
 police justice
@@ -27207,14 +25950,15 @@ politique affaire
 politique agricole
 politique ambitieuse
 politique antisociale
-politique aujourd'hui
 politique austerite
-politique avons
+politique autour
 politique belle
+politique besoin
 politique casse
 politique cheques
 politique chiffre
 politique claire
+politique combat
 politique commerciale
 politique culturelle
 politique deputes
@@ -27234,9 +25978,7 @@ politique face
 politique familiale
 politique forestiere
 politique fort
-politique francais
-politique francaise
-politique france
+politique gauche
 politique generale
 politique gouvernement
 politique immigration
@@ -27280,7 +26022,6 @@ politiques austerite
 politiques differents
 politiques doivent
 politiques economiques
-politiques francais
 politiques gauche
 politiques gouvernement
 politiques liberales
@@ -27308,7 +26049,6 @@ polonais
 polonaise
 polt
 polynesie
-polynesie francaise
 polystyrene
 polyvalent
 polyvalente
@@ -27329,6 +26069,7 @@ pompiers policiers
 pompiers professionnels
 pompiers pyromanes
 pompiers soignants
+pompiers vaccines
 pompiers volontaires
 pompili
 poncifs
@@ -27340,13 +26081,11 @@ pop
 populaire
 populaire circonscription
 populaire ecologique
-populaire francais
 populaires
 populaires classes
 populaires moyennes
 popularite
 population
-population francaise
 populations
 populisme
 populiste
@@ -27404,7 +26143,6 @@ portee collegue
 portee main
 portees
 portefeuille
-portefeuille francais
 portent
 portent fruits
 porter
@@ -27480,7 +26218,6 @@ positifs
 position
 position claire
 position deputes
-position france
 position groupe
 position vote
 positionnement
@@ -27497,7 +26234,6 @@ possession
 possibilite
 possibilites
 possible
-possible francais
 possible grace
 possibles
 post
@@ -27754,7 +26490,6 @@ preferable
 preferant
 prefere
 prefere defendre
-prefere francais
 prefere laisser
 preferee
 preferees
@@ -27809,7 +26544,6 @@ premier trimestre
 premier vers
 premier vote
 premiere
-premiere annee
 premiere assemblee
 premiere audition
 premiere cause
@@ -27822,7 +26556,6 @@ premiere edition
 premiere etape
 premiere femme
 premiere force
-premiere france
 premiere grande
 premiere guerre
 premiere heure
@@ -27895,7 +26628,6 @@ preoccupant
 preoccupante
 preoccupation
 preoccupations
-preoccupations francais
 preoccupe
 preoccupent
 preoccuper
@@ -27922,7 +26654,6 @@ prerogatives
 pres
 pres amendements
 pres emplois
-pres francais
 pres habitants
 pres jeunes
 pres milliard
@@ -27938,6 +26669,7 @@ presage
 prescription
 presence
 presence @elisabeth_borne
+presence assemblee
 presence autorites
 presence collegues
 presence cotes
@@ -27962,13 +26694,16 @@ presence soutien
 present
 present apres-midi
 present assemblee
-present aujourd'hui
+present aupres
+present camarades
 present ceremonie
 present collegues
 present commission
+present conseil
 present cotes
 present defendre
 present demain
+present devant
 present fete
 present hemicycle
 present hier
@@ -27977,13 +26712,14 @@ present invitation
 present lors
 present manifestation
 present marche
-present matin
 present midi
 present rassemblement
 present remise
 present reunion
+present salon
 present samedi
 present seance
+present soutien
 present voeux
 presentaient
 presentais
@@ -27998,11 +26734,12 @@ presentation proposition
 presentation rapport
 presentation voeux
 presente
+presente @assembleenat
 presente amendement
 presente apres-midi
 presente assemblee
-presente aujourd'hui
 presente ceremonie
+presente collegue
 presente collegues
 presente commission
 presente condoleances
@@ -28018,7 +26755,7 @@ presente hier
 presente inauguration
 presente invitation
 presente manifestation
-presente matin
+presente marche
 presente meilleurs
 presente mesures
 presente plan
@@ -28031,6 +26768,7 @@ presente reforme
 presente reunion
 presente seance
 presente sinceres
+presente soutien
 presente voeux
 presentee
 presentees
@@ -28057,12 +26795,11 @@ presentions
 presentons
 presents
 presents assemblee
-presents aujourd'hui
+presents commission
 presents cotes
 presents defendre
 presents hemicycle
 presents lors
-presents matin
 presents nombre
 preservant
 preservatifs
@@ -28083,7 +26820,6 @@ preserves
 preservons
 presidais
 preside
-preside matin
 preside seance
 presidee
 presidence
@@ -28093,7 +26829,6 @@ presidence @rnational_off
 presidence assemblee
 presidence commission
 presidence conseil
-presidence francaise
 presidence groupe
 presidence lr
 presidence mouvement
@@ -28101,6 +26836,8 @@ presidence parti
 presidence rassemblement
 presidence republique
 presidence rn
+presidence ue
+presidence union
 presidences
 president
 president @assembleenat
@@ -28128,7 +26865,6 @@ president directoire
 president elu
 president emmanuel
 president federation
-president france
 president gouvernement
 president groupe
 president honneur
@@ -28170,7 +26906,6 @@ presidente seance
 presidentes
 presidentiel
 presidentielle
-presidentielle avons
 presidentielle gouvernement
 presidentielle legislatives
 presidentielle refuse
@@ -28197,7 +26932,6 @@ presse concernant
 presse deputes
 presse groupe
 presse locale
-presse matin
 presse presentation
 presse proposition
 presse rentree
@@ -28379,7 +27113,7 @@ privatisation transports
 privatise
 privatiser
 prive
-prive francais
+prive debat
 prive public
 privee
 privees
@@ -28416,8 +27150,6 @@ prix etat
 prix explosent
 prix fort
 prix fournitures
-prix francais
-prix france
 prix gaz
 prix hausse
 prix humour
@@ -28453,7 +27185,6 @@ probleme financement
 probleme immigration
 probleme politique
 problemes
-problemes francais
 problemes lies
 procede
 proceder
@@ -28524,7 +27255,6 @@ production electricite
 production electrique
 production energie
 production energies
-production france
 productions
 productive
 productivisme
@@ -28626,7 +27356,6 @@ programmation pluriannuelle
 programmatique
 programme
 programme @mlp_officiel
-programme aujourd'hui
 programme commun
 programme echanges
 programme nucleaire
@@ -28664,7 +27393,6 @@ projet
 projet @emmanuelmacron
 projet ambitieux
 projet avenir
-projet avons
 projet budget
 projet casse
 projet clair
@@ -28676,8 +27404,6 @@ projet ecocide
 projet eolien
 projet europeen
 projet extension
-projet francais
-projet france
 projet funeste
 projet gouvernement
 projet gouvernemental
@@ -28698,6 +27424,7 @@ projet projet
 projet reforme
 projet retraite
 projet retraites
+projet retrouvez
 projet societe
 projet soutenu
 projet transformation
@@ -28827,6 +27554,7 @@ propose amendements
 propose assemblee
 propose augmentation
 propose augmenter
+propose commission
 propose creer
 propose gouvernement
 propose hausse
@@ -28836,6 +27564,7 @@ propose nupes
 propose retrouver
 propose solutions
 propose taxer
+propose texte
 proposee
 proposee @mlp_officiel
 proposee gouvernement
@@ -28852,7 +27581,6 @@ proposez
 proposions
 proposition
 proposition @mlp_officiel
-proposition aujourd'hui
 proposition collegue
 proposition commission
 proposition groupe
@@ -28910,7 +27638,6 @@ protection face
 protection familles
 protection femmes
 protection forets
-protection francais
 protection judiciaire
 protection mineurs
 protection nature
@@ -28922,7 +27649,7 @@ protections
 protections periodiques
 protectrice
 protege
-protege francais
+protege face
 protege pouvoir
 protegeant
 protegee
@@ -28930,7 +27657,6 @@ protegees
 protegent
 protegent quotidien
 protegeons
-protegeons francais
 proteger
 proteger accompagner
 proteger agriculteurs
@@ -28949,8 +27675,10 @@ proteger familles
 proteger femmes
 proteger forets
 proteger fragiles
-proteger francais
-proteger france
+proteger francaises
+proteger garantir
+proteger hausse
+proteger inflation
 proteger interets
 proteger jeunes
 proteger logements
@@ -29007,6 +27735,7 @@ provoquee
 provoquent
 provoquer
 proximite
+proximite elus
 prud'
 prud' hommes
 prudence
@@ -29038,8 +27767,6 @@ public education
 public energie
 public ferroviaire
 public fort
-public francais
-public france
 public justice
 public nombreux
 public participation
@@ -29074,7 +27801,6 @@ publics qualite
 publics territoires
 publicsenat
 publie
-publie aujourd'hui
 publiee
 publient
 publier
@@ -29087,7 +27813,6 @@ publique chere
 publique demain
 publique developpement
 publique etat
-publique france
 publique hier
 publique nupes
 publique organisee
@@ -29248,7 +27973,6 @@ querelles
 question
 question @brunolemaire
 question @mincolonna
-question aujourd'hui
 question centrale
 question complete
 question droits
@@ -29258,6 +27982,7 @@ question gouvernement
 question importante
 question justice
 question laisser
+question lors
 question ministre
 question orale
 question partage
@@ -29285,6 +28010,7 @@ questions gouvernement
 questions orales
 questions politiques
 questions posees
+questions posent
 questions reponses
 questions securite
 questure
@@ -29303,6 +28029,7 @@ quinze
 quittait
 quittant
 quitte
+quitte fonctions
 quitte hemicycle
 quittent
 quittent hemicycle
@@ -29322,7 +28049,6 @@ quotidien aupres
 quotidien concitoyens
 quotidien depute
 quotidien face
-quotidien francais
 quotidien habitants
 quotidien personnes
 quotidien proteger
@@ -29331,7 +28057,6 @@ quotidien service
 quotidien suivez
 quotidien travail
 quotidienne
-quotidienne francais
 quotidiennement
 quotidiennement regime
 quotidiennes
@@ -29363,6 +28088,7 @@ racisme delit
 racisme opinion
 racisme ordinaire
 raciste
+raciste extreme-droite
 raciste xenophobe
 racistes
 racistes antisemites
@@ -29394,7 +28120,6 @@ radicalite
 radicaux
 radieux
 radio
-radio france
 radioactifs
 radiojfrance
 radios
@@ -29402,6 +28127,7 @@ rafale
 rafales
 raffinerie
 raffineries
+raffineries greve
 raffineurs
 rafle
 rafle vel
@@ -29497,7 +28223,6 @@ rappels reglement
 rappeur
 rapport
 rapport @courdescomptes
-rapport annee
 rapport annuel
 rapport application
 rapport avis
@@ -29514,6 +28239,7 @@ rapport inspection
 rapport mission
 rapport parlementaire
 rapport proposition
+rapport publie
 rapport special
 rapport sujet
 rapport travail
@@ -29634,10 +28360,8 @@ rayon
 rayonne
 rayonnement
 rayonnement economique
-rayonnement france
 rayonnement international
 rayonner
-rayonner france
 rayonner territoire
 rayonner ville
 rayons
@@ -29656,7 +28380,6 @@ rdv lundi
 rdv lutte
 rdv mardi
 rdv mars
-rdv matin
 rdv mercredi
 rdv paris
 rdv permanence
@@ -29712,7 +28435,6 @@ realiste
 realistes
 realite
 realite face
-realite francais
 realite gouvernement
 realite pays
 realite terrain
@@ -29753,7 +28475,6 @@ recettes fiscales
 recettes supplementaires
 recevabilite
 recevais
-recevais matin
 recevait
 recevant
 recevez
@@ -29763,7 +28484,6 @@ recevoir @assembleenat
 recevoir agenda
 recevoir assemblee
 recevoir delegation
-recevoir matin
 recevoir newsletter
 recevons
 recevra
@@ -29827,6 +28547,7 @@ reconfort
 reconnais
 reconnaissance
 reconnaissance engagement
+reconnaissance envers
 reconnaissance etat
 reconnaissance meritee
 reconnaissance nation
@@ -29897,10 +28618,8 @@ recu
 recu @assembleenat
 recu apres-midi
 recu assemblee
-recu aujourd'hui
 recu delegation
 recu hier
-recu matin
 recu medaille
 recu permanence
 recu plusieurs
@@ -29990,7 +28709,6 @@ redressement
 redressement judiciaire
 redressement pays
 redresser
-redresser france
 redresser pays
 reduction
 reduction consommation
@@ -30025,7 +28743,6 @@ reecrit
 reecriture
 reeducation
 reel
-reel francais
 reel plaisir
 reelection
 reelire
@@ -30076,7 +28793,6 @@ reforme antisociale
 reforme assemblee
 reforme assurance
 reforme assurance-chomage
-reforme avons
 reforme bourses
 reforme brutale
 reforme car
@@ -30087,7 +28803,6 @@ reforme dont
 reforme enseignement
 reforme equilibree
 reforme femmes
-reforme francais
 reforme gauche
 reforme gouvernement
 reforme impopulaire
@@ -30121,6 +28836,7 @@ reforme structurelle
 reforme systeme
 reforme touraine
 reforme venir
+reforme veulent
 reforme voie
 reforme votee
 reformer
@@ -30169,6 +28885,7 @@ refusent debat
 refusent voter
 refuser
 refuser augmenter
+refuser reforme
 refuser voter
 refuses
 refusez
@@ -30242,7 +28959,6 @@ regionales
 regionaux
 regionaux departementaux
 regions
-regions france
 regis
 registre
 regle
@@ -30309,7 +29025,6 @@ rehabilite
 rehabiliter
 reims
 reindustrialisation
-reindustrialisation france
 reindustrialisation pays
 reindustrialisation verte
 reindustrialiser
@@ -30356,7 +29071,6 @@ rejete majorite
 rejete proposition
 rejete voix
 rejetee
-rejetee francais
 rejetee majorite
 rejetees
 rejeter
@@ -30497,6 +29211,7 @@ remettons
 remettra
 remettre
 remettre cause
+remettre coeur
 remettre humain
 remettre medaille
 remettre medailles
@@ -30511,6 +29226,7 @@ remis question
 remise
 remise carburant
 remise cause
+remise cheque
 remise diplomes
 remise insignes
 remise medaille
@@ -30577,8 +29293,6 @@ renaud muselier
 renaudpila
 renault
 rencontrais
-rencontrais aujourd'hui
-rencontrais matin
 rencontre
 rencontre acteurs
 rencontre agents
@@ -30587,14 +29301,15 @@ rencontre apres-midi
 rencontre artisans
 rencontre association
 rencontre associations
-rencontre aujourd'hui
 rencontre benevoles
 rencontre celles
 rencontre circonscription
 rencontre citoyenne
+rencontre collectif
 rencontre commercants
 rencontre communaute
 rencontre delegation
+rencontre depute
 rencontre deputes
 rencontre directeur
 rencontre direction
@@ -30610,22 +29325,24 @@ rencontre entrepreneurs
 rencontre equipe
 rencontre equipes
 rencontre etudiants
-rencontre francais
+rencontre habitant
 rencontre habitants
 rencontre hier
 rencontre homologue
 rencontre jeunes
 rencontre lundi
 rencontre m.
+rencontre madame
 rencontre maire
 rencontre maires
-rencontre matin
+rencontre marche
 rencontre membres
 rencontre militants
 rencontre ministre
 rencontre mme
 rencontre monsieur
 rencontre nombreux
+rencontre organisations
 rencontre parlementaires
 rencontre passionnante
 rencontre personnel
@@ -30685,24 +29402,22 @@ rendez 18h30
 rendez 19h
 rendez 19h00
 rendez 19h30
+rendez 20h
 rendez 8h30
 rendez annuel
 rendez apres-midi
-rendez aujourd'hui
 rendez circonscription
 rendez demain
 rendez dimanche
 rendez direct
 rendez fevrier
 rendez histoire
-rendez ici
 rendez incontournable
 rendez janvier
 rendez jeudi
 rendez lundi
 rendez mardi
 rendez mars
-rendez matin
 rendez mercredi
 rendez minutes
 rendez octobre
@@ -30726,7 +29441,6 @@ rendre action
 rendre argent
 rendre comptes
 rendre ecole
-rendre francais
 rendre hommage
 rendre justice
 rendre obligatoire
@@ -30741,17 +29455,16 @@ rends
 rends hommage
 rendu
 rendu apres-midi
-rendu aujourd'hui
 rendu ceremonie
 rendu hier
 rendu hommage
 rendu marche
-rendu matin
 rendu possible
 rendu public
+rendu salon
 rendu visite
 rendue
-rendue matin
+rendue centre
 rendue possible
 rendues
 rendus
@@ -30904,7 +29617,6 @@ reparer
 reparer injustice
 reparle
 reparler
-reparler francais
 reparlera
 repart
 repartent
@@ -30952,6 +29664,7 @@ repond enjeux
 repond questions
 repond urgence
 repondais
+repondais questions
 repondait
 repondant
 reponde
@@ -30998,7 +29711,6 @@ reponse concrete
 reponse crise
 reponse europeenne
 reponse gouvernement
-reponse ici
 reponse m.
 reponse madame
 reponse ministre
@@ -31007,6 +29719,7 @@ reponse politique
 reponse question
 reponse questions
 reponse simple
+reponse video
 reponses
 reponses apporter
 reponses concretes
@@ -31072,8 +29785,7 @@ representative
 representatives
 representativite
 represente
-represente aujourd'hui
-represente france
+represente suppleante
 representee
 representee cotes
 representees
@@ -31082,8 +29794,6 @@ representer
 representer @assembleenat
 representer assemblee
 representer defendre
-representer francais
-representer france
 representera
 representerai
 representes
@@ -31121,16 +29831,14 @@ republique @emmanuelmacron
 republique annonce
 republique armenie
 republique assemblee
-republique aujourd'hui
-republique avons
+republique bfmtv
+republique bravo
 republique copains
 republique democratie
 republique democratique
 republique doivent
 republique emmanuel
 republique exemplaire
-republique francaise
-republique france
 republique gouvernement
 republique islamique
 republique laique
@@ -31231,7 +29939,6 @@ respect droit
 respect droits
 respect engagements
 respect environnement
-respect francais
 respect institution
 respect institutions
 respect loi
@@ -31277,12 +29984,11 @@ respirer
 responsabilisation
 responsabiliser
 responsabilite
-responsabilite avons
+responsabilite agir
 responsabilite collective
 responsabilite elargie
 responsabilite etat
 responsabilite face
-responsabilite francais
 responsabilite gouvernement
 responsabilite immense
 responsabilite politique
@@ -31332,7 +30038,6 @@ reste charge
 reste chemin
 reste cotes
 reste ecoute
-reste france
 reste heures
 reste jours
 reste loi
@@ -31349,7 +30054,6 @@ restee
 restees
 restent
 rester
-rester france
 rester loi
 rester vigilantes
 rester vigilants
@@ -31447,7 +30151,6 @@ retour
 retour @assembleenat
 retour arriere
 retour assemblee
-retour aujourd'hui
 retour bancs
 retour circonscription
 retour commission
@@ -31460,7 +30163,6 @@ retour image
 retour images
 retour inauguration
 retour isf
-retour matin
 retour normale
 retour paix
 retour paris
@@ -31498,8 +30200,6 @@ retraite agriculteurs
 retraite annuites
 retraite antichambre
 retraite augmenter
-retraite aujourd'hui
-retraite avons
 retraite capitalisation
 retraite chomage
 retraite deputes
@@ -31509,8 +30209,6 @@ retraite euros
 retraite femmes
 retraite fin
 retraite flambeaux
-retraite francais
-retraite france
 retraite gouvernement
 retraite injuste
 retraite macron
@@ -31542,9 +30240,8 @@ retraites article
 retraites assemblee
 retraites assurance
 retraites augmenter
-retraites aujourd'hui
-retraites avons
 retraites belle
+retraites besoin
 retraites bfmtv
 retraites bravo
 retraites car
@@ -31558,7 +30255,9 @@ retraites debat
 retraites demain
 retraites depute
 retraites deputes
+retraites doivent
 retraites dont
+retraites echanges
 retraites elisabeth
 retraites emmanuel
 retraites ensemble
@@ -31566,10 +30265,9 @@ retraites eux
 retraites face
 retraites femmes
 retraites fin
-retraites francais
-retraites france
 retraites gauche
 retraites gouvernement
+retraites groupe
 retraites hier
 retraites indispensable
 retraites inflation
@@ -31581,7 +30279,7 @@ retraites macron
 retraites macronie
 retraites macronistes
 retraites majorite
-retraites matin
+retraites marche
 retraites millions
 retraites ministre
 retraites mobilisation
@@ -31619,10 +30317,12 @@ retraites senat
 retraites serai
 retraites serait
 retraites seront
+retraites seulement
 retraites sommes
 retraites soutien
 retraites systeme
 retraites travailler
+retraites veulent
 retraites vote
 retraites voulons
 retraites voulue
@@ -31633,14 +30333,12 @@ retrouvant
 retrouve
 retrouve 14h
 retrouve @bfmtv
-retrouve aujourd'hui
 retrouve collegues
 retrouve demain
 retrouve heure
 retrouve jeudi
 retrouve lundi
 retrouve mardi
-retrouve matin
 retrouve mercredi
 retrouve minutes
 retrouve mort
@@ -31653,7 +30351,6 @@ retrouvent
 retrouver
 retrouver ami
 retrouver amis
-retrouver aujourd'hui
 retrouver camarades
 retrouver chemin
 retrouver collegues
@@ -31663,9 +30360,7 @@ retrouver echanger
 retrouver elus
 retrouver ensemble
 retrouver habitants
-retrouver ici
 retrouver integralite
-retrouver matin
 retrouver militants
 retrouver nombreux
 retrouver partager
@@ -31688,7 +30383,7 @@ retrouvez actualite
 retrouvez agenda
 retrouvez apres-midi
 retrouvez article
-retrouvez aujourd'hui
+retrouvez bilan
 retrouvez ci-dessous
 retrouvez communique
 retrouvez conference
@@ -31699,11 +30394,11 @@ retrouvez derniere
 retrouvez dimanche
 retrouvez direct
 retrouvez discours
+retrouvez edito
 retrouvez ensemble
 retrouvez entretien
 retrouvez essentiel
 retrouvez heure
-retrouvez ici
 retrouvez instants
 retrouvez integralite
 retrouvez intervention
@@ -31713,7 +30408,6 @@ retrouvez jeudi
 retrouvez lettre
 retrouvez lundi
 retrouvez mardi
-retrouvez matin
 retrouvez mercredi
 retrouvez minutes
 retrouvez newsletter
@@ -31723,6 +30417,8 @@ retrouvez portrait
 retrouvez presentation
 retrouvez proposition
 retrouvez question
+retrouvez questions
+retrouvez rapport
 retrouvez reaction
 retrouvez replay
 retrouvez reponse
@@ -31744,8 +30440,6 @@ retrouvons mardi
 retrouvons samedi
 retrouvons vendredi
 reuni
-reuni aujourd'hui
-reuni matin
 reunie
 reunies
 reunion
@@ -31759,12 +30453,13 @@ reunion constitutive
 reunion delegation
 reunion deputes
 reunion echanges
+reunion equipe
 reunion groupe
 reunion hebdomadaire
 reunion hier
 reunion information
 reunion intergroupe
-reunion matin
+reunion ministere
 reunion organisee
 reunion prefecture
 reunion preparation
@@ -31781,9 +30476,7 @@ reunir
 reunira
 reunirai
 reunis
-reunis aujourd'hui
 reunis autour
-reunis matin
 reunissais
 reunissait
 reunissant
@@ -31916,7 +30609,6 @@ revolu
 revolution
 revolution citoyenne
 revolution ecologique
-revolution francaise
 revolutionnaire
 revolutionnaires
 revolutionner
@@ -32004,8 +30696,6 @@ rmc
 rmcinfo
 rn
 rn assemblee
-rn aujourd'hui
-rn avons
 rn change
 rn commission
 rn defend
@@ -32031,6 +30721,7 @@ rn nupes
 rn oppose
 rn opposition
 rn parti
+rn pouvoir
 rn prefere
 rn presents
 rn propose
@@ -32089,7 +30780,6 @@ role determinant
 role elu
 role essentiel
 role fondamental
-role france
 role important
 role joue
 role jouer
@@ -32180,11 +30870,9 @@ rude
 rue
 rue appel
 rue assemblee
-rue aujourd'hui
 rue cotes
 rue defendre
 rue demain
-rue france
 rue gouvernement
 rue greve
 rue hemicycle
@@ -32231,6 +30919,7 @@ russes guerre
 russia
 russian
 russie
+russie poutine
 russie ukraine
 rustines
 ruth
@@ -32369,7 +31058,6 @@ salaires conditions
 salaires dignes
 salaires entreprises
 salaires face
-salaires francais
 salaires inflation
 salaires jusqu'
 salaires nets
@@ -32399,7 +31087,6 @@ salaries demandent
 salaries doivent
 salaries entreprise
 salaries entreprises
-salaries francais
 salaries greve
 salaries lutte
 salaries millions
@@ -32476,7 +31163,6 @@ samedi janvier
 samedi juillet
 samedi marche
 samedi mars
-samedi matin
 samedi novembre
 samedi octobre
 samedi prochain
@@ -32538,10 +31224,9 @@ sante enfants
 sante environnement
 sante environnementale
 sante femmes
-sante francais
-sante france
 sante francois
 sante gouvernement
+sante hopital
 sante humaine
 sante mentale
 sante pouvoir
@@ -32566,7 +31251,6 @@ sapeurs pompiers
 sapeurs-
 sapeurs-pompiers
 sapeurs-pompiers engages
-sapeurs-pompiers france
 sapeurs-pompiers mobilises
 sapeurs-pompiers volontaires
 sapin
@@ -32641,8 +31325,6 @@ savaient
 savais
 savait
 save
-savent
-savent peuvent
 saveur
 saveurs
 savez
@@ -32654,7 +31336,6 @@ savoir
 savoir actualites
 savoir-faire
 savoir-faire excellence
-savoir-faire francais
 savoirs
 savoirs fondamentaux
 savoirs-faire
@@ -32737,6 +31418,7 @@ seance questions
 seance suspendue
 seance travail
 seance vote
+seance voter
 seances
 seances assemblee
 seances hemicycle
@@ -32752,6 +31434,7 @@ secession
 seche
 secheresse
 secheresse historique
+secheresse incendies
 secheresses
 second
 second degre
@@ -32818,8 +31501,6 @@ securite collective
 securite concitoyens
 securite defense
 securite energetique
-securite francais
-securite france
 securite generale
 securite habitants
 securite immigration
@@ -32831,6 +31512,7 @@ securite onu
 securite pays
 securite policiers
 securite premiere
+securite priorite
 securite privee
 securite publique
 securite quotidien
@@ -32907,10 +31589,7 @@ sem
 semaine
 semaine @assembleenat
 semaine agenda
-semaine annee
 semaine assemblee
-semaine aujourd'hui
-semaine avons
 semaine bataille
 semaine chargee
 semaine circonscription
@@ -32951,12 +31630,13 @@ semaine rentree
 semaine retour
 semaine retrouver
 semaine retrouvez
+semaine seance
 semaine semaine
 semaine serai
 semaine travail
+semaine vote
 semaines
 semaines assemblee
-semaines avons
 semaines debat
 semaines debats
 semaines greve
@@ -32998,13 +31678,13 @@ seniors entreprises
 sens
 sens action
 sens amendement
-sens avons
 sens collectif
 sens compromis
 sens devoir
 sens engagement
 sens histoire
 sens interet
+sens metier
 sens mot
 sens politique
 sens priorites
@@ -33012,6 +31692,7 @@ sens proposition
 sens propre
 sens responsabilites
 sens travail
+sens vote
 sensibilisation
 sensibilise
 sensibiliser
@@ -33053,10 +31734,11 @@ sequence
 sequences
 sequestre
 serai
+serai 18h20
+serai 19h
 serai @bfmtv
 serai attentif
 serai attentive
-serai aujourd'hui
 serai cote
 serai cotes
 serai demain
@@ -33070,7 +31752,6 @@ serai invitee
 serai jeudi
 serai lundi
 serai mardi
-serai matin
 serai mercredi
 serai permanence
 serai plateau
@@ -33157,9 +31838,7 @@ service departemental
 service developpement
 service entreprises
 service etat
-service francais
 service francaises
-service france
 service habitants
 service interet
 service jeunes
@@ -33172,10 +31851,12 @@ service pays
 service peuple
 service population
 service pouvoir
+service projet
 service protection
 service proximite
 service public
 service rendu
+service reussite
 service riches
 service sante
 service securite
@@ -33185,6 +31866,7 @@ service territoires
 service transition
 service travail
 service urgences
+service vote
 services
 services education
 services etat
@@ -33201,8 +31883,6 @@ services urgence
 services urgences
 servie
 servir
-servir francais
-servir france
 servir interet
 servir interets
 servira
@@ -33244,7 +31924,6 @@ seul rn
 seule
 seule alternative
 seule ambition
-seule annee
 seule boussole
 seule chose
 seule facon
@@ -33362,9 +32041,7 @@ signatures
 signaux
 signe
 signe appel
-signe aujourd'hui
 signe contrat
-signe matin
 signe petition
 signe proposition
 signe tribune
@@ -33528,12 +32205,10 @@ sobre
 sobriete
 sobriete energetique
 social
-social aujourd'hui
 social culturel
 social ecologique
 social economique
 social environnemental
-social francais
 social medico-social
 social politique
 social reforme
@@ -33542,8 +32217,6 @@ social xtor
 social-democratie
 sociale
 sociale assemblee
-sociale aujourd'hui
-sociale avons
 sociale climatique
 sociale democratique
 sociale ecologie
@@ -33552,7 +32225,6 @@ sociale economique
 sociale enfance
 sociale environnementale
 sociale fiscale
-sociale francais
 sociale gouvernement
 sociale macron
 sociale majeure
@@ -33589,13 +32261,11 @@ societaux
 societe
 societe civile
 societe demain
-societe francaise
 societe inclusive
 societe plein
 societe travail
 societes
 societes autoroutes
-societes france
 sociologie
 sociologue
 socle
@@ -33654,7 +32324,6 @@ soit-disant
 soixantaine
 soja
 sol
-sol francais
 sol-air
 solaire
 solaires
@@ -33662,7 +32331,6 @@ soldat
 soldat inconnu
 soldats
 soldats feu
-soldats francais
 soldats morts
 soldats tombes
 solde
@@ -33683,13 +32351,13 @@ solidarite europeenne
 solidarite famille
 solidarite familles
 solidarite femmes
-solidarite france
 solidarite generations
 solidarite grevistes
 solidarite habitants
 solidarite intergenerationnelle
 solidarite internationale
 solidarite nationale
+solidarite pays
 solidarite peuple
 solidarite soutien
 solidarite totale
@@ -33736,12 +32404,12 @@ some
 somme
 sommeil
 sommes
+sommes 1er
 sommes accord
 sommes alles
 sommes alternative
 sommes arrives
 sommes attaches
-sommes aujourd'hui
 sommes battus
 sommes capables
 sommes confrontes
@@ -33761,11 +32429,9 @@ sommes face
 sommes favorables
 sommes fiers
 sommes force
-sommes france
 sommes hemicycle
 sommes heritiers
 sommes heureux
-sommes ici
 sommes loin
 sommes majorite
 sommes millions
@@ -33801,7 +32467,6 @@ sommet
 sommet etat
 sommets
 sondage
-sondage francais
 sondage ifop
 sondages
 sonia
@@ -33879,7 +32544,6 @@ souhaitait
 souhaitant
 souhaite
 souhaite adresser
-souhaite annee
 souhaite belle
 souhaite belles
 souhaite bienvenue
@@ -34049,12 +32713,12 @@ soutenir combat
 soutenir developpement
 soutenir entreprises
 soutenir equipe
+soutenir face
 soutenir familles
 soutenir femmes
 soutenir filiere
 soutenir financierement
 soutenir forces
-soutenir francais
 soutenir greve
 soutenir grevistes
 soutenir initiatives
@@ -34137,8 +32801,6 @@ soutien financier
 soutien force
 soutien forces
 soutien fort
-soutien francais
-soutien france
 soutien gendarmes
 soutien gouvernement
 soutien greve
@@ -34154,7 +32816,6 @@ soutien maire
 soutien manifestants
 soutien manifestation
 soutien massif
-soutien matin
 soutien militaire
 soutien militants
 soutien ministre
@@ -34190,6 +32851,7 @@ soutien scolaire
 soutien soldats
 soutien solidarite
 soutien total
+soutien travail
 soutien travailleurs
 soutien ukraine
 soutien victimes
@@ -34207,7 +32869,6 @@ soutiens proposition
 soutient
 souvenez
 souvenir
-souvenir francais
 souvenir oublier
 souvenirs
 souvenons
@@ -34222,8 +32883,6 @@ souverainete alimentaire
 souverainete economique
 souverainete energetique
 souverainete europeenne
-souverainete francaise
-souverainete france
 souverainete independance
 souverainete industrielle
 souverainete nationale
@@ -34263,6 +32922,7 @@ space
 space twitter
 spatial
 spatiale
+spatiale europeenne
 spatiaux
 spe
 special
@@ -34311,7 +32971,6 @@ spontanement
 sport
 sport culture
 sport feminin
-sport francais
 sport sante
 sport vecteur
 sportif
@@ -34340,7 +32999,6 @@ stabiliser
 stabilite
 stable
 stade
-stade france
 stades
 staff
 stage
@@ -34433,7 +33091,6 @@ strasbourg
 stratege
 strategie
 strategie energetique
-strategie francaise
 strategie gouvernement
 strategie nationale
 strategie obstruction
@@ -34507,7 +33164,6 @@ successives
 sucre
 sucrerie
 sud
-sud france
 sud ouest
 sud radio
 sud seine-et-marne
@@ -34614,13 +33270,11 @@ suivre actualite
 suivre debats
 suivre direct
 suivre exemple
-suivre ici
 suivre quotidien
 suivre twitter
 suivront
 sujet
 sujet assemblee
-sujet aujourd'hui
 sujet concerne
 sujet crucial
 sujet dont
@@ -34628,6 +33282,7 @@ sujet essentiel
 sujet gouvernement
 sujet important
 sujet lequel
+sujet lors
 sujet majeur
 sujet merite
 sujet projet
@@ -34685,7 +33340,6 @@ suppleante carine
 suppleante representait
 supplementaire
 supplementaires
-supplementaires annee
 supplementaires seront
 suppletifs
 support
@@ -34856,7 +33510,6 @@ systeme educatif
 systeme electrique
 systeme energetique
 systeme equilibre
-systeme francais
 systeme hospitalier
 systeme judiciaire
 systeme politique
@@ -34923,7 +33576,7 @@ tant elu
 tant elue
 tant elus
 tant femme
-tant francais
+tant gouvernement
 tant maire
 tant membre
 tant ministre
@@ -35148,6 +33801,7 @@ tentez
 tenu
 tenu adresser
 tenu cotes
+tenu presente
 tenu propos
 tenu rappeler
 tenu remercier
@@ -35158,6 +33812,7 @@ tenue uniforme
 tenues
 tenus
 tenus depute
+tenus hemicycle
 ter
 terada
 tergiversations
@@ -35176,12 +33831,10 @@ terminera
 terminons
 terrain
 terrain assemblee
-terrain aujourd'hui
 terrain aupres
 terrain circonscription
 terrain cotes
 terrain ecoute
-terrain matin
 terrain rencontre
 terrains
 terrasse
@@ -35209,14 +33862,13 @@ terrifiant
 terrifiante
 territoire
 territoire assemblee
-territoire avons
 territoire belfort
 territoire bravo
 territoire cotes
 territoire dont
+territoire ensemble
+territoire etat
 territoire felicitations
-territoire francais
-territoire france
 territoire habitants
 territoire heureux
 territoire national
@@ -35227,7 +33879,6 @@ territoire retrouvez
 territoire rural
 territoires
 territoires bravo
-territoires france
 territoires montagne
 territoires occupes
 territoires outre-mer
@@ -35267,7 +33918,6 @@ texte equilibre
 texte essentiel
 texte examine
 texte final
-texte francais
 texte gouvernement
 texte important
 texte initial
@@ -35454,7 +34104,6 @@ tomber
 tomber gouvernement
 tomber reforme
 tombes
-tombes france
 tombes sous
 tombons
 tondelier
@@ -35476,7 +34125,6 @@ torturee
 torturer
 tortures
 tot
-tot matin
 tot metiers
 tot retraite
 tot tard
@@ -35519,9 +34167,9 @@ toulousaine
 toulousains
 toulouse
 tour
+tour deserts
 tour election
 tour elections
-tour france
 tour horizon
 tour legislatives
 tour presidentielle
@@ -35573,7 +34221,7 @@ tracer
 traces
 tract
 tractage
-tractage matin
+tractage marche
 tracte
 tracter
 tracteurs
@@ -35616,7 +34264,6 @@ trahissent
 trahit
 trail
 train
-train france
 train passer
 traine
 trainer
@@ -35755,15 +34402,13 @@ travail aesh
 travail afin
 travail agents
 travail an
-travail annee
 travail apres-midi
 travail assemblee
 travail associations
 travail augmenter
-travail aujourd'hui
 travail autour
-travail avons
 travail bravo
+travail car
 travail charge
 travail circonscription
 travail coeur
@@ -35781,9 +34426,9 @@ travail defendre
 travail degradees
 travail degradent
 travail delegation
+travail demain
 travail depute
 travail deputes
-travail devons
 travail difficile
 travail difficiles
 travail dignes
@@ -35812,12 +34457,10 @@ travail force
 travail forces
 travail formation
 travail formidable
-travail francais
-travail france
 travail gouvernement
+travail grand
 travail groupe
 travail hier
-travail ici
 travail important
 travail indispensable
 travail jusqu'
@@ -35827,7 +34470,6 @@ travail long
 travail longue
 travail majorite
 travail manque
-travail matin
 travail memoire
 travail mene
 travail merite
@@ -35843,6 +34485,7 @@ travail parlementaire
 travail parlementaires
 travail paye
 travail payer
+travail pays
 travail permet
 travail personnels
 travail personnes
@@ -35850,6 +34493,7 @@ travail place
 travail plein
 travail plutot
 travail policiers
+travail politique
 travail poursuit
 travail pouvoir
 travail precieux
@@ -35915,7 +34559,6 @@ travailler dossiers
 travailler elus
 travailler ensemble
 travailler eux
-travailler francais
 travailler gagner
 travailler gouvernement
 travailler interet
@@ -35940,7 +34583,6 @@ travailleurs
 travailleurs essentiels
 travailleurs etrangers
 travailleurs euses
-travailleurs francais
 travailleurs frontaliers
 travailleurs greve
 travailleurs handicapes
@@ -35976,7 +34618,6 @@ travaux utilite
 travaux venir
 travees
 travers
-travers france
 traverse
 traversee
 traversees
@@ -36187,7 +34828,6 @@ tyrannie
 tyrans
 uber
 uber files
-uber france
 uberfiles
 uberisation
 uberises
@@ -36199,7 +34839,6 @@ ugobernalicis
 uk
 ukraine
 ukraine face
-ukraine france
 ukraine peuple
 ukraine russie
 ukraini
@@ -36234,6 +34873,7 @@ unanimite assemblee
 unanimite commission
 unanimite proposition
 unanimite texte
+unanimite vote
 unc
 und
 under
@@ -36257,7 +34897,6 @@ union nationale
 union populaire
 union sacree
 unique
-unique france
 unique objectif
 uniquement
 uniques
@@ -36280,6 +34919,7 @@ unite nation
 unite nationale
 unite pays
 unite peuple
+unite politique
 unite syndicale
 united
 unites
@@ -36370,7 +35010,6 @@ uterus
 utile
 utilement
 utiles
-utiles francais
 utilisant
 utilisateurs
 utilisation
@@ -36466,7 +35105,6 @@ valeurs communes
 valeurs democratiques
 valeurs europeennes
 valeurs fondamentales
-valeurs france
 valeurs gauche
 valeurs humanistes
 valeurs liberte
@@ -36576,13 +35214,13 @@ vendeur
 vendre
 vendredi
 vendredi apres-midi
+vendredi assemblee
 vendredi decembre
 vendredi dernier
 vendredi fevrier
 vendredi janvier
 vendredi juillet
 vendredi mars
-vendredi matin
 vendredi novembre
 vendredi octobre
 vendredi prochain
@@ -36609,7 +35247,6 @@ venir aide
 venir assemblee
 venir decouvrir
 venir echanger
-venir france
 venir notamment
 venir rencontre
 venir rencontrer
@@ -36627,6 +35264,7 @@ ventes
 ventre
 vents
 venu
+venu apporter
 venu echanger
 venu rencontre
 venu saluer
@@ -36636,7 +35274,6 @@ venue soutenir
 venues
 venus
 venus echanger
-venus france
 venus nombre
 venus nombreux
 veran
@@ -36667,7 +35304,6 @@ veritable succes
 veritablement
 veritables
 verite
-verite francais
 verite justice
 verites
 verne
@@ -36751,7 +35387,6 @@ veufs veuves
 veuille
 veulent
 veulent entendre
-veulent francais
 veulent imposer
 veulent pouvoir
 veulent reforme
@@ -36822,8 +35457,8 @@ victoire
 victoire @mlp_officiel
 victoire @rnational_off
 victoire amendement
+victoire article
 victoire assemblee
-victoire aujourd'hui
 victoire belle
 victoire bravo
 victoire collective
@@ -36831,8 +35466,6 @@ victoire commission
 victoire deputes
 victoire elections
 victoire face
-victoire francais
-victoire france
 victoire gouvernement
 victoire grace
 victoire hier
@@ -36854,7 +35487,6 @@ vide grenier
 vide-grenier
 video
 video complete
-video ici
 video repentance
 videoprotection
 videos
@@ -36937,7 +35569,6 @@ ville
 ville belle
 ville bravo
 ville departement
-ville france
 ville habitants
 ville logement
 ville nice
@@ -36952,7 +35583,6 @@ villes campagnes
 villes circonscription
 villes demain
 villes francaises
-villes france
 villes moyennes
 villes villages
 villette
@@ -37032,7 +35662,6 @@ visa
 visage
 visage decouvert
 visage extreme-droite
-visage france
 visage parcours
 visage rn
 visages
@@ -37083,7 +35712,6 @@ vision
 vision avenir
 vision commune
 vision democratie
-vision france
 vision long
 vision politique
 vision societe
@@ -37095,10 +35723,10 @@ visitais
 visite
 visite @assembleenat
 visite @emmanuelmacron
+visite agence
 visite apres-midi
 visite assemblee
 visite atelier
-visite aujourd'hui
 visite caserne
 visite centrale
 visite centre
@@ -37121,7 +35749,6 @@ visite locaux
 visite lycee
 visite maison
 visite marche
-visite matin
 visite ministerielle
 visite ministre
 visite musee
@@ -37133,7 +35760,9 @@ visite passionnante
 visite prison
 visite rencontre
 visite salon
+visite service
 visite services
+visite siege
 visite site
 visite stand
 visite surprise
@@ -37184,9 +35813,9 @@ vive
 vive amitie
 vive democratie
 vive emotion
-vive france
 vive republique
 vive traditions
+vive vive
 vive voix
 vivement
 vivent
@@ -37206,7 +35835,7 @@ vivre decemment
 vivre democratie
 vivre dignement
 vivre ensemble
-vivre francais
+vivre esprit
 vivre heureux
 vivre libre
 vivre libres
@@ -37231,13 +35860,13 @@ vociferations
 voeu
 voeux
 voeux ami
-voeux annee
 voeux bonheur
 voeux chaleureux
 voeux circonscription
 voeux communaute
 voeux commune
 voeux communes
+voeux depute
 voeux federation
 voeux forces
 voeux habitants
@@ -37251,12 +35880,16 @@ voeux monsieur
 voeux nouvelle
 voeux occasion
 voeux organisee
+voeux plaisir
 voeux population
 voeux president
 voeux retablissement
 voeux reussite
 voeux samedi
+voeux sante
+voeux souhaite
 voeux succes
+voeux tant
 vogue
 voice
 voici
@@ -37306,10 +35939,9 @@ voix deputes
 voix extreme-droite
 voix femmes
 voix forte
-voix francais
-voix france
 voix groupe
 voix habitants
+voix hemicycle
 voix majorite
 voix manquer
 voix nord
@@ -37331,7 +35963,6 @@ volee
 volees
 volent
 voler
-voler francais
 voles
 volet
 volets
@@ -37350,7 +35981,6 @@ volonte agir
 volonte avancer
 volonte commune
 volonte defendre
-volonte francais
 volonte generale
 volonte gouvernement
 volonte partagee
@@ -37383,10 +36013,9 @@ vote amendements
 vote article
 vote assemblee
 vote augmentation
-vote aujourd'hui
 vote aura
 vote avis
-vote avons
+vote bravo
 vote budget
 vote car
 vote censure
@@ -37406,7 +36035,6 @@ vote eux
 vote faveur
 vote fin
 vote final
-vote francais
 vote gouvernement
 vote groupe
 vote hausse
@@ -37421,7 +36049,6 @@ vote macron
 vote main
 vote majoritaire
 vote majorite
-vote matin
 vote mesure
 vote mesures
 vote milliards
@@ -37433,6 +36060,7 @@ vote nuit
 vote nupes
 vote parlement
 vote peuple
+vote ppl
 vote premiere
 vote presidence
 vote projet
@@ -37646,7 +36274,6 @@ xi
 xtor
 xtor cs7-51-
 xv
-xv france
 xve
 xvi
 xvie
