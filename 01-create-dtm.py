@@ -44,6 +44,7 @@ from utils import (
     RANDOM_SEED,
 )
 
+NB_RANDOM_TWEETS = 100000
 ORIGINAL_TWEET_COUNT = 0
 STORE_PATH = os.path.join("data_prod", "dfm")
 
@@ -82,7 +83,10 @@ def group_by_file_and_user(root, nb_files, public, random_tweets=False):
         )
         random.seed(RANDOM_SEED)
         random_tweet_indices = sorted(
-            random.sample(range(ORIGINAL_TWEET_COUNT), k=10000)
+            random.sample(
+                range(ORIGINAL_TWEET_COUNT),
+                k=min(ORIGINAL_TWEET_COUNT, NB_RANDOM_TWEETS),
+            )
         )
         current_index = 0
 
@@ -260,6 +264,7 @@ if __name__ == "__main__":
             args.public,
         )
     )
+
     if public_is_congress:
         sort_row_data(X)
 
