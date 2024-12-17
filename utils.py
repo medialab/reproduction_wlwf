@@ -53,6 +53,7 @@ STOP_WORDS_FR = [
     "après",
     "as",
     "au",
+    "aujourdhui",
     "aujourd'hui",
     "aussi",
     "autre",
