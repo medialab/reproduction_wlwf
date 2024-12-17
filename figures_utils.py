@@ -25,7 +25,6 @@ def draw_topic_keywords(topic, words, x, y):
     )
 
     ax.set_xlabel("c-TF-IDF scores")
-    ax.set_ylabel("c-TF-IDF scores")
 
     for word, xvalue, yvalue in zip(words, x, y):
         ax.text(xvalue, yvalue, word)
@@ -35,3 +34,4 @@ def draw_topic_keywords(topic, words, x, y):
             "data_prod", "dashboard", "files", "img", "bertopic_{}.png".format(topic)
         )
     )
+    plt.close()

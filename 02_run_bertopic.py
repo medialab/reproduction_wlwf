@@ -177,4 +177,6 @@ for i, row in topic_model.get_topic_info().iterrows():
     topic = row["Topic"]
     top_list = topic_model.get_topic(topic)
     top_words, top_ctfidf = zip(*top_list)
-    draw_topic_keywords(topic, top_words, top_ctfidf, top_ctfidf)
+    draw_topic_keywords(
+        topic, top_words, top_ctfidf, sorted(range(len(top_words)), reverse=True)
+    )
