@@ -56,8 +56,9 @@ parser.add_argument(
 args = parser.parse_args()
 
 embedding_model = SentenceTransformer(SBERT_NAME)
+sbert_name_string = SBERT_NAME.replace("/", "_")
 
-SAVE_PATH = os.path.join(args.output_folder, "tweets_sentence-camembert-large.npz")
+SAVE_PATH = os.path.join(args.output_folder, "{}.npz".format(sbert_name_string))
 
 
 def format_output(size):
@@ -104,7 +105,7 @@ max_index, embeddings = load_embeddings(
 # Encode docs
 for i in tqdm(
     range(max_index, len(docs), batch_size),
-    desc="Encode sentences using CamemBERT large",
+    desc="Encode sentences using {}".format(sbert_name_string),
 ):
     if i % args.save_size == 0 and i > 0:
         np.savez_compressed(
