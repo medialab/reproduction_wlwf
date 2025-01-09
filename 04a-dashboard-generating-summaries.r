@@ -45,7 +45,8 @@ K <- 100
 
 num.words <- 15
 normalized.topics <- exp(lda.fit@beta) / rowSums(exp(lda.fit@beta)) # exp(lda.fit@beta) contient la matrice de probabilités associées
-# aux mots (en colonne) dans les thèmes (en ligne). Les valeurs brutes sont probablement des log-probabilités, puisqu'elles sont négatives.
+# aux mots (en colonne) dans les thèmes (en ligne). Les valeurs brutes sont probablement des log-probabilités, puisqu'elles sont négatives. 
+#normalized-topics correspond alors à la matrice donnant pour chaque case : proba du mot dans le topic / somme des probas de chaque mot dans le topic 
 
 calculate.specificity <- function(mod) {
   # 1. Vérification du type de l'objet 'mod'
@@ -86,11 +87,15 @@ calculate.specificity <- function(mod) {
 normalized.words <- calculate.specificity(lda.fit)
 
 scores <- apply(normalized.topics, 2, function(x)
-    x * ( log(x + 1e-05) - sum(log(x + 1e-05))/length(x)) )
+    x * ( log(x + 1e-05) - sum(log(x + 1e-05))/length(x)) ) #Pour chaque mot, on multiplie sa probabilité d'être dans chaque topic 
+    #par l'écart entre le log de sa proba  et de la moyenne des log-proba du mot parmi tous les topics 
+    # 1e-05 est ajouté pour éviter les erreurs de 0 
+    # Cela met donc en avant les mots qui ont des probas hétérogènes. Par ex, un mot très probable dans le topic 1 mais peu dans les autres aura un score + élevé 
+    # Cette formule fait penser à un tf-idf  
 
 colnames(scores) <- lda.fit@terms
 
-# les 15 mots avec le score de spécificité le plus élevé par topic ?
+# les 15 mots avec le score pseudo tf-idf le plus proche 
 words <- apply(scores, 1, function(x)
         colnames(scores)[order(x, decreasing = TRUE)[1:num.words]])
 
@@ -99,7 +104,7 @@ f.scores <- apply(scores, 1, function(x)
 
 n.topics <- rep(seq(1, K, 1), each=num.words)
 
-# construction d'un df des mots les plus spécifiques pour chaque Topic
+# construction d'un df des mots avec les plus gros tf-idf pour chaque topic pour chaque Topic
 info.df <- data.frame(
     topic = n.topics,
     word = c(words),
@@ -112,7 +117,7 @@ for (i in 1:length(info.df$topic)){
 }
 info.df$topic <- paste0("Topic ", info.df$topic)
 info.df$topic <- factor(info.df$topic, levels=paste0("Topic ", 1:K))
-info.df$order <- factor(order.topics <- rep(seq(1, num.words, 1), times=K), levels=as.character(15:1))
+info.df$order <- factor(order.topics <- rep(seq(1, num.words, 1), times=K), levels=as.character(15:1)) #Ajoute le rank en fonction du score pseudo tf-idf 
 
 
 # generating figures
