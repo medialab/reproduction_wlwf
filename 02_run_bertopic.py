@@ -3,7 +3,7 @@ import json
 import random
 import argparse
 
-from figures_utils import draw_topic_keywords
+from figures_utils import draw_topic_keywords 
 from hdbscan import HDBSCAN
 from umap import UMAP
 from bertopic import BERTopic
@@ -180,3 +180,22 @@ for i, row in topic_model.get_topic_info().iterrows():
     draw_topic_keywords(
         topic, top_words, top_ctfidf, sorted(range(len(top_words)), reverse=True)
     )
+
+print(topics)
+#Création du tableau au format adapté pour les graphiques TS d'Antoine 
+#Avec preprocess : on découpe les documents en tweet unique, et la date est dans le nom, et le groupe et le nom du dossier. Ca pourrait donc être un premier pas. 
+#Topics contient le topic associé à chaque tweet 
+
+#Création d'une matrice contenant le group et le numéro de chaque document
+infos = np.array(
+    [
+        (group_name, filename)  # Stocke uniquement group_name et filename
+        for group_name, filename in preprocess_info(
+            args.input_path, count_nb_files(args.input_path), apply_unidecode=True
+        )
+    ]
+)
+
+#Ajout du topic associé à chaque tweet daté et associé à un groupe
+np.c_[infos, topics]
+
