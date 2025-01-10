@@ -767,7 +767,7 @@ def preprocess_info(root, nb_files, apply_unidecode=False, write_files=False, sm
                         row[text_pos] = doc
                         enricher.writerow(row, [is_thread, group_name])
                     counter_threads += 1
-                    yield doc, group_name, filename
+                    yield group_name, filename
 
         if write_files:
             output_file.close()
