@@ -2,6 +2,7 @@ import os
 import json
 import random
 import argparse
+import pandas 
 
 from figures_utils import draw_topic_keywords 
 from hdbscan import HDBSCAN
@@ -20,6 +21,7 @@ from utils import (
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
+    preprocess_info
 )
 
 parser = argparse.ArgumentParser()
@@ -181,7 +183,6 @@ for i, row in topic_model.get_topic_info().iterrows():
         topic, top_words, top_ctfidf, sorted(range(len(top_words)), reverse=True)
     )
 
-print(topics)
 #Création du tableau au format adapté pour les graphiques TS d'Antoine 
 #Avec preprocess : on découpe les documents en tweet unique, et la date est dans le nom, et le groupe et le nom du dossier. Ca pourrait donc être un premier pas. 
 #Topics contient le topic associé à chaque tweet 
@@ -197,5 +198,14 @@ infos = np.array(
 )
 
 #Ajout du topic associé à chaque tweet daté et associé à un groupe
-np.c_[infos, topics]
+infos = np.c_[infos, topics]
 
+df = pd.DataFrame(infos, columns=['party', 'date', 'topic']) #Conversion to facilitate operations 
+
+df = df.groupby(['party', 'date', 'topic']).size().reset_index(name='count') #Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
+
+df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
+
+df['prop'] = df_grouped['count'] / df_grouped['total'] #Calcul de proportion
+df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
+df.to_csv('data_prod/dashboard/files/df_forTS.csv')
