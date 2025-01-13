@@ -11,6 +11,7 @@ from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import argparse
 import os
 import sys
+from functools import reduce
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -64,5 +65,19 @@ for df in df_list:
         else:
             sys.exit("Stopping the script because the differentiation of time series is not stationary.")
     #On verra si on redifférencie encore + : est ce que ça aurait du sens en terme d'interprétabilité ??? 
+
+df_dep = #Trouver la base de données dépendante selon le group défini plus tot
+df_list.remove(df_dep)
+
+exog = reduce(lambda left, right: pd.merge(left, right, how='outer', left_index=True, right_index=True), df_list)
+
+model = VAR(df_dep, exog) #Faudra voir comment ajouter les effets fixes
+
+order_selection = model.select_order(maxlags=12)
+print(order_selection.summary())
+
+p = input("Choose the number of lags of VAR model")
+
+results = model.fit(p)
 
 
