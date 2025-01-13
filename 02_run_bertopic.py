@@ -2,7 +2,7 @@ import os
 import json
 import random
 import argparse
-import pandas 
+import pandas as pd
 
 from figures_utils import draw_topic_keywords 
 from hdbscan import HDBSCAN
@@ -20,8 +20,7 @@ from utils import (
     load_embeddings,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
-    RANDOM_SEED,
-    preprocess_info
+    RANDOM_SEED
 )
 
 parser = argparse.ArgumentParser()
@@ -126,14 +125,16 @@ def save_ctfidf_config(model, path):
 
 save_utils.save_ctfidf_config = save_ctfidf_config
 
-docs = np.array(
+docs_infos = np.array(
     [
-        doc
-        for doc in preprocess(
+        (doc, group_name, filename)  # Stocke uniquement group_name et filename
+        for doc, group_name, filename in preprocess(
             args.input_path, count_nb_files(args.input_path), apply_unidecode=True
         )
     ]
 )
+
+docs = docs_infos[:,0]
 
 max_index, embeddings = load_embeddings(
     embeddings_path,
@@ -188,24 +189,18 @@ for i, row in topic_model.get_topic_info().iterrows():
 #Topics contient le topic associé à chaque tweet 
 
 #Création d'une matrice contenant le group et le numéro de chaque document
-infos = np.array(
-    [
-        (group_name, filename)  # Stocke uniquement group_name et filename
-        for group_name, filename in preprocess_info(
-            args.input_path, count_nb_files(args.input_path), apply_unidecode=True
-        )
-    ]
-)
+#infos = docs_info[:, 1:3]
 
 #Ajout du topic associé à chaque tweet daté et associé à un groupe
-infos = np.c_[infos, topics]
+#infos = np.c_[infos, topics]
 
-df = pd.DataFrame(infos, columns=['party', 'date', 'topic']) #Conversion to facilitate operations 
+#df = pd.DataFrame(infos, columns=['party', 'date', 'topic']) #Conversion to facilitate operations 
+#df['date'] = df['date'].str.extract(r'(\d{8})')
 
-df = df.groupby(['party', 'date', 'topic']).size().reset_index(name='count') #Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
+#df = df.groupby(['party', 'date', 'topic']).size().reset_index(name='count') #Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
 
-df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
+#df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
 
-df['prop'] = df_grouped['count'] / df_grouped['total'] #Calcul de proportion
-df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
-df.to_csv('data_prod/dashboard/files/df_forTS.csv')
+#df['prop'] = df_grouped['count'] / df_grouped['total'] #Calcul de proportion
+#df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
+#df.to_csv('data_prod/dashboard/files/df_forTS.csv')
