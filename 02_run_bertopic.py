@@ -196,6 +196,7 @@ for i, row in topic_model.get_topic_info().iterrows():
 
 #df = pd.DataFrame(infos, columns=['party', 'date', 'topic']) #Conversion to facilitate operations 
 #df['date'] = df['date'].str.extract(r'(\d{8})')
+#df['date'] = df['date'].str.slice(0, 4) + '-' + df['date'].str.slice(4, 6) + '-' + df['date'].str.slice(6, 8)
 
 #df = df.groupby(['party', 'date', 'topic']).size().reset_index(name='count') #Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
 
