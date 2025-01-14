@@ -643,7 +643,11 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=F
 
 def load_embeddings(path, save_size, nb_docs, resume_encoding=False):
     max_index = 0
-    embeddings = np.empty((save_size, EMB_DIMENSION)) if resume_encoding else np.empty((nb_docs, EMB_DIMENSION))
+    embeddings = (
+        np.empty((save_size, EMB_DIMENSION))
+        if resume_encoding
+        else np.empty((nb_docs, EMB_DIMENSION))
+    )
     for file in glob.glob(path.replace(".npz", "_*")):
         index = int(file[len(path) - 3 : -len(".npz")])
         if index > max_index:
@@ -653,11 +657,13 @@ def load_embeddings(path, save_size, nb_docs, resume_encoding=False):
             if index % save_size == 0:
                 embeddings[index - save_size : index] = np.load(file)["embeddings"]
             else:
-                embeddings[embeddings.shape[0] - (embeddings.shape[0] % save_size) :] = (
-                    np.load(file)["embeddings"]
-                )
+                embeddings[
+                    embeddings.shape[0] - (embeddings.shape[0] % save_size) :
+                ] = np.load(file)["embeddings"]
     if not resume_encoding:
-        print("Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum()))
+        print(
+            "Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum())
+        )
     return max_index, embeddings
 
 
