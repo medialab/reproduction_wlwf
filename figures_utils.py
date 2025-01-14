@@ -31,7 +31,7 @@ def draw_topic_keywords(topic, words, x, y):
 
     fig.savefig(
         os.path.join(
-            "data_prod", "dashboard", "files", "img", "bertopic_{}.png".format(topic)
+            "data_prod", "dashboard", "img", "bertopic_{}.png".format(topic)
         )
     )
     plt.close()
