@@ -49,8 +49,9 @@ parser.add_argument(
     action="store_true",
 )
 args = parser.parse_args()
+sbert_name_string = SBERT_NAME.replace("/", "_")
 embeddings_path = os.path.join(
-    args.embeddings_folder, "tweets_sentence-camembert-large.npz"
+    args.embeddings_folder, "{}.npz".format(sbert_name_string)
 )
 
 hdbscan_model = HDBSCAN(
