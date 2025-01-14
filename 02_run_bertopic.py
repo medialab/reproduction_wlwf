@@ -3,6 +3,7 @@ import json
 import random
 import argparse
 import pandas as pd
+import re
 
 from figures_utils import draw_topic_keywords 
 from hdbscan import HDBSCAN
@@ -194,28 +195,51 @@ infos = docs_infos[:, 1:3]
 
 #Ajout du topic associé à chaque tweet daté et associé à un groupe
 infos = np.c_[infos, topics]
+#columns=['party', 'date', 'topic'])
 
-print(infos)
+def extract_and_format_date(date_str):
+    match = re.search(r'(\d{8})', date_str)  # Extraction des 8 chiffres
+    if match:
+        date_raw = match.group(1)  # "20250101"
+        # Reformater en "AAAA-MM-JJ"
+        return date_raw[:4] + '-' + date_raw[4:6] + '-' + date_raw[6:]
+    return None  # Retourne None si aucune date valide n'est trouvée
 
-#Conversion d'infos en datafrale 
-df = pd.DataFrame(infos, columns=['party', 'date', 'topic'])
+# Appliquer la fonction à la colonne des dates (index 1)
+formatted_dates = np.array([extract_and_format_date(row[1]) for row in infos])
 
+# Mise à jour de la colonne 'date' dans la matrice NumPy
+infos[:, 1] = formatted_dates
 
-#df = pd.DataFrame(infos, columns=['party', 'date', 'topic']) #Conversion to facilitate operations 
-df['date'] = df['date'].str.extract(r'(\d{8})')
-df['date'] = df['date'].str.slice(0, 4) + '-' + df['date'].str.slice(4, 6) + '-' + df['date'].str.slice(6, 8)
+unique_combinations, counts = np.unique(infos, axis=0, return_counts=True) #Compte de chaque combinaison parti-topic par jour par groupe
 
-df = df.groupby(['party', 'date', 'topic']).size().reset_index(name='count') #Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
+grouped_data = np.column_stack((unique_combinations, counts))
 
-df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
+print(grouped_data)
 
-df['prop'] = df['count'] / df['total'] #Calcul de proportion
-df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
-df.sort_values(by=['date'], axis=0, inplace=True) #Tri des proportions par date puis topic
+#Tronche de l'output 
+'''[['lr' '2022-06-23' '0' '1']
+ ['lr' '2022-06-26' '-1' '1']
+ ['lr' '2022-06-28' '2' '1']
+ ...
+ ['rn' '2023-03-11' '2' '1']
+ ['rn' '2023-03-13' '-1' '1']
+ ['rn' '2023-03-14' '2' '1']]''' #Faudra voir les shapes
+
+#Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
+
+#df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
+
+#df['prop'] = df['count'] / df['total'] #Calcul de proportion
+#df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
+#df.sort_values(by=['date'], axis=0, inplace=True) #Tri des proportions par date puis topic
 
 
 #Créer un CSV par topics
-for topic_number in df['topic'].unique().tolist():
-    df_exp = df[df['topic'] == topic_number]
-    file_name_ts = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
-    df_exp.to_csv(file_name_ts, index=False)
+#for topic_number in df['topic'].unique().tolist():
+    #Penser à nommer les colonnes pour Antoine 
+    #df_exp = df[df['topic'] == topic_number]
+    #file_name_ts = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
+    #df_exp.to_csv(file_name_ts, index=False)
+
+#collections : default-dict et le counter (conseil guillaume)
