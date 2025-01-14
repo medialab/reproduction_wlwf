@@ -55,7 +55,7 @@ embeddings_path = os.path.join(
 )
 
 hdbscan_model = HDBSCAN(
-    min_cluster_size=3,
+    min_cluster_size=10,
     metric="euclidean",
     cluster_selection_method="eom",
     prediction_data=True,
@@ -148,6 +148,7 @@ if args.small:
     random.seed(a=RANDOM_SEED)
     indices = random.choices(range(len(docs)), k=1000)
     docs = docs[indices]
+    docs_infos = docs_infos[indices]
     embeddings = embeddings[indices]
 
     topics, probs = topic_model.fit_transform(docs, embeddings)
@@ -189,19 +190,27 @@ for i, row in topic_model.get_topic_info().iterrows():
 #Topics contient le topic associé à chaque tweet 
 
 #Création d'une matrice contenant le group et le numéro de chaque document
-#infos = docs_info[:, 1:3]
+infos = docs_infos[:, 1:3]
 
 #Ajout du topic associé à chaque tweet daté et associé à un groupe
-#infos = np.c_[infos, topics]
+infos = np.c_[infos, topics]
+
+print(infos)
+
+#Conversion d'infos en datafrale 
+df = pd.DataFrame(infos, columns=['party', 'date', 'topic'])
+
 
 #df = pd.DataFrame(infos, columns=['party', 'date', 'topic']) #Conversion to facilitate operations 
-#df['date'] = df['date'].str.extract(r'(\d{8})')
-#df['date'] = df['date'].str.slice(0, 4) + '-' + df['date'].str.slice(4, 6) + '-' + df['date'].str.slice(6, 8)
+df['date'] = df['date'].str.extract(r'(\d{8})')
+df['date'] = df['date'].str.slice(0, 4) + '-' + df['date'].str.slice(4, 6) + '-' + df['date'].str.slice(6, 8)
 
-#df = df.groupby(['party', 'date', 'topic']).size().reset_index(name='count') #Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
+df = df.groupby(['party', 'date', 'topic']).size().reset_index(name='count') #Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
 
-#df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
+df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
 
-#df['prop'] = df_grouped['count'] / df_grouped['total'] #Calcul de proportion
-#df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
-#df.to_csv('data_prod/dashboard/files/df_forTS.csv')
+df['prop'] = df['count'] / df['total'] #Calcul de proportion
+df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
+df.to_csv('data_prod/dashboard/files/df_forTS.csv')
+
+#Ajouter des sort by pour vérifier 
