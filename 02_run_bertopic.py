@@ -211,6 +211,11 @@ df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le
 
 df['prop'] = df['count'] / df['total'] #Calcul de proportion
 df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
-df.to_csv('data_prod/dashboard/files/df_forTS.csv')
+df.sort_values(by=['date'], axis=0, inplace=True) #Tri des proportions par date puis topic
 
-#Ajouter des sort by pour vérifier 
+
+#Créer un CSV par topics
+for topic_number in df['topic'].unique().tolist():
+    df_exp = df[df['topic'] == topic_number]
+    file_name_ts = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
+    df_exp.to_csv(file_name_ts, index=False)
