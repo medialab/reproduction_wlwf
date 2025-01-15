@@ -68,7 +68,7 @@ calculate.specificity <- function(mod) {
   # 5. Calcul de la probabilité des mots pondérée par la distribution des sujets
   pwords <- apply(terms, 2, function(x)
     sum(x * ptopic)
-    )
+    ) 
 
   # 6. numer : p of word in a topic * p of topic
   # Chaque élément de la matrice représente la contribution d'un mot à un sujet, pondérée par la probabilité d'apparition de ce sujet dans le corpus.
@@ -80,7 +80,7 @@ calculate.specificity <- function(mod) {
                    ncol = Nwords,
                    byrow = TRUE)
 
-  # 8. Spécificité = p word in each topic * p topic / overall p of words
+  # 8. Spécificité = p word in each topic * p topic / proba de l'apparition du mot dans l'ensemble des documents (par la formule des probas totales)
   return(numer / denom)
 }
 
