@@ -215,8 +215,6 @@ unique_combinations, counts = np.unique(infos, axis=0, return_counts=True) #Comp
 
 grouped_data = np.column_stack((unique_combinations, counts))
 
-print(grouped_data)
-
 #Tronche de l'output 
 '''[['lr' '2022-06-23' '0' '1']
  ['lr' '2022-06-26' '-1' '1']
@@ -226,9 +224,20 @@ print(grouped_data)
  ['rn' '2023-03-13' '-1' '1']
  ['rn' '2023-03-14' '2' '1']]''' #Faudra voir les shapes
 
-#Aggrégation des données pour mettre ensemble les jours/topics/groupe similaires en leur associant leur occurence dans la dataframe 
 
-#df['total'] = df.groupby(['party', 'date'])['count'].transform('sum') #Compte le nombre de tweets totaux par groupe 
+comb2, counts_group = np.unique(grouped_data[:, (0,1)], axis=0, return_counts=True) 
+
+grouped_data_TOT = np.column_stack((comb2, counts_group)) #Compte du nombre de tweets totaux par groupe par jour 
+
+#Calcul de la proportion de tweet par topic par jour par groupe 
+for row in grouped_data:
+    comb = row[:2] #Récupération de la clé de grouped_data pour regrouper les données 
+    idx = np.where((comb2 == comb).all(axis=1))[0][0]  # Trouver l'indice correspondant dans grouped_data_TOT.
+    prop.append(row[-1] / counts_group[idx])  # Calcul de la proportion.
+
+
+grouped_data = np.column_stack((grouped_data, prop)) #On colle la proportion à grouped_data
+np.delete(grouped_data, -2, 1) #On vire la colonne counts qui ne nous sert plus
 
 #df['prop'] = df['count'] / df['total'] #Calcul de proportion
 #df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
