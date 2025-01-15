@@ -528,11 +528,20 @@ def iter_on_files(root, nb_files):
         )
     return tar, loop, compressed
 
+def extract_and_format_date(date_str): #Fonction pour extraire les dates des noms de fichier 
+    match = re.search(r'(\d{8})', date_str)  # Extraction des 8 chiffres
+    if match:
+        date_raw = match.group(1)  # "20250101"
+        # Reformater en "AAAA-MM-JJ"
+        return date_raw[:4] + '-' + date_raw[4:6] + '-' + date_raw[6:]
+    return None  # Retourne None si aucune date valide n'est trouvée
 
-def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=False):
+
+def preprocess(root, nb_files, d={}, apply_unidecode=False, write_files=False, small=False):
     counter_all = 0
     counter_original = 0
     counter_threads = 0
+    counter_date = 0 
 
     tar, loop, compressed = iter_on_files(root, nb_files)
 
@@ -544,6 +553,8 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=F
 
         loop.set_description(filename)
 
+        file_date = extract_and_format_date(filename)
+       
         group_name = grep_group_name(filename)
 
         thread_ids = dict()
@@ -554,6 +565,11 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=F
         else:
             filestream = open(file)
         reader = casanova.reader(filestream)
+
+        d[filename] = (file_date, , group_name, counter_date)
+
+        line_count = sum(1 for _ in reader) #On compte le nombre de lignes associés à cette date 
+        counter_date = counter_date + line_count #On associe alors au compteur de la date l'index à partir du quel la prochaine date commencera
 
         text_pos = reader.headers.text
         id_pos = reader.headers.id
@@ -625,7 +641,7 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=F
                         row[text_pos] = doc
                         enricher.writerow(row, [is_thread, group_name])
                     counter_threads += 1
-                    yield doc, group_name, filename
+                    yield doc
 
         if write_files:
             output_file.close()
