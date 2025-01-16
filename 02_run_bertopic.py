@@ -182,7 +182,7 @@ for i, row in topic_model.get_topic_info().iterrows():
     top_list = topic_model.get_topic(topic)
     top_words, top_ctfidf = zip(*top_list)
     draw_topic_keywords(
-        topic, top_words, top_ctfidf, sorted(range(len(top_words)), reverse=True)
+        topic, top_words, top_ctfidf
     )
 
 #Création du tableau au format adapté pour les graphiques TS d'Antoine 
