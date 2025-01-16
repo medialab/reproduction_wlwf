@@ -1,5 +1,0 @@
-Ou trouver les tweets complet : dossier tweet dans store/medialex 
-Ou trouver embeddings : store/medialex/embeddings 
-Ou ranger : dans bertopic 
-
-python 02_run_bertopic.py /store/medialex/tweets/tweets_from_deputesXVI_220620-230314/ /store/medialex/embeddings/deputes/ /store/medialex/bertopic/deputes_k10_n3 --small
