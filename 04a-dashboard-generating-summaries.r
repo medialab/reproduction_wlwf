@@ -80,7 +80,7 @@ calculate.specificity <- function(mod) {
                    ncol = Nwords,
                    byrow = TRUE)
 
-  # 8. Spécificité = p word in each topic * p topic / overall p of words
+  # 8. Spécificité = p word in each topic * p topic / proba de l'apparition du mot dans l'ensemble des documents (par la formule des probas totales)
   return(numer / denom)
 }
 
