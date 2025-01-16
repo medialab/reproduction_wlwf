@@ -566,9 +566,10 @@ def preprocess(root, nb_files, d={}, apply_unidecode=False, write_files=False, s
             filestream = open(file)
         reader = casanova.reader(filestream)
 
-        d[filename] = (file_date, , group_name, counter_date)
-
         line_count = sum(1 for _ in reader) #On compte le nombre de lignes associés à cette date 
+
+        d[filename] = (file_date, group_name, line_count, counter_date)
+
         counter_date = counter_date + line_count #On associe alors au compteur de la date l'index à partir du quel la prochaine date commencera
 
         text_pos = reader.headers.text

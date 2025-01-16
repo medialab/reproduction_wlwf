@@ -126,16 +126,16 @@ def save_ctfidf_config(model, path):
 
 save_utils.save_ctfidf_config = save_ctfidf_config
 
-docs_infos = np.array(
+d = {}
+
+docs = np.array(
     [
-        (doc, group_name, filename)  # Stocke uniquement group_name et filename
-        for doc, group_name, filename in preprocess(
-            args.input_path, count_nb_files(args.input_path), apply_unidecode=True
+        doc # Stocke uniquement group_name et filename
+        for doc in preprocess(
+            args.input_path, count_nb_files(args.input_path), d=d, apply_unidecode=True
         )
     ]
 )
-
-docs = docs_infos[:,0]
 
 max_index, embeddings = load_embeddings(
     embeddings_path,
@@ -149,7 +149,6 @@ if args.small:
     random.seed(a=RANDOM_SEED)
     indices = random.choices(range(len(docs)), k=1000)
     docs = docs[indices]
-    docs_infos = docs_infos[indices]
     embeddings = embeddings[indices]
 
     topics, probs = topic_model.fit_transform(docs, embeddings)
@@ -187,68 +186,37 @@ for i, row in topic_model.get_topic_info().iterrows():
     )
 
 #Création du tableau au format adapté pour les graphiques TS d'Antoine 
-#Avec preprocess : on découpe les documents en tweet unique, et la date est dans le nom, et le groupe et le nom du dossier. Ca pourrait donc être un premier pas. 
-#Topics contient le topic associé à chaque tweet 
+#dategroup_array = np.array(list(d.values())) #Conversion du dictionnaire d en matrice numpy
 
-#Création d'une matrice contenant le group et le numéro de chaque document
-infos = docs_infos[:, 1:3]
+#Calcul du nombre de tweets qui parlent de chaque topic par jour
 
-#Ajout du topic associé à chaque tweet daté et associé à un groupe
-infos = np.c_[infos, topics]
-#columns=['party', 'date', 'topic'])
-
-def extract_and_format_date(date_str):
-    match = re.search(r'(\d{8})', date_str)  # Extraction des 8 chiffres
-    if match:
-        date_raw = match.group(1)  # "20250101"
-        # Reformater en "AAAA-MM-JJ"
-        return date_raw[:4] + '-' + date_raw[4:6] + '-' + date_raw[6:]
-    return None  # Retourne None si aucune date valide n'est trouvée
-
-# Appliquer la fonction à la colonne des dates (index 1)
-formatted_dates = np.array([extract_and_format_date(row[1]) for row in infos])
-
-# Mise à jour de la colonne 'date' dans la matrice NumPy
-infos[:, 1] = formatted_dates
-
-unique_combinations, counts = np.unique(infos, axis=0, return_counts=True) #Compte de chaque combinaison parti-topic par jour par groupe
-
-grouped_data = np.column_stack((unique_combinations, counts))
-
-#Tronche de l'output 
-'''[['lr' '2022-06-23' '0' '1']
- ['lr' '2022-06-26' '-1' '1']
- ['lr' '2022-06-28' '2' '1']
- ...
- ['rn' '2023-03-11' '2' '1']
- ['rn' '2023-03-13' '-1' '1']
- ['rn' '2023-03-14' '2' '1']]''' #Faudra voir les shapes
+if args.small:
+    #Associer docs et indice dans une array car --small donne un tirage aléatoire
+    topics_ind = np.column_stack((topics, indices))
+else:
+    topics_ind = topics
 
 
-comb2, counts_group = np.unique(grouped_data[:, (0,1)], axis=0, return_counts=True) 
+proportion = []
+start_idx = 0
+for key, value in d.items():
+    end_idx = value[2] #On récupère l'index de fin
+    if args.small: #On récupère le groupe considéré 
+        elements_group = [item for item in topics_ind if start_idx <= item[1] < end_idx] 
+    else:
+        elements_group = topics_ind[start_idx:end_idx]
+    if elements_group != []:
+        for topic_number in np.unique(topics): #Calcul de la proportion pour chaque topic 
+            elem_in_topic = sum(1 for elem in elements_group if elem[0]==topic_number) #Compte le nombre d'éléments dans le topic
 
-grouped_data_TOT = np.column_stack((comb2, counts_group)) #Compte du nombre de tweets totaux par groupe par jour 
+            proportion.append((value[0], value[1], topic_number, elem_in_topic/ len(elements_group)))
 
-#Calcul de la proportion de tweet par topic par jour par groupe 
-for row in grouped_data:
-    comb = row[:2] #Récupération de la clé de grouped_data pour regrouper les données 
-    idx = np.where((comb2 == comb).all(axis=1))[0][0]  # Trouver l'indice correspondant dans grouped_data_TOT.
-    prop.append(row[-1] / counts_group[idx])  # Calcul de la proportion.
+            start_idx = end_idx #Mise à jour de l'indice
 
+proportion = np.array(proportion)
 
-grouped_data = np.column_stack((grouped_data, prop)) #On colle la proportion à grouped_data
-np.delete(grouped_data, -2, 1) #On vire la colonne counts qui ne nous sert plus
-
-#df['prop'] = df['count'] / df['total'] #Calcul de proportion
-#df.drop(['count', 'total'], axis=1, inplace=True)  #On enlève les colonnes inutiles 
-#df.sort_values(by=['date'], axis=0, inplace=True) #Tri des proportions par date puis topic
-
-
-#Créer un CSV par topics
-#for topic_number in df['topic'].unique().tolist():
-    #Penser à nommer les colonnes pour Antoine 
-    #df_exp = df[df['topic'] == topic_number]
-    #file_name_ts = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
-    #df_exp.to_csv(file_name_ts, index=False)
-
-#collections : default-dict et le counter (conseil guillaume)
+for topic_number in np.unique(topics):
+    to_export = [item for item in proportion if item[2] == topic_number] #Sélection des lignes correspondant au topic envisagé
+    noms_col = np.array(['date', 'party', 'topic', 'prop']) #Création d'une ligne pour les noms de colonne
+    export_pathname = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
+    np.savetxt("output.csv", to_export, delimiter=",", fmt="%s", header="date,party,topic,prop", comments='')
