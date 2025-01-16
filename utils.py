@@ -17,7 +17,7 @@ GROUPS = [
     "rn",
     "nupes",
 ]  # MPs tweets should be stored in {input_folder}/{group}/YYYYMMDD.csv, e.g. data_source/lr/20221224.csv
-SBERT_NAME = "dangvantuan/sentence-camembert-large"  # Sentence-BERT for French tweets
+SBERT_NAME = "Lajavaness/sentence-camembert-large"  # Sentence-BERT for French tweets
 EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
@@ -660,7 +660,11 @@ def preprocess(root, nb_files, d={}, apply_unidecode=False, write_files=False, s
 
 def load_embeddings(path, save_size, nb_docs, resume_encoding=False):
     max_index = 0
-    embeddings = np.empty((save_size, EMB_DIMENSION)) if resume_encoding else np.empty((nb_docs, EMB_DIMENSION))
+    embeddings = (
+        np.empty((save_size, EMB_DIMENSION))
+        if resume_encoding
+        else np.empty((nb_docs, EMB_DIMENSION))
+    )
     for file in glob.glob(path.replace(".npz", "_*")):
         index = int(file[len(path) - 3 : -len(".npz")])
         if index > max_index:
@@ -670,11 +674,13 @@ def load_embeddings(path, save_size, nb_docs, resume_encoding=False):
             if index % save_size == 0:
                 embeddings[index - save_size : index] = np.load(file)["embeddings"]
             else:
-                embeddings[embeddings.shape[0] - (embeddings.shape[0] % save_size) :] = (
-                    np.load(file)["embeddings"]
-                )
+                embeddings[
+                    embeddings.shape[0] - (embeddings.shape[0] % save_size) :
+                ] = np.load(file)["embeddings"]
     if not resume_encoding:
-        print("Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum()))
+        print(
+            "Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum())
+        )
     return max_index, embeddings
 
 

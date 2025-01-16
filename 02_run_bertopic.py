@@ -51,12 +51,13 @@ parser.add_argument(
     action="store_true",
 )
 args = parser.parse_args()
+sbert_name_string = SBERT_NAME.replace("/", "_")
 embeddings_path = os.path.join(
-    args.embeddings_folder, "tweets_sentence-camembert-large.npz"
+    args.embeddings_folder, "{}.npz".format(sbert_name_string)
 )
 
 hdbscan_model = HDBSCAN(
-    min_cluster_size=10,
+    min_cluster_size=2 if args.small else 100,
     metric="euclidean",
     cluster_selection_method="eom",
     prediction_data=True,
@@ -72,13 +73,12 @@ umap_model = UMAP(
 )
 
 if args.small:
-    vectorizer.min_df = 3
+    vectorizer.min_df = 1
 
 topic_model = BERTopic(
     vectorizer_model=vectorizer,
     hdbscan_model=hdbscan_model,
     umap_model=umap_model,
-    nr_topics=10 if args.small else 100,
     # Hyperparameters
     top_n_words=10,
     verbose=True,
@@ -158,10 +158,10 @@ if args.small:
         save_ctfidf=True,
         save_embedding_model=SBERT_NAME,
     )
-
+    print(topic_model.get_topic_info())
 else:
     topics, probs = topic_model.fit_transform(docs, embeddings)
-
+    print(topic_model.get_topic_info())
     # Save model
     topic_model.save(
         args.output_folder,
@@ -171,7 +171,11 @@ else:
     )
 
 new_topics = topic_model.reduce_outliers(
-    docs, topics, probabilities=probs, strategy="probabilities", threshold=0.3
+    docs,  # type: ignore
+    topics,
+    probabilities=probs,  # type: ignore
+    strategy="probabilities",
+    threshold=0.01,
 )
 topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
 
