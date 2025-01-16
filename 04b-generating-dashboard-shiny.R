@@ -58,8 +58,19 @@ ui <- fluidPage(
  #   tableOutput("brushed_data")
  # )
  fluidRow(
+   #tags$head(
+  #   tags$script(src = "https://platform.twitter.com/widgets.js")
+   #),
+   titlePanel("Tweets représentatifs de député⋅es (à gauche) et de médias (à droite)"),
+   #uiOutput("congress_tweets")
    column(6, htmlOutput("congress_tweets")),
-   column(6, htmlOutput("media_tweets"))
+   column(6, htmlOutput("media_tweets")
+          #tags$head(
+          #  tags$script(src = "https://platform.twitter.com/widgets.js")
+          #),
+          #titlePanel("Test d'intégration de tweet"),
+          #uiOutput("tweets_test")
+          )
    )#,
 )
 
@@ -164,12 +175,15 @@ output$topwords_image <- renderImage({
       media_rs |> filter(topic == input$topic)
     })
     
-    # Organiser les tweets en deux colonnes
     HTML(#paste(
       selected_media_tweets()$embed#, collapse = "<br><br>")
     )
   })
-  
+  #output$tweets_test <- renderUI({
+  #  HTML('<blockquote class="twitter-tweet" data-theme="light">
+  #              <a href="https://twitter.com/franceinfo/status/1539578460305330176"></a>
+  #            </blockquote>')
+  #})
 }
 
 # Run the application
