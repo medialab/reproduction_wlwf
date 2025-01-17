@@ -588,7 +588,7 @@ def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files
         if not compressed:
             filestream.close()
 
-        dict_files[filename] = (file_date, group_name, line_count, counter_date)
+        dict_files[counter_date] = (file_date, group_name)
 
         counter_date = counter_date + line_count #On associe alors au compteur de la date l'index à partir du quel la prochaine date commencera
 

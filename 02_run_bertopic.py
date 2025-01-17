@@ -199,7 +199,7 @@ else:
 proportion = []
 start_idx = 0
 for key, value in dict_file.items():
-    end_idx = value[2] #On récupère l'index de fin
+    end_idx = int(key) #On récupère l'index de fin
     if args.small: #On récupère le groupe considéré 
         elements_group = [item for item in topics_ind if start_idx <= item[1] < end_idx] 
     else:
