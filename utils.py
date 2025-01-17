@@ -528,13 +528,9 @@ def iter_on_files(root, nb_files):
         )
     return tar, loop, compressed
 
-def extract_and_format_date(date_str): #Fonction pour extraire les dates des noms de fichier 
-    match = re.search(r'(\d{8})', date_str)  # Extraction des 8 chiffres
-    if match:
-        date_raw = match.group(1)  # "20250101"
-        # Reformater en "AAAA-MM-JJ"
-        return date_raw[:4] + '-' + date_raw[4:6] + '-' + date_raw[6:]
-    return None  # Retourne None si aucune date valide n'est trouvée
+def extract_and_format_date(file): #Fonction pour extraire les dates des noms de fichier
+    date_raw = os.path.basename(file)
+    return date_raw[:4] + '-' + date_raw[4:6] + '-' + date_raw[6:]
 
 
 def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files=False, small=False):
@@ -573,10 +569,8 @@ def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files
         to_user_pos = reader.headers.to_userid
         to_id_pos = reader.headers.to_tweetid
 
-        line_count = 0
 
         for row in reader:
-            line_count +=1
             counter_all += 1
             if not row[rt_pos]:
                 counter_original += 1
@@ -588,9 +582,7 @@ def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files
         if not compressed:
             filestream.close()
 
-        dict_files[counter_date] = (file_date, group_name)
-
-        counter_date = counter_date + line_count #On associe alors au compteur de la date l'index à partir du quel la prochaine date commencera
+        dict_files[counter_all] = (file_date, group_name)
 
         for key, value in sorted(thread_ids.items()):
             if not value:
