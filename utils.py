@@ -537,7 +537,7 @@ def extract_and_format_date(date_str): #Fonction pour extraire les dates des nom
     return None  # Retourne None si aucune date valide n'est trouvée
 
 
-def preprocess(root, nb_files, d={}, apply_unidecode=False, write_files=False, small=False):
+def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files=False, small=False):
     counter_all = 0
     counter_original = 0
     counter_threads = 0
@@ -566,12 +566,6 @@ def preprocess(root, nb_files, d={}, apply_unidecode=False, write_files=False, s
             filestream = open(file)
         reader = casanova.reader(filestream)
 
-        line_count = sum(1 for _ in reader) #On compte le nombre de lignes associés à cette date 
-
-        d[filename] = (file_date, group_name, line_count, counter_date)
-
-        counter_date = counter_date + line_count #On associe alors au compteur de la date l'index à partir du quel la prochaine date commencera
-
         text_pos = reader.headers.text
         id_pos = reader.headers.id
         rt_pos = reader.headers.retweeted_id
@@ -579,7 +573,10 @@ def preprocess(root, nb_files, d={}, apply_unidecode=False, write_files=False, s
         to_user_pos = reader.headers.to_userid
         to_id_pos = reader.headers.to_tweetid
 
+        line_count = 0
+
         for row in reader:
+            line_count +=1
             counter_all += 1
             if not row[rt_pos]:
                 counter_original += 1
@@ -590,6 +587,10 @@ def preprocess(root, nb_files, d={}, apply_unidecode=False, write_files=False, s
                         thread_ids[row[to_id_pos]] = None
         if not compressed:
             filestream.close()
+
+        dict_files[filename] = (file_date, group_name, line_count, counter_date)
+
+        counter_date = counter_date + line_count #On associe alors au compteur de la date l'index à partir du quel la prochaine date commencera
 
         for key, value in sorted(thread_ids.items()):
             if not value:

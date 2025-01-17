@@ -2,8 +2,6 @@ import os
 import json
 import random
 import argparse
-import pandas as pd
-import re
 
 from figures_utils import draw_topic_keywords 
 from hdbscan import HDBSCAN
@@ -126,13 +124,13 @@ def save_ctfidf_config(model, path):
 
 save_utils.save_ctfidf_config = save_ctfidf_config
 
-d = {}
+dict_file = {}
 
 docs = np.array(
     [
         doc # Stocke uniquement group_name et filename
         for doc in preprocess(
-            args.input_path, count_nb_files(args.input_path), d=d, apply_unidecode=True
+            args.input_path, count_nb_files(args.input_path), dict_files=dict_file, apply_unidecode=True
         )
     ]
 )
@@ -189,10 +187,7 @@ for i, row in topic_model.get_topic_info().iterrows():
         topic, top_words, top_ctfidf
     )
 
-#Création du tableau au format adapté pour les graphiques TS d'Antoine 
-#dategroup_array = np.array(list(d.values())) #Conversion du dictionnaire d en matrice numpy
-
-#Calcul du nombre de tweets qui parlent de chaque topic par jour
+#Création du tableau au format adapté pour les graphiques TS 
 
 if args.small:
     #Associer docs et indice dans une array car --small donne un tirage aléatoire
@@ -203,7 +198,7 @@ else:
 
 proportion = []
 start_idx = 0
-for key, value in d.items():
+for key, value in dict_file.items():
     end_idx = value[2] #On récupère l'index de fin
     if args.small: #On récupère le groupe considéré 
         elements_group = [item for item in topics_ind if start_idx <= item[1] < end_idx] 
