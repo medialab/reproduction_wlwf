@@ -48,7 +48,11 @@ parser.add_argument(
     type=int,
     default=DEFAULT_SAVE_SIZE,
 )
-
+parser.add_argument(
+    "--small",
+    help=("run the script on one week of data"),
+    action="store_true",
+)
 args = parser.parse_args()
 sbert_name_string = SBERT_NAME.replace("/", "_")
 embeddings_path = os.path.join(
@@ -76,15 +80,25 @@ print("Predict model")
 
 topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
-topics, probs = topic_model.transform(docs, embeddings)
-
-# Préparer les données sous forme d'un tableau numpy
-data = np.column_stack((topics, probs))
-
-# Sauvegarde dans un fichier CSV
-header = "Topic,Probability"  # En-tête du fichier
-np.savetxt("data_prod/topics/topics_pred_results.csv", data, fmt="%s", delimiter=",", header=header, comments="")  #Il faudra voir comment faire des sauvegardes différentes selon le type de public et voir comment on fait dans gpu
-
+if args.small:
+    indices = random.choices(range(len(docs)), k=1000)
+    docs = docs[indices]
+    embeddings = embeddings[indices]
+    topics, probs = topic_model.transform(docs, embeddings)
+    # Préparer les données sous forme d'un tableau numpy
+    data = np.column_stack((topics, probs))
+    header = "Topic,Probability"  # En-tête du fichier
+    last_part = os.path.basename(embeddings_path)
+    output_file = f"data_prod/topics/{last_part}_topics_pred_results_SMALL.csv"
+else:
+    topics, probs = topic_model.transform(docs, embeddings)
+    # Préparer les données sous forme d'un tableau numpy
+    data = np.column_stack((topics, probs))
+    header = "Topic,Probability"  # En-tête du fichier
+    last_part = os.path.basename(embeddings_path)
+    output_file = f"data_prod/topics/{last_part}_topics_pred_results.csv"
+    
+np.savetxt(output_file, data, fmt="%s", delimiter=",", header=header, comments="")  
 print(topic_model.get_topic_info())
 
 '''
