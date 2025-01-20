@@ -55,6 +55,7 @@ embeddings_path = os.path.join(
     args.embeddings_folder, "{}.npz".format(sbert_name_string)
 )
 
+#Add a dict_file here + dans le code preprocess quand on aura fait le lien avec la branche principale 
 
 docs = np.array(
     [
@@ -73,20 +74,20 @@ max_index, embeddings = load_embeddings(
 
 print("Predict model")
 
-topic_model = BERTopic.load(args.model_path)
+topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
 topics, probs = topic_model.transform(docs, embeddings)
 
 # Préparer les données sous forme d'un tableau numpy
-data = np.column_stack((docs, topics, probs))
+data = np.column_stack((topics, probs))
 
 # Sauvegarde dans un fichier CSV
-header = "Document,Topic,Probability"  # En-tête du fichier
-full_path = os.path.join("/data_prod/topics/topics_pred_results.csv") #Il faudra voir comment faire des sauvegardes différentes selon le type de public et voir comment on fait dans gpu
-np.savetxt("topics_results.csv", data, fmt="%s", delimiter=",", header=header, comments="")
+header = "Topic,Probability"  # En-tête du fichier
+np.savetxt("data_prod/topics/topics_pred_results.csv", data, fmt="%s", delimiter=",", header=header, comments="")  #Il faudra voir comment faire des sauvegardes différentes selon le type de public et voir comment on fait dans gpu
 
 print(topic_model.get_topic_info())
 
+'''
 #Résultats sous forme de Time Series
 
 proportion = []
@@ -112,3 +113,5 @@ for topic_number in np.unique(topics):
     noms_col = np.array(['date', 'party', 'topic', 'prop']) #Création d'une ligne pour les noms de colonne
     export_pathname = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
     np.savetxt("output.csv", to_export, delimiter=",", fmt="%s", header="date,party,topic,prop", comments='')
+
+'''
