@@ -1,6 +1,6 @@
 import os
 import matplotlib.pyplot as plt
-import numpy as np 
+import numpy as np
 
 
 def draw_topic_keywords(topic, words, x):
@@ -16,7 +16,9 @@ def draw_topic_keywords(topic, words, x):
     interval_x = (max(x) - min(x)) / len(x)
     interval_y = range(len(words))
 
-    max_word_length = max(len(word) for word in words) #Création d'un espace pour l'axe des absisses afin que celui-ci s'adapte à la longueur des top words
+    max_word_length = max(
+        len(word) for word in words
+    )  # Création d'un espace pour l'axe des absisses afin que celui-ci s'adapte à la longueur des top words
     extra_space = max_word_length * 0.0003
 
     ax.axis(
@@ -24,7 +26,7 @@ def draw_topic_keywords(topic, words, x):
             min(x) - interval_x,
             max(x) + interval_x + extra_space,
             0,
-            len(words) +1,
+            len(words) + 1,
         ]
     )
 
@@ -33,14 +35,13 @@ def draw_topic_keywords(topic, words, x):
     ax.set_xlabel("c-TF-IDF scores")
     ax.set_ylabel("Ranking")
 
-
-    sorted_indices = np.argsort(x)[::-1] +1
+    sorted_indices = np.argsort(x)[::-1] + 1
 
     for word, xvalue, rank in zip(words, x, sorted_indices):
         ax.text(xvalue, rank, word)
 
     ax.set_yticks(np.arange(1, len(words) + 1))  # On fixe les ticks pour l'axe y
-    ax.get_yaxis().set_tick_params(which='both', left=False, right=False) 
+    ax.get_yaxis().set_tick_params(which="both", left=False, right=False)
 
     fig.savefig(
         os.path.join(
