@@ -1,9 +1,10 @@
 import os
+import csv
 import json
 import random
 import argparse
-
-from figures_utils import draw_topic_keywords 
+from collections import defaultdict
+from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
 from umap import UMAP
 from bertopic import BERTopic
@@ -19,7 +20,7 @@ from utils import (
     load_embeddings,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
-    RANDOM_SEED
+    RANDOM_SEED,
 )
 
 parser = argparse.ArgumentParser()
@@ -124,13 +125,16 @@ def save_ctfidf_config(model, path):
 
 save_utils.save_ctfidf_config = save_ctfidf_config
 
-dict_file = {}
+party_day_counts = []
 
 docs = np.array(
     [
-        doc # Stocke uniquement group_name et filename
+        doc  # Stocke uniquement group_name et filename
         for doc in preprocess(
-            args.input_path, count_nb_files(args.input_path), dict_files=dict_file, apply_unidecode=True
+            args.input_path,
+            count_nb_files(args.input_path),
+            party_day_counts=party_day_counts,
+            apply_unidecode=True,
         )
     ]
 )
@@ -145,7 +149,7 @@ print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__d
 
 if args.small:
     random.seed(a=RANDOM_SEED)
-    indices = random.choices(range(len(docs)), k=1000)
+    indices = sorted(random.sample(range(len(docs)), k=1000))
     docs = docs[indices]
     embeddings = embeddings[indices]
 
@@ -183,39 +187,59 @@ for i, row in topic_model.get_topic_info().iterrows():
     topic = row["Topic"]
     top_list = topic_model.get_topic(topic)
     top_words, top_ctfidf = zip(*top_list)
-    draw_topic_keywords(
-        topic, top_words, top_ctfidf
-    )
+    draw_topic_keywords(topic, top_words, top_ctfidf)
 
-#Création du tableau au format adapté pour les graphiques TS 
+# Création du tableau au format adapté pour les graphiques TS
 
-if args.small:
-    #Associer docs et indice dans une array car --small donne un tirage aléatoire
-    topics_ind = np.column_stack((topics, indices))
-else:
-    topics_ind = topics
+file_index = 0
+"""
+party_day_count is a list with the following structure:
+[
+    (29, 'lr', '2022-06-20'),
+    (46, 'lr', '2022-06-21'),
+    (83, 'lr', '2022-06-22'),
+    (117, 'lr', '2022-06-23'),
+    ...
+]
+"""
+doc_count, party, day = party_day_counts[file_index]
 
 
-proportion = []
-start_idx = 0
-for key, value in dict_file.items():
-    end_idx = int(key) #On récupère l'index de fin
-    if args.small: #On récupère le groupe considéré 
-        elements_group = [item for item in topics_ind if start_idx <= item[1] < end_idx] 
+topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+for i, topic in enumerate(topics):
+    if args.small:
+        doc_index = indices[i]
     else:
-        elements_group = topics_ind[start_idx:end_idx]
-    if elements_group != []:
-        for topic_number in np.unique(topics): #Calcul de la proportion pour chaque topic 
-            elem_in_topic = sum(1 for elem in elements_group if elem[0]==topic_number) #Compte le nombre d'éléments dans le topic
+        doc_index = i
 
-            proportion.append((value[0], value[1], topic_number, elem_in_topic/ len(elements_group)))
+    while doc_index >= doc_count:
+        file_index += 1
 
-            start_idx = end_idx #Mise à jour de l'indice
+        doc_count, party, day = party_day_counts[file_index]
 
-proportion = np.array(proportion)
+    topics_info[topic][party][day] += 1
 
-for topic_number in np.unique(topics):
-    to_export = [item for item in proportion if item[2] == topic_number] #Sélection des lignes correspondant au topic envisagé
-    noms_col = np.array(['date', 'party', 'topic', 'prop']) #Création d'une ligne pour les noms de colonne
-    export_pathname = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
-    np.savetxt("output.csv", to_export, delimiter=",", fmt="%s", header="date,party,topic,prop", comments='')
+# Open one CSV file per topic
+for topic, info in topics_info.items():
+    with open(
+        os.path.join(
+            "data_prod",
+            "dashboard",
+            "files",
+            "data",
+            "bertopic_ts_{}.csv".format(topic),
+        ),
+        "w",
+    ) as f:
+        writer = csv.writer(f)
+        writer.writerow(["date", "party", "prop"])
+        previous_doc_count = 0
+        for doc_count, party, day in party_day_counts:
+            writer.writerow(
+                [
+                    day,
+                    party,
+                    round(info[party][day] / (doc_count - previous_doc_count), 5),
+                ]
+            )
+            previous_doc_count = doc_count

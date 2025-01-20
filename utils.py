@@ -528,16 +528,24 @@ def iter_on_files(root, nb_files):
         )
     return tar, loop, compressed
 
-def extract_and_format_date(file): #Fonction pour extraire les dates des noms de fichier
+
+def extract_and_format_date(
+    file,
+):  # Fonction pour extraire les dates des noms de fichier
     date_raw = os.path.basename(file)
-    return date_raw[:4] + '-' + date_raw[4:6] + '-' + date_raw[6:]
+    return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
 
 
-def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files=False, small=False):
+def preprocess(
+    root,
+    nb_files,
+    party_day_counts=None,
+    apply_unidecode=False,
+    write_files=False,
+):
     counter_all = 0
     counter_original = 0
     counter_threads = 0
-    counter_date = 0 
 
     tar, loop, compressed = iter_on_files(root, nb_files)
 
@@ -550,7 +558,7 @@ def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files
         loop.set_description(filename)
 
         file_date = extract_and_format_date(filename)
-       
+
         group_name = grep_group_name(filename)
 
         thread_ids = dict()
@@ -569,7 +577,6 @@ def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files
         to_user_pos = reader.headers.to_userid
         to_id_pos = reader.headers.to_tweetid
 
-
         for row in reader:
             counter_all += 1
             if not row[rt_pos]:
@@ -581,8 +588,6 @@ def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files
                         thread_ids[row[to_id_pos]] = None
         if not compressed:
             filestream.close()
-
-        dict_files[counter_all] = (file_date, group_name)
 
         for key, value in sorted(thread_ids.items()):
             if not value:
@@ -636,6 +641,8 @@ def preprocess(root, nb_files, dict_files={}, apply_unidecode=False, write_files
                         enricher.writerow(row, [is_thread, group_name])
                     counter_threads += 1
                     yield doc
+        if party_day_counts is not None:
+            party_day_counts.append((counter_threads, group_name, file_date))
 
         if write_files:
             output_file.close()
