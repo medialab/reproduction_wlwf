@@ -642,7 +642,10 @@ def preprocess(
                     counter_threads += 1
                     yield doc
         if party_day_counts is not None:
-            party_day_counts.append((counter_threads, group_name, file_date))
+            if group_name != "":
+                party_day_counts.append((counter_threads, group_name, file_date))
+            else:
+                party_day_counts.append((counter_threads, file_date))
 
         if write_files:
             output_file.close()

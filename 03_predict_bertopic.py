@@ -59,13 +59,16 @@ embeddings_path = os.path.join(
     args.embeddings_folder, "{}.npz".format(sbert_name_string)
 )
 
-#Add a dict_file here + dans le code preprocess quand on aura fait le lien avec la branche principale 
+party_day_counts = []
 
 docs = np.array(
     [
-        doc
+        doc  # Stocke uniquement group_name et filename
         for doc in preprocess(
-            args.input_path, count_nb_files(args.input_path), apply_unidecode=True
+            args.input_path,
+            count_nb_files(args.input_path),
+            party_day_counts=party_day_counts,
+            apply_unidecode=True,
         )
     ]
 )
@@ -76,7 +79,7 @@ max_index, embeddings = load_embeddings(
     docs.shape[0],
 )
 
-print("Predict model")
+print(f"Predict model from _{model_path}")
 
 topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
@@ -85,47 +88,53 @@ if args.small:
     docs = docs[indices]
     embeddings = embeddings[indices]
     topics, probs = topic_model.transform(docs, embeddings)
-    # Préparer les données sous forme d'un tableau numpy
-    data = np.column_stack((topics, probs))
-    header = "Topic,Probability"  # En-tête du fichier
-    last_part = os.path.basename(embeddings_path)
-    output_file = f"data_prod/topics/{last_part}_topics_pred_results_SMALL.csv"
 else:
     topics, probs = topic_model.transform(docs, embeddings)
-    # Préparer les données sous forme d'un tableau numpy
-    data = np.column_stack((topics, probs))
-    header = "Topic,Probability"  # En-tête du fichier
-    last_part = os.path.basename(embeddings_path)
-    output_file = f"data_prod/topics/{last_part}_topics_pred_results.csv"
     
 np.savetxt(output_file, data, fmt="%s", delimiter=",", header=header, comments="")  
 print(topic_model.get_topic_info())
 
-'''
 #Résultats sous forme de Time Series
+file_index = 0
+doc_count, day = party_day_counts[file_index]
 
-proportion = []
-start_idx = 0
-for key, value in dict_file.items():
-    end_idx = int(key) #On récupère l'index de fin
-    if args.small: #On récupère le groupe considéré 
-        elements_group = [item for item in topics_ind if start_idx <= item[1] < end_idx] 
+
+topics_info = defaultdict(lambda: defaultdict(int))
+for i, topic in enumerate(topics):
+    if args.small:
+        doc_index = indices[i]
     else:
-        elements_group = topics_ind[start_idx:end_idx]
-    if elements_group != []:
-        for topic_number in np.unique(topics): #Calcul de la proportion pour chaque topic 
-            elem_in_topic = sum(1 for elem in elements_group if elem[0]==topic_number) #Compte le nombre d'éléments dans le topic
+        doc_index = i
 
-            proportion.append((value[0], value[1], topic_number, elem_in_topic/ len(elements_group)))
+    while doc_index >= doc_count:
+        file_index += 1
 
-            start_idx = end_idx #Mise à jour de l'indice
+        doc_count, day = party_day_counts[file_index]
 
-proportion = np.array(proportion)
+    topics_info[topic][day] += 1
 
-for topic_number in np.unique(topics):
-    to_export = [item for item in proportion if item[2] == topic_number] #Sélection des lignes correspondant au topic envisagé
-    noms_col = np.array(['date', 'party', 'topic', 'prop']) #Création d'une ligne pour les noms de colonne
-    export_pathname = f"data_prod/dashboard/files/BERT_TS_Topic_{topic_number}.csv"
-    np.savetxt("output.csv", to_export, delimiter=",", fmt="%s", header="date,party,topic,prop", comments='')
+# Open one CSV file per topic
+last_part = os.path.basename(embeddings_path)
 
-'''
+for topic, info in topics_info.items():
+    with open(
+    os.path.join(
+        "data_prod",
+        "dashboard",
+        "bertopic",
+        "data",
+        f"bertopic_ts_{topic}_{last_part}.csv", 
+    ),
+    "w",
+    ) as f:
+        writer = csv.writer(f)
+        writer.writerow(["date", "prop"])
+        previous_doc_count = 0
+        for doc_count, day in party_day_counts:
+            writer.writerow(
+                [
+                    day,
+                    round(info[day] / (doc_count - previous_doc_count), 5),
+                ]
+            )
+            previous_doc_count = doc_count
