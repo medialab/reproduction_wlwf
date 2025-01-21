@@ -135,6 +135,7 @@ docs = np.array(
             count_nb_files(args.input_path),
             party_day_counts=party_day_counts,
             apply_unidecode=True,
+            small=args.small
         )
     ]
 )
@@ -146,31 +147,20 @@ max_index, embeddings = load_embeddings(
 )
 
 print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
+topics, probs = topic_model.fit_transform(docs, embeddings)
+print(topic_model.get_topic_info())
 
-if args.small:
-    random.seed(a=RANDOM_SEED)
-    indices = sorted(random.sample(range(len(docs)), k=1000))
-    docs = docs[indices]
-    embeddings = embeddings[indices]
-
-    topics, probs = topic_model.fit_transform(docs, embeddings)
-    topic_model.save(
-        os.path.join(args.output_folder, "small"),
-        serialization="safetensors",
-        save_ctfidf=True,
-        save_embedding_model=SBERT_NAME,
-    )
-    print(topic_model.get_topic_info())
+if args.small :
+    output_folder = os.path.join(args.output_folder, "_small")
 else:
-    topics, probs = topic_model.fit_transform(docs, embeddings)
-    print(topic_model.get_topic_info())
-    # Save model
-    topic_model.save(
-        args.output_folder,
-        serialization="safetensors",
-        save_ctfidf=True,
-        save_embedding_model=SBERT_NAME,
-    )
+    output_folder = args.output_folder
+
+topic_model.save(
+    output_folder,
+    serialization="safetensors",
+    save_ctfidf=True,
+    save_embedding_model=SBERT_NAME,
+)
 
 new_topics = topic_model.reduce_outliers(
     docs,  # type: ignore
@@ -207,12 +197,8 @@ doc_count, party, day = party_day_counts[file_index]
 
 topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
 for i, topic in enumerate(topics):
-    if args.small:
-        doc_index = indices[i]
-    else:
-        doc_index = i
 
-    while doc_index >= doc_count:
+    while i >= doc_count:
         file_index += 1
 
         doc_count, party, day = party_day_counts[file_index]
