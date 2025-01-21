@@ -225,7 +225,7 @@ for topic, info in topics_info.items():
         os.path.join(
             "data_prod",
             "dashboard",
-            "files",
+            "bertopic",
             "data",
             "bertopic_ts_{}.csv".format(topic),
         ),
