@@ -227,7 +227,7 @@ for topic, info in topics_info.items():
             "dashboard",
             "bertopic",
             "data",
-            "bertopic_ts_{}.csv".format(topic),
+            "bertopic_ts_{}_deputes.csv".format(topic),
         ),
         "w",
     ) as f:
