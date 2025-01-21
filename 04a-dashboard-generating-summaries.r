@@ -153,7 +153,7 @@ for (k in 1:K){
 
 	pq
 
-	ggsave(pq, file=paste0("data_prod/dashboard/files/img/words-plot-", k, '.png'), height=3.5, width=3, create.dir = TRUE)
+	ggsave(pq, file=paste0("data_prod/dashboard/lda/img/words-plot-", k, '.png'), height=3.5, width=3, create.dir = TRUE)
 
 }
 
@@ -318,7 +318,7 @@ for (k in 1:K){
     rbind(general |> filter(topic == k))
     
   # exports date
-  write.csv(sbs, file=paste0("data_prod/dashboard/files/data/ts-", k, '.csv'),
+  write.csv(sbs, file=paste0("data_prod/dashboard/lda/data/ts-", k, '.csv'),
 		row.names=FALSE, quote=FALSE)
 }
 
