@@ -95,10 +95,14 @@ else:
 
 
 docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
+
+# Here, loading means checking what part of the data was already encoded,
+# hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
     SAVE_PATH,
     args.save_size,
     len(docs),
+    resume_encoding=True
 )
 
 
@@ -110,13 +114,19 @@ for i in tqdm(
     if i % args.save_size == 0 and i > 0:
         np.savez_compressed(
             format_output(i),
-            embeddings=embeddings[i - args.save_size : i],
+            embeddings=embeddings,
         )
-    embeddings[i : min(len(docs), i + batch_size)] = embedding_model.encode(
+
+    if i + batch_size >= len(docs): # last iteration
+        embeddings[i % args.save_size: i % args.save_size + len(docs) % batch_size ] = embedding_model.encode(
         docs[i : i + batch_size]
     )
+    else:
+        embeddings[i % args.save_size: i % args.save_size + batch_size ] = embedding_model.encode(
+            docs[i : i + batch_size]
+        )
 
 np.savez_compressed(
     format_output(len(docs)),
-    embeddings=embeddings[len(docs) - (len(docs) % args.save_size) :],
+    embeddings=embeddings[:i % args.save_size + len(docs) % batch_size],
 )

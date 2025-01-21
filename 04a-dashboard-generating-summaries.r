@@ -153,7 +153,7 @@ for (k in 1:K){
 
 	pq
 
-	ggsave(pq, file=paste0("data_prod/dashboard/files/img/words-plot-", k, '.png'), height=3.5, width=3, create.dir = TRUE)
+	ggsave(pq, file=paste0("data_prod/dashboard/lda/img/words-plot-", k, '.png'), height=3.5, width=3, create.dir = TRUE)
 
 }
 
@@ -176,7 +176,7 @@ dates <- fls |>
 parties <- c("dep. lr", "dep. majo.", "dep. nupes", "dep. rn")
 
 # ## computing differences across parties
-
+suppressMessages({
 congress <- lda.fit@gamma |>  # probabilité partis / jour en ligne, topics en colonne
   # À VERIFIER !!!!!!!!!!!!!
   # /!\ Est-ce que l'ordre des lignes du lda.fit@gamma est bien le même que l'ordre dans fls ? /!\
@@ -191,7 +191,7 @@ congress <- lda.fit@gamma |>  # probabilité partis / jour en ligne, topics en c
          ) |> 
   relocate(c(topic, prop), .after = "actor") |> 
   arrange(topic, date, actor)
-
+})
 # chaque jour, la somme du "score d'attention" de chaque acteur réparti entre les différents topics vaut 1
 # verif
 cat("check the coherence of congress time-series df\n")
@@ -200,17 +200,6 @@ congress |> summarise(s = sum(prop), .by = date) # la somme des probas chaque jo
 congress |> summarise(s = sum(prop), .by = actor) # la somme des probas pour chaque parti vaut 268 (1 par jour)
 congress |> summarise(m = mean(prop), .by = actor)
 })
-# time.series <- t(lda.fit@gamma) # transpose la matrice des probabilités document-sujet, pour avoir les topics en ligne et les partis / jours en colonnes
-
-#congress <- data.frame(
-#    date = rep(as.Date(dates), each = 100),
-#    actor = rep(party, each = 100),
-#    topic = rep(1:100, length(dates)),
-#    prop = c(time.series # concatène
-#             # la distribution des sujets pour chaque doc,
-#                          # = le score moyen par jour de chaque topic.
-#             ),
-#    stringsAsFactors = F)
 
 # verif
 
@@ -254,7 +243,7 @@ build_ts <- function(
   # passage en format tidy
   pivot_longer(everything(),
                names_to = "topic",
-               names_pattern = "(\\d+)", # récupère les chiffres dans les noms de colonnes
+               names_pattern = "(\\d+)", # get the numbers in the column-names
                values_to = "prop") |>  
   mutate(date = rep(dates, each = K),
          actor = actor_label,
@@ -271,29 +260,13 @@ media <- build_ts(
   actor_label = "medias"
   )
 
-#load("data_prod/topics/lda-output/lda-media-results.Rdata")
-#media <- data.frame(
-#  date = rep(dd, 100),
-#  topic = rep(1:100,
-#              each = length(dd)),
-#  prop = c(results$topics), # on concatène les probabilités / jours / topics
-#  stringsAsFactors=F) |> 
-#  add_column(actor = "Medias", .after = "date")
-#
-#
+
 # >> supporters (majority) ----
 
 majority <- build_ts(
   actor_ldafile_naming = "majority_supporters",
   actor_label = "sup. majo."
 )
-# dd <- substr(users[grep('_democr', users)], 1, 10)
-# load("data_prod/topics/lda-output/lda-majority_supporters-results.Rdata")
-# majority <- data.frame(
-#   date = rep(as.Date(dd), K),
-#   topic = rep(1:K, each=nrow(results$topics)),
-#   prop = c(results$topics), stringsAsFactors=F)|> 
-#   add_column(actor = "supporters de la majorité", .after = "date")
 
 # >> supporters (lr) ----
 lr <- build_ts(
@@ -301,54 +274,24 @@ lr <- build_ts(
   "sup. lr"
 )
 
-# dd <- substr(users[grep('_repub', users)], 1, 10)
-# load("data_prod/topics/lda-output/lda-lr_supporters-results.Rdata")
-# lr <- data.frame(
-#   date = rep(as.Date(dd), K),
-#   topic = rep(1:K, each=nrow(results$topics)),
-#   prop = c(results$topics), stringsAsFactors=F)|> 
-#   add_column(actor = "supporters LR", .after = "date")
-
 # >> supporters (nupes) ----
 nupes <- build_ts(
   "nupes_supporters",
   "sup. nupes"
 )
 
-# load("data_prod/topics/lda-output/lda-nupes_supporters-results.Rdata")
-# nupes <- data.frame(
-#   date = rep(as.Date(dd), K),
-#   topic = rep(1:K, each=nrow(results$topics)),
-#   prop = c(results$topics), stringsAsFactors=F) |> # on concatène les probabilités / jours / topics
-#   add_column(actor = "supporter NUPES", .after = "date")
-#
+
 # >> supporters (rn) ----
 rn <- build_ts(
   "rn_supporters",
   "sup. rn"
 )
 
-# load("data_prod/topics/lda-output/lda-rn_supporters-results.Rdata")
-# rn <- data.frame(
-#   date = rep(as.Date(dd), K),
-#   topic = rep(1:K, each=nrow(results$topics)),
-#   prop = c(results$topics), stringsAsFactors=F) |> # récupère 
-#   add_column(actor = "supporters RN", .after = "date")
-#
 # >> attentive public ----
 attentive <- build_ts(
   "attentive",
   "pub. attentif"
 )
-
-# users <- scan("data_prod/dfm/users-list.txt", what='character')
-# load("data_prod/topics/lda-output/lda-attentive-results.Rdata")
-# # dd <- substr(users[grep('_public', users)], 1, 10)
-# attentive <- data.frame(
-#   date = rep(as.Date(dd), K),
-#   topic = rep(1:K, each=nrow(results$topics)),
-#   prop = c(results$topics), stringsAsFactors=F) |> 
-#   add_column(actor = "Public attentif", .after = "date")
 
 # >> general public ----
 
@@ -356,12 +299,6 @@ general <- build_ts(
   "general",
   "pub. general"
 )
-# load("data_prod/topics/lda-output/lda-general-results.Rdata")
-# general <- data.frame(
-#   date = rep(as.Date(dd), K),
-#   topic = rep(1:K, each = nrow(results$topics)),
-#   prop = c(results$topics), stringsAsFactors=F) |> 
-#   add_column(actor = "Public général", .after = "date")
 
 # créé le répertoire data si besoin
 if (!dir.exists("data_prod/dashboard/files/data")) {
@@ -370,7 +307,6 @@ if (!dir.exists("data_prod/dashboard/files/data")) {
 }
 
 for (k in 1:K){
-  # pour les graphiques de time series générés dans 04b, on produit un fichier "long" par topic
   sbs <- congress |>
     filter(topic == k) |> 
     rbind(media |> filter(topic == k)) |> 
@@ -380,51 +316,9 @@ for (k in 1:K){
     rbind(rn |> filter(topic == k)) |> 
     rbind(attentive |> filter(topic == k)) |> 
     rbind(general |> filter(topic == k))
-    # group_by(date, party) |>
-    # summarise(prop = mean(prop)) |>
-    # mutate(prop = round(prop, 3)) |>
-    # ungroup() # |>
-    # pivot_wider(names_from = party,
-    #             names_prefix = "prop_",
-    #             values_from = x)
-
-
-	# sbs <- df[df$topic==k,]
-	# sbs <- aggregate(sbs$prop, by=list(date=sbs$date, party=sbs$party), FUN=mean)
-	# media
-  # mm <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-  #   media[media$topic==k, c("date", "prop")], all.x=TRUE)
-  # mm$prop[is.na(mm$prop)] <- 0
-
-  #
-  # # public
-  # pp <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-  #   pub[pub$topic==k, c("date", "prop")], all.x=TRUE)
-  # pp$prop[is.na(pp$prop)] <- 0
-  # dd <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-  #   dem[dem$topic==k, c("date", "prop")], all.x=TRUE)
-  # dd$prop[is.na(dd$prop)] <- 0
-  # rr <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-  #   rep[rep$topic==k, c("date", "prop")], all.x=TRUE)
-  # rr$prop[is.na(rr$prop)] <- 0
-  #
-  # ## random users
-  # rnn <- merge(data.frame(date=unique(sbs$date), stringsAsFactors=F),
-  #   rnd[rnd$topic==k, c("date", "prop")], all.x=TRUE)
-  # rnn$prop[is.na(rnn$prop)] <- 0
-
-
-#   sbs <- data.frame(
-# 		date = unique(sbs$date),
-# 		Democrats = round(sbs$x[sbs$party=="dem"], 3),
-# 		Republicans = round(sbs$x[sbs$party=="rep"], 3),
-#     Media = round(mm$prop, 3),
-#     Public = round(pp$prop, 3),
-#     Democratic_Supporters = round(dd$prop, 3),
-#     Republican_Supporters = round(rr$prop, 3),
-#     Random_Users= round(rnn$prop, 3))
-
-	write.csv(sbs, file=paste0("data_prod/dashboard/files/data/ts-", k, '.csv'),
+    
+  # exports date
+  write.csv(sbs, file=paste0("data_prod/dashboard/lda/data/ts-", k, '.csv'),
 		row.names=FALSE, quote=FALSE)
 }
 
@@ -559,17 +453,14 @@ tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
-  rs$embed[i] <- tw.embed(rs$text[i], rs$screen_name[i], rs$screen_name[i], rs$id_str[i],
-    "", "")
+  rs$embed[i] <- tw.embed(rs$text[i], name = rs$user_screen_name[i], screen_name = rs$user_screen_name[i], id_str = rs$id[i],
+    dt = rs$local_time[i], "")
 
 }
 congress_rs <- rs
 save(congress_rs, file="data_prod/dashboard/congress-rs-tweets.rdata")
 #
 #
-# ###############################################################################
-# ### D) Representative media tweets ----
-# ###############################################################################
 ### >> Medias ----
 cat("selecting representative medias tweets for each topic\n")
 
@@ -577,14 +468,7 @@ ind <- scan("data_prod/dfm/media-rs-dtm-indices.txt")
 pointers <- scan("data_prod/dfm/media-rs-dtm-pointers.txt")
 values <- scan("data_prod/dfm/media-rs-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
-# # Lit et concatène tous les fichiers dans un seul data frame
-if (!dir.exists("data_temp")) {
-  dir.create("data_temp",
-             recursive = TRUE)
-}
-
 tweets <- data.table::fread("data_prod/dfm/media-rs-tweet-list.csv")
-# tweets <- data.table::fread("data_temp/all_media_IPG_tweets.csv")
 #
 X <- sparseMatrix(j=ind, p=pointers, x=values,
   dims=c(nrow(tweets), length(words)), index1=FALSE)
@@ -602,41 +486,45 @@ duplicated <- which(duplicated(tweets$text))
 tweets <- tweets[-duplicated,]
 results$topics <- results$topics[-duplicated,]
 
-# deleting weird tweets
-#todelete <- grep('xss', tweets$text)
-#tweets <- tweets[-todelete,]
-#results$topics <- results$topics[-todelete,]
-
 K <- 100
 rs <- list()
 
 for (k in 1:K){
-  choices <- tail(order(results$topics[,k]),n=6)
+  choices <- tail(order(results$topics[,k]),n=10)
   rs[[k]] <- tweets[choices,]
   rs[[k]]$topic <- k
 }
 rs <- do.call(rbind, rs)
 
 # function to display embedded tweet
-tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
-    txt <- paste0('<blockquote class="twitter-tweet" data-cards="hidden" data-conversation="none" width="450"><p>',
-        text, '</p> ', name, " (@", screen_name,
-        ") <a href='https://twitter.com/", screen_name,
-        '/status/', id_str, "'>",
-        dt, '</a></blockquote>')
+tw.embed <- function(text, name, 
+  screen_name, id_str, created_at, dt, 
+  js=FALSE){
+  embed_html <- paste0('<blockquote class="twitter-tweet" data-cards="hidden" data-conversation="none" width="450"><p>',
+         text, '</p> ', name, " (@", screen_name,
+         ") <a href='https://twitter.com/", screen_name,
+         '/status/', id_str, "'>",
+         dt, '</a></blockquote>')
+  #embed_html <- paste0(
+  #  '<blockquote class="twitter-tweet" data-theme="light" data-conversation="none">',
+  #  '<a href="https://twitter.com/', screen_name, '/status/', id_str, '"></a>',
+  #  '</blockquote>'
+  #)
     if (js){
-        txt <- paste0(txt,
-            ' <script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>')
+        embed_hmtl <- paste0(embed_html,
+        '<script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>')
+        #'<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>')
     }
-    return(txt)
+    return(embed_html)
 }
 
 # preparing embed
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
-  rs$embed[i] <- tw.embed(rs$text[i], rs$screen_name[i], rs$screen_name[i], rs$id_str[i],
-    "", "")
+  rs$embed[i] <- tw.embed(rs$text[i], name = rs$user_screen_name[i], 
+    screen_name = rs$user_screen_name[i], id_str = rs$id[i], dt = rs$local_time[i], ""
+    )
 
 }
 

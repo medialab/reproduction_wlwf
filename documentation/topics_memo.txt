@@ -1,4 +1,4 @@
-8, attentats_kurdes
+8,attentats_kurdes
 9,motion_censure
 10,aesh_revalorisation
 11,paty
