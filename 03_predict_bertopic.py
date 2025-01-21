@@ -1,7 +1,9 @@
 import os
 import json
+import csv
 import random
 import argparse
+from collections import defaultdict
 
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
@@ -69,6 +71,7 @@ docs = np.array(
             count_nb_files(args.input_path),
             party_day_counts=party_day_counts,
             apply_unidecode=True,
+            small = args.small
         )
     ]
 )
@@ -79,32 +82,33 @@ max_index, embeddings = load_embeddings(
     docs.shape[0],
 )
 
-print(f"Predict model from _{model_path}")
+print(f"Predict model from _{args.model_path}")
 
 topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
 if args.small:
-    indices = random.choices(range(len(docs)), k=1000)
-    docs = docs[indices]
-    embeddings = embeddings[indices]
+    #indices = random.choices(range(len(docs)), k=1000)
+    #docs = docs[indices]
+    #embeddings = embeddings[indices]
     topics, probs = topic_model.transform(docs, embeddings)
 else:
     topics, probs = topic_model.transform(docs, embeddings)
     
-np.savetxt(output_file, data, fmt="%s", delimiter=",", header=header, comments="")  
 print(topic_model.get_topic_info())
 
 #Résultats sous forme de Time Series
 file_index = 0
 doc_count, day = party_day_counts[file_index]
 
+print(day)
+
 
 topics_info = defaultdict(lambda: defaultdict(int))
 for i, topic in enumerate(topics):
-    if args.small:
-        doc_index = indices[i]
-    else:
-        doc_index = i
+    #if args.small:
+        #doc_index = indices[i]
+    #else:
+    doc_index = i
 
     while doc_index >= doc_count:
         file_index += 1
@@ -114,7 +118,7 @@ for i, topic in enumerate(topics):
     topics_info[topic][day] += 1
 
 # Open one CSV file per topic
-last_part = os.path.basename(embeddings_path)
+last_part = os.path.basename(args.embeddings_folder)
 
 for topic, info in topics_info.items():
     with open(

@@ -22,7 +22,7 @@ EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
-NB_DOCS_SMALL = 1000 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
+NB_DOCS_SMALL = 10000 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"
@@ -530,11 +530,15 @@ def iter_on_files(root, nb_files):
     return tar, loop, compressed
 
 
-def extract_and_format_date(
-    file,
+def extract_and_format_date(root,
+    file
 ):  # Fonction pour extraire les dates des noms de fichier
     date_raw = os.path.basename(file)
-    return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
+    if os.path.basename(root) =='attentive_public_nort':
+        return date_raw[:10]
+    elif os.path.basename(root) == 'tweets_from_deputesXVI_220620-230314':
+        return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
+    #Penser à considérer les autres cas
 
 
 def preprocess(
@@ -559,7 +563,7 @@ def preprocess(
 
         loop.set_description(filename)
 
-        file_date = extract_and_format_date(filename)
+        file_date = extract_and_format_date(root, filename)
 
         group_name = grep_group_name(filename)
 
