@@ -22,6 +22,7 @@ EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
+NB_DOCS_SMALL = 1000 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"
@@ -542,6 +543,7 @@ def preprocess(
     party_day_counts=None,
     apply_unidecode=False,
     write_files=False,
+    small=False
 ):
     counter_all = 0
     counter_original = 0
@@ -652,6 +654,9 @@ def preprocess(
         if not compressed:
             input_file.close()
 
+        if small and counter_threads >= NB_DOCS_SMALL:
+            break
+
     if compressed:
         tar.close()
     print(
@@ -674,6 +679,8 @@ def load_embeddings(path, save_size, nb_docs, resume_encoding=False):
             max_index = index
 
         if not resume_encoding:
+            if index == save_size and nb_docs < save_size: # deal with --small case
+                return None, np.load(file)["embeddings"][:nb_docs]
             if index % save_size == 0:
                 embeddings[index - save_size : index] = np.load(file)["embeddings"]
             else:
