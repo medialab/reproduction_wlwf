@@ -529,7 +529,20 @@ def iter_on_files(root, nb_files):
     return tar, loop, compressed
 
 
-def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=False):
+def extract_and_format_date(
+    file,
+):  # Fonction pour extraire les dates des noms de fichier
+    date_raw = os.path.basename(file)
+    return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
+
+
+def preprocess(
+    root,
+    nb_files,
+    party_day_counts=None,
+    apply_unidecode=False,
+    write_files=False,
+):
     counter_all = 0
     counter_original = 0
     counter_threads = 0
@@ -543,6 +556,8 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=F
             filename = file
 
         loop.set_description(filename)
+
+        file_date = extract_and_format_date(filename)
 
         group_name = grep_group_name(filename)
 
@@ -626,6 +641,8 @@ def preprocess(root, nb_files, apply_unidecode=False, write_files=False, small=F
                         enricher.writerow(row, [is_thread, group_name])
                     counter_threads += 1
                     yield doc
+        if party_day_counts is not None:
+            party_day_counts.append((counter_threads, group_name, file_date))
 
         if write_files:
             output_file.close()
