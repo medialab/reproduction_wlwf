@@ -81,7 +81,6 @@ if len(docs)==0:
     #Le cas où le directory est faux (le dossier n'existe pas) ou alors on a pas un ficher compressé au format souhaité, le code aura déjà généré une erreur avant ce stade 
 
 
-'''
 # Here, loading means checking what part of the data was already encoded,
 # hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
@@ -113,4 +112,3 @@ np.savez_compressed(
     format_npz_output(SAVE_PATH, len(docs)),
     embeddings=embeddings[: i % DEFAULT_SAVE_SIZE + len(docs) % batch_size],
 )
-'''
