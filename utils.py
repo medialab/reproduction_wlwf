@@ -537,12 +537,16 @@ def iter_on_files(root, nb_files):
     return tar, loop, compressed
 
 
-def extract_and_format_date(
+def extract_and_format_date(root,
     file,
-):  # Fonction pour extraire les dates des noms de fichier
+):  # Function to extract dates from file name. It needs to be updated according to input_path type 
     date_raw = os.path.basename(file)
-    return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
-
+    if date_raw=='tweets_from_deputesXVI_220620-230314':
+        return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
+    elif date_raw=='attentive_public_nort':
+        return date_raw[:10]
+    else:
+        return date_raw[:10]
 
 def preprocess(
     root,
@@ -565,8 +569,9 @@ def preprocess(
             filename = file
 
         loop.set_description(filename)
+        print(filename)
 
-        file_date = extract_and_format_date(filename)
+        file_date = extract_and_format_date(root, filename)
 
         group_name = grep_group_name(filename)
 
@@ -653,7 +658,10 @@ def preprocess(
                     counter_threads += 1
                     yield doc
         if party_day_counts is not None:
-            party_day_counts.append((counter_threads, group_name, file_date))
+            if group_name != "":
+                party_day_counts.append((counter_threads, group_name, file_date))
+            else: 
+                party_day_counts.append((counter_threads, file_date))
 
         if write_files:
             output_file.close()
