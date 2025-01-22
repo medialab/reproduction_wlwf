@@ -34,7 +34,7 @@ parser.add_argument(
 
 parser.add_argument(
     "model_path",
-    help = "Path to a folder containing the model. It is the output_folder arg in 02_run_bertopic.py" #Il faudra peut-être être plus précis sur ce contenu
+    help = "Path to a folder containing the model. It is the output_folder arg in 02_run_bertopic.py" 
 )
 
 '''parser.add_argument(
@@ -65,7 +65,7 @@ party_day_counts = []
 
 docs = np.array(
     [
-        doc  # Stocke uniquement group_name et filename
+        doc 
         for doc in preprocess(
             args.input_path,
             count_nb_files(args.input_path),
@@ -91,7 +91,7 @@ topics, probs = topic_model.transform(docs, embeddings)
 # Get infos about topic
 topic_info = topic_model.get_topic_info()
 
-#We add a code to determine a representative document
+#We add a code to determine a representative document (the most probable one related to the considered topic)
 
 for topic in topic_info['Topic']:
     topic_docs_indices = [i for i, t in enumerate(topics) if t == topic] #Collection of the document associated to a topic
@@ -122,7 +122,7 @@ for i, topic in enumerate(topics):
     topics_info[topic][day] += 1
 
 # Open one CSV file per topic
-last_part = os.path.basename(args.embeddings_folder) #To add column party to allow better data manipulation regarding 02 script
+last_part = os.path.basename(args.embeddings_folder) #Created to add column party to allow better data manipulation regarding 02 script
 
 
 for topic, info in topics_info.items():
