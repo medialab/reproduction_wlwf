@@ -642,6 +642,8 @@ def preprocess(
                         row[text_pos] = doc
                         enricher.writerow(row, [is_thread, group_name])
                     counter_threads += 1
+                    if small and counter_threads >= NB_DOCS_SMALL:
+                        break
                     yield doc
         if party_day_counts is not None:
             party_day_counts.append((counter_threads, group_name, file_date))
