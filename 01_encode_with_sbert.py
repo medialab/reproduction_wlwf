@@ -31,6 +31,7 @@ from utils import (
     create_dir,
     load_embeddings,
     DEFAULT_SAVE_SIZE,
+    format_npz_output,
 )
 
 
@@ -47,12 +48,7 @@ parser.add_argument(
     help="Path to a folder that will be created and contain all encoded vectors",
     type=create_dir,
 )
-parser.add_argument(
-    "--save-size",
-    help="Size of saved files in number of vectors",
-    type=int,
-    default=DEFAULT_SAVE_SIZE,
-)
+
 args = parser.parse_args()
 
 embedding_model = SentenceTransformer(SBERT_NAME)
@@ -61,11 +57,7 @@ sbert_name_string = SBERT_NAME.replace("/", "_")
 SAVE_PATH = os.path.join(args.output_folder, "{}.npz".format(sbert_name_string))
 
 
-def format_output(size):
-    return SAVE_PATH.replace(".npz", "_" + str(size) + ".npz")
-
-
-if os.path.isfile(format_output(args.save_size)):
+if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     answer = input(
         """Files in the output folder already exist, do you want to resume from there?
           y resume from last file
@@ -75,12 +67,6 @@ if os.path.isfile(format_output(args.save_size)):
 
     if answer == "n" or answer == "no":
         sys.exit(0)
-
-elif os.path.isfile(format_output(DEFAULT_SAVE_SIZE)):
-    raise ValueError(
-        """Files in the output folder have a different save_size than the input save_size ({}).
-        It is impossible to resume from there.""".format(args.save_size)
-    )
 
 else:
     files_contain_save_size = []
@@ -99,10 +85,7 @@ docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_pat
 # Here, loading means checking what part of the data was already encoded,
 # hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
-    SAVE_PATH,
-    args.save_size,
-    len(docs),
-    resume_encoding=True
+    SAVE_PATH, args.save_size, len(docs), resume_encoding=True
 )
 
 
@@ -113,20 +96,20 @@ for i in tqdm(
 ):
     if i % args.save_size == 0 and i > 0:
         np.savez_compressed(
-            format_output(i),
+            format_npz_output(SAVE_PATH, i),
             embeddings=embeddings,
         )
 
-    if i + batch_size >= len(docs): # last iteration
-        embeddings[i % args.save_size: i % args.save_size + len(docs) % batch_size ] = embedding_model.encode(
-        docs[i : i + batch_size]
-    )
+    if i + batch_size >= len(docs):  # last iteration
+        embeddings[i % args.save_size : i % args.save_size + len(docs) % batch_size] = (
+            embedding_model.encode(docs[i : i + batch_size])
+        )
     else:
-        embeddings[i % args.save_size: i % args.save_size + batch_size ] = embedding_model.encode(
-            docs[i : i + batch_size]
+        embeddings[i % args.save_size : i % args.save_size + batch_size] = (
+            embedding_model.encode(docs[i : i + batch_size])
         )
 
 np.savez_compressed(
-    format_output(len(docs)),
-    embeddings=embeddings[:i % args.save_size + len(docs) % batch_size],
+    format_npz_output(SAVE_PATH, len(docs)),
+    embeddings=embeddings[: i % args.save_size + len(docs) % batch_size],
 )
