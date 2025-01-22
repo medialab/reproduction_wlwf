@@ -1,5 +1,6 @@
 import os
 import csv
+import sys
 import json
 import argparse
 from collections import defaultdict
@@ -20,6 +21,7 @@ from utils import (
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
+    NB_DOCS_SMALL,
 )
 
 parser = argparse.ArgumentParser()
@@ -53,6 +55,13 @@ sbert_name_string = SBERT_NAME.replace("/", "_")
 embeddings_path = os.path.join(
     args.embeddings_folder, "{}.npz".format(sbert_name_string)
 )
+
+if args.small and DEFAULT_SAVE_SIZE < NB_DOCS_SMALL:
+    print(
+        """Please change value of DEFAULT_SAVE_SIZE or NB_DOCS_SMALL in file utils.py.
+        DEFAULT_SAVE_SIZE should be greater than NB_DOCS_SMALL"""
+    )
+    sys.exit(1)
 
 hdbscan_model = HDBSCAN(
     min_cluster_size=2 if args.small else 100,
@@ -143,6 +152,7 @@ max_index, embeddings = load_embeddings(
     embeddings_path,
     args.save_size,
     docs.shape[0],
+    small=args.small,
 )
 
 print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
