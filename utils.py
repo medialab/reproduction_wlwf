@@ -537,13 +537,6 @@ def iter_on_files(root, nb_files):
     return tar, loop, compressed
 
 
-def extract_and_format_date(
-    file,
-):  # Fonction pour extraire les dates des noms de fichier
-    date_raw = os.path.basename(file)
-    return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
-
-
 def preprocess(
     root,
     nb_files,
@@ -566,7 +559,7 @@ def preprocess(
 
         loop.set_description(filename)
 
-        file_date = extract_and_format_date(filename)
+        file_date = filename[:10]
 
         group_name = grep_group_name(filename)
 
