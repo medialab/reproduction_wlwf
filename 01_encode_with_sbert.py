@@ -69,6 +69,11 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
 
 docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
 
+
+if len(docs)==0:
+    raise ValueError("No csv files found in your directory or compressed file")
+
+
 # Here, loading means checking what part of the data was already encoded,
 # hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
