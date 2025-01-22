@@ -50,7 +50,6 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-
 embedding_model = SentenceTransformer(SBERT_NAME)
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
@@ -67,18 +66,6 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
 
     if answer == "n" or answer == "no":
         sys.exit(0)
-
-else:
-    files_contain_save_size = []
-    for file in glob.glob(SAVE_PATH.replace(".npz", "_*")):
-        index = int(file[len(SAVE_PATH) - 3 : -len(".npz")])
-        files_contain_save_size.append(index == DEFAULT_SAVE_SIZE)
-    if len(files_contain_save_size) > 0 and not any(files_contain_save_size):
-        raise ValueError(
-            """Files in the output folder have a different save_size than the input save_size ({}).
-            It is impossible to resume from there.""".format(DEFAULT_SAVE_SIZE)
-        )
-
 
 docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
 
