@@ -559,7 +559,7 @@ def preprocess(
 
         loop.set_description(filename)
 
-        file_date = filename[:10]
+        file_date = os.path.basename(filename)[:10]
 
         group_name = grep_group_name(filename)
 
