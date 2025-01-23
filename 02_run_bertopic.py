@@ -32,13 +32,20 @@ parser.add_argument(
 )
 parser.add_argument(
     "embeddings_folder",
-    help="Path to a folder containing .npz embeddings. It is the output_folder arg in 01_encode_with_sbert.py",
+    help="Path to a folder containing .npz embeddings. It is the cd  arg in 01_encode_with_sbert.py",
 )
 parser.add_argument(
-    "output_folder",
+    "output_folder_model",
     help="Path to a folder that will be created and contain the BERTopic model",
     type=create_dir,
 )
+
+parser.add_argument(
+    "output_folder_TS",
+    help="Path to a folder that will be created and contain the time series linked to BERTopic model",
+    type=create_dir,
+)
+
 parser.add_argument(
     "--save-size",
     help="Size of saved files (in embeddings_folder) in number of vectors",
@@ -160,9 +167,9 @@ topics, probs = topic_model.fit_transform(docs, embeddings)
 print(topic_model.get_topic_info())
 
 if args.small:
-    output_folder = os.path.join(args.output_folder, "_small")
+    output_folder = os.path.join(args.output_folder_model, "_small")
 else:
-    output_folder = args.output_folder
+    output_folder = args.output_folder_model
 
 topic_model.save(
     output_folder,
@@ -217,11 +224,8 @@ for i, topic in enumerate(topics):
 for topic, info in topics_info.items():
     with open(
         os.path.join(
-            "data_prod",
-            "dashboard",
-            "bertopic",
-            "data",
-            "bertopic_ts_{}.csv".format(topic),
+            args.output_folder_TS,
+            "bertopic_ts_{}_deputes.csv".format(topic),
         ),
         "w",
     ) as f:

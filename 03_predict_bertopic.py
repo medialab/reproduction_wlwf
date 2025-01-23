@@ -37,12 +37,11 @@ parser.add_argument(
     help = "Path to a folder containing the model. It is the output_folder arg in 02_run_bertopic.py" 
 )
 
-'''parser.add_argument(
+parser.add_argument(
     "output_folder",
-    help="Path to a folder that will be created and contain the predictions",
-    type=create_dir,
+    help="Path to a folder that will be created and contain the time series data after prediction",
+    type=existing_dir_path, #We want to put TS in the same folder than Times Series from script 02 
 )
-'''
 
 parser.add_argument(
     "--save-size",
@@ -93,9 +92,11 @@ topics, probs = topic_model.transform(docs, embeddings)
 topic_info = topic_model.get_topic_info()
 #We add a code to determine a representative document (the most probable one related to the considered topic)
 
-for topic in topic_info['Topic']:
+nb_topics = max(topics)
+
+for topic in range(nb_topics): 
     topic_docs_indices = [i for i, t in enumerate(topics) if t == topic] #Collection of the document associated to a topic
-    topic_probs = [probs[i] for i in topic_docs_indices] #Collection of associated probabilities
+    topic_probs = [probs[i][topic] for i in topic_docs_indices] #Collection of associated probabilities
     #Take the max value of probability 
     if topic_probs != []:
         max_prob_index = topic_docs_indices[np.argmax(topic_probs)]
@@ -139,10 +140,7 @@ else:
 for topic, info in topics_info.items():
     with open(
     os.path.join(
-        "data_prod",
-        "dashboard",
-        "bertopic",
-        "data",
+        args.output_folder,
         f"bertopic_ts_{topic}_{last_part}.csv", 
     ),
     "w",

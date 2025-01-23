@@ -536,18 +536,6 @@ def iter_on_files(root, nb_files):
         )
     return tar, loop, compressed
 
-
-def extract_and_format_date(root,
-    file,
-):  # Function to extract dates from file name. It needs to be updated according to input_path type 
-    date_raw = os.path.basename(file)
-    if date_raw=='tweets_from_deputesXVI_220620-230314':
-        return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
-    elif date_raw=='attentive_public_nort':
-        return date_raw[:10]
-    else:
-        return date_raw[:10]
-
 def preprocess(
     root,
     nb_files,
@@ -571,7 +559,7 @@ def preprocess(
         loop.set_description(filename)
         print(filename)
 
-        file_date = extract_and_format_date(root, filename)
+        file_date = os.path.basename(filename)[:10]
 
         group_name = grep_group_name(filename)
 
