@@ -69,16 +69,9 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
 
 docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
 
-
 if len(docs)==0:
-    #Distinguer cas de fichier vide ou d'absence de fichier 
-    if args.input_path.endswith(".xz"):
-        raise ValueError(f"Your compressed file {args.input_path} is empty or in an incorrect format") #(Dire à Béatrice que des précisions pourraient être apportées : notion de fichier normal)
-    elif count_nb_files(args.input_path)==0:
-        raise ValueError(f"No csv files found in your folder {args.input_path}") 
-    else: 
-        raise ValueError(f"Your files in your folder {args.input_path} are empty") 
-    #Le cas où le directory est faux (le dossier n'existe pas) ou alors on a pas un ficher compressé au format souhaité, le code aura déjà généré une erreur avant ce stade 
+    if count_nb_files(args.input_path)==0:
+        raise ValueError(f"No csv files found in your folder {args.input_path}")  
 
 
 # Here, loading means checking what part of the data was already encoded,

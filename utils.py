@@ -516,6 +516,8 @@ def iter_on_files(root, nb_files):
     if file_extension:
         if file_extension == ".xz":
             compressed = True
+            if os.path.getsize(root) == 0:
+                raise ValueError("The compressed file is empty")
             tar = tarfile.open(root, "r:xz")
             loop = tqdm(
                 (
@@ -571,6 +573,9 @@ def preprocess(
         else:
             filestream = open(file)
         reader = casanova.reader(filestream)
+
+        if reader.empty==True:
+            raise ValueError("An empty file was found in your input folder or compressed file")
 
         text_pos = reader.headers.text
         id_pos = reader.headers.id
