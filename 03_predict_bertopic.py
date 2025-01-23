@@ -88,14 +88,14 @@ print(f"Predict model from _{args.model_path}")
 topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
 topics, probs = topic_model.transform(docs, embeddings)
+
 # Get infos about topic
 topic_info = topic_model.get_topic_info()
-
 #We add a code to determine a representative document (the most probable one related to the considered topic)
 
 for topic in topic_info['Topic']:
     topic_docs_indices = [i for i, t in enumerate(topics) if t == topic] #Collection of the document associated to a topic
-    topic_probs = [probs[i, int(topic) + +1] for i in topic_docs_indices] #Collection of associated probabilities
+    topic_probs = [probs[i] for i in topic_docs_indices] #Collection of associated probabilities
     #Take the max value of probability 
     if topic_probs != []:
         max_prob_index = topic_docs_indices[np.argmax(topic_probs)]
@@ -109,20 +109,31 @@ print(topic_info)
 
 #Time Series Results 
 file_index = 0
-doc_count, day = party_day_counts[file_index]
-topics_info = defaultdict(lambda: defaultdict(int))
-for i, topic in enumerate(topics):
-    doc_index = i
 
-    while doc_index >= doc_count:
-        file_index += 1
+last_part = os.path.basename(args.embeddings_folder.rstrip('/'))
 
-        doc_count, day = party_day_counts[file_index]
+if last_part=='supporters_public':
+    doc_count, party, day = party_day_counts[file_index]
+    topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    for i, topic in enumerate(topics):
+        while i >= doc_count:
+            file_index += 1
 
-    topics_info[topic][day] += 1
+            doc_count, party, day = party_day_counts[file_index]
 
-# Open one CSV file per topic
-last_part = os.path.basename(args.embeddings_folder) #Created to add column party to allow better data manipulation regarding 02 script
+        topics_info[topic][party][day] += 1
+else:
+    doc_count, day = party_day_counts[file_index]
+    topics_info = defaultdict(lambda: defaultdict(int))
+    for i, topic in enumerate(topics):
+        doc_index = i
+
+        while doc_index >= doc_count:
+            file_index += 1
+
+            doc_count, day = party_day_counts[file_index]
+
+        topics_info[topic][day] += 1
 
 
 for topic, info in topics_info.items():
@@ -139,12 +150,23 @@ for topic, info in topics_info.items():
         writer = csv.writer(f)
         writer.writerow(["date", "party", "prop"])
         previous_doc_count = 0
-        for doc_count, day in party_day_counts:
-            writer.writerow(
-                [
-                    day,
-                    last_part,
-                    round(info[day] / (doc_count - previous_doc_count), 5),
-                ]
-            )
-            previous_doc_count = doc_count
+        if last_part=='supporters_public':
+            for doc_count, party, day in party_day_counts:
+                writer.writerow(
+                    [
+                        day,
+                        f'{party}_supp',
+                        round(info[party][day] / (doc_count - previous_doc_count), 5),
+                    ]
+                )
+                previous_doc_count = doc_count
+        else: 
+            for doc_count, day in party_day_counts:
+                writer.writerow(
+                    [
+                        day,
+                        last_part,
+                        round(info[day] / (doc_count - previous_doc_count), 5),
+                    ]
+                )
+                previous_doc_count = doc_count
