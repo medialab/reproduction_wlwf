@@ -92,9 +92,7 @@ topics, probs = topic_model.transform(docs, embeddings)
 topic_info = topic_model.get_topic_info()
 #We add a code to determine a representative document (the most probable one related to the considered topic)
 
-nb_topics = max(topics)
-
-for topic in range(nb_topics): 
+for topic in topic_info['Topic']: 
     topic_docs_indices = [i for i, t in enumerate(topics) if t == topic] #Collection of the document associated to a topic
     topic_probs = [probs[i][topic] for i in topic_docs_indices] #Collection of associated probabilities
     #Take the max value of probability 
@@ -113,6 +111,9 @@ file_index = 0
 
 last_part = os.path.basename(args.embeddings_folder.rstrip('/'))
 
+topics_unique = sorted(set(topic_model.topics_))
+not_mentionned_topics = [topic for topic in topics_unique if topic not in topics]
+
 if last_part=='supporters_public':
     doc_count, party, day = party_day_counts[file_index]
     topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
@@ -123,6 +124,7 @@ if last_part=='supporters_public':
             doc_count, party, day = party_day_counts[file_index]
 
         topics_info[topic][party][day] += 1
+
 else:
     doc_count, day = party_day_counts[file_index]
     topics_info = defaultdict(lambda: defaultdict(int))
@@ -136,7 +138,13 @@ else:
 
         topics_info[topic][day] += 1
 
-
+#Create keys in the dictionnary also for topics that were not mentionned in the group
+for topic in not_mentionned_topics:
+    if last_part=='supporters_public':
+        topics_info[topic][party][day] = 0
+    else:
+        topics_info[topic][day] =0
+        
 for topic, info in topics_info.items():
     with open(
     os.path.join(

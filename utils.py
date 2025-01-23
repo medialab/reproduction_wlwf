@@ -24,7 +24,7 @@ DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
-NB_DOCS_SMALL = 1000
+NB_DOCS_SMALL = 90000
 
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
