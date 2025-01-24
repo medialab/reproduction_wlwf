@@ -71,7 +71,7 @@ docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_pat
 
 if len(docs)==0:
     if count_nb_files(args.input_path)==0:
-        raise ValueError(f"No csv files found in your folder {args.input_path}")  
+        raise ValueError(f"No csv files found in your folder or compressed file {args.input_path}")  
 
 
 # Here, loading means checking what part of the data was already encoded,

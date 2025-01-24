@@ -516,13 +516,14 @@ def iter_on_files(root, nb_files):
     if file_extension:
         if file_extension == ".xz":
             compressed = True
-            if os.path.getsize(root) == 0:
-                raise ValueError("The compressed file is empty")
             tar = tarfile.open(root, "r:xz")
+            members = [m for m in tar.getmembers() if m.isreg()] 
+            if members==[]:
+                raise ValueError("Compressed file don't contain files, or the files detected are in an incorrect format")
             loop = tqdm(
                 (
                     member
-                    for member in sorted(tar.getmembers(), key=lambda x: x.name)
+                    for member in sorted(members, key=lambda x: x.name)
                     if member.isreg()
                 ),
                 total=nb_files,
@@ -575,8 +576,8 @@ def preprocess(
         reader = casanova.reader(filestream)
 
         if reader.empty==True:
-            raise ValueError("An empty file was found in your input folder or compressed file")
-
+                raise ValueError("At least one empty CSV file was found in your input folder or compressed file")
+       
         text_pos = reader.headers.text
         id_pos = reader.headers.id
         rt_pos = reader.headers.retweeted_id
