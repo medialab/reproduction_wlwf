@@ -16,7 +16,6 @@ contact the corresponding author.
 """
 
 from tqdm import tqdm
-import glob
 import os
 import sys
 import argparse
@@ -69,9 +68,9 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
 
 docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
 
-if len(docs)==0:
-    if count_nb_files(args.input_path)==0:
-        raise ValueError(f"No csv files found in your folder or compressed file {args.input_path}")  
+if len(docs) == 0:
+    if count_nb_files(args.input_path) == 0:
+        raise ValueError(f"No csv files found in {args.input_path}")
 
 
 # Here, loading means checking what part of the data was already encoded,
@@ -93,11 +92,11 @@ for i in tqdm(
         )
 
     if i + batch_size >= len(docs):  # last iteration
-        embeddings[i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE + len(docs) % batch_size] = (
-            embedding_model.encode(docs[i : i + batch_size])
-        )
+        embeddings[
+            i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE + len(docs) % batch_size
+        ] = embedding_model.encode(docs[i : i + batch_size])
     else:
-        embeddings[i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE+ batch_size] = (
+        embeddings[i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE + batch_size] = (
             embedding_model.encode(docs[i : i + batch_size])
         )
 
