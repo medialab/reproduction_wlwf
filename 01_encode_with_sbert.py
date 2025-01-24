@@ -16,7 +16,6 @@ contact the corresponding author.
 """
 
 from tqdm import tqdm
-import glob
 import os
 import sys
 import argparse
@@ -50,7 +49,6 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-
 embedding_model = SentenceTransformer(SBERT_NAME)
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
@@ -68,24 +66,17 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     if answer == "n" or answer == "no":
         sys.exit(0)
 
-else:
-    files_contain_save_size = []
-    for file in glob.glob(SAVE_PATH.replace(".npz", "_*")):
-        index = int(file[len(SAVE_PATH) - 3 : -len(".npz")])
-        files_contain_save_size.append(index == args.save_size)
-    if len(files_contain_save_size) > 0 and not any(files_contain_save_size):
-        raise ValueError(
-            """Files in the output folder have a different save_size than the input save_size ({}).
-            It is impossible to resume from there.""".format(args.save_size)
-        )
-
-
 docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
+
+if len(docs) == 0:
+    if count_nb_files(args.input_path) == 0:
+        raise ValueError(f"No csv files found in {args.input_path}")
+
 
 # Here, loading means checking what part of the data was already encoded,
 # hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
-    SAVE_PATH, args.save_size, len(docs), resume_encoding=True
+    SAVE_PATH, DEFAULT_SAVE_SIZE, len(docs), resume_encoding=True
 )
 
 
@@ -94,22 +85,22 @@ for i in tqdm(
     range(max_index, len(docs), batch_size),
     desc="Encode sentences using {}".format(sbert_name_string),
 ):
-    if i % args.save_size == 0 and i > 0:
+    if i % DEFAULT_SAVE_SIZE == 0 and i > 0:
         np.savez_compressed(
             format_npz_output(SAVE_PATH, i),
             embeddings=embeddings,
         )
 
     if i + batch_size >= len(docs):  # last iteration
-        embeddings[i % args.save_size : i % args.save_size + len(docs) % batch_size] = (
-            embedding_model.encode(docs[i : i + batch_size])
-        )
+        embeddings[
+            i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE + len(docs) % batch_size
+        ] = embedding_model.encode(docs[i : i + batch_size])
     else:
-        embeddings[i % args.save_size : i % args.save_size + batch_size] = (
+        embeddings[i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE + batch_size] = (
             embedding_model.encode(docs[i : i + batch_size])
         )
 
 np.savez_compressed(
     format_npz_output(SAVE_PATH, len(docs)),
-    embeddings=embeddings[: i % args.save_size + len(docs) % batch_size],
+    embeddings=embeddings[: i % DEFAULT_SAVE_SIZE + len(docs) % batch_size],
 )

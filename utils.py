@@ -517,12 +517,11 @@ def iter_on_files(root, nb_files):
         if file_extension == ".xz":
             compressed = True
             tar = tarfile.open(root, "r:xz")
+            members = [m for m in tar.getmembers() if m.isreg()]
+            if members == []:
+                raise ValueError(f"Tar archive {root} doesn't contain files")
             loop = tqdm(
-                (
-                    member
-                    for member in sorted(tar.getmembers(), key=lambda x: x.name)
-                    if member.isreg()
-                ),
+                sorted(members, key=lambda x: x.name),
                 total=nb_files,
                 desc="Read compressed files",
             )
@@ -535,13 +534,6 @@ def iter_on_files(root, nb_files):
             desc="Read csv files",
         )
     return tar, loop, compressed
-
-
-def extract_and_format_date(
-    file,
-):  # Fonction pour extraire les dates des noms de fichier
-    date_raw = os.path.basename(file)
-    return date_raw[:4] + "-" + date_raw[4:6] + "-" + date_raw[6:8]
 
 
 def preprocess(
@@ -557,7 +549,7 @@ def preprocess(
     counter_threads = 0
 
     tar, loop, compressed = iter_on_files(root, nb_files)
-
+    empty_warn = []
     for file in loop:
         if compressed:
             filename = file.name
@@ -566,7 +558,7 @@ def preprocess(
 
         loop.set_description(filename)
 
-        file_date = extract_and_format_date(filename)
+        file_date = os.path.basename(filename)[:10]
 
         group_name = grep_group_name(filename)
 
@@ -578,6 +570,9 @@ def preprocess(
         else:
             filestream = open(file)
         reader = casanova.reader(filestream)
+
+        if reader.empty:
+            empty_warn.append(filename)
 
         text_pos = reader.headers.text
         id_pos = reader.headers.id
@@ -666,10 +661,15 @@ def preprocess(
     if compressed:
         tar.close()
     print(
-        "nb of tweets: {}, nb of original tweets: {}, nb of original tweets grouped by threads: {}".format(
+        "nb of tweets: {}, nb of original tweets: {}, nb of original tweets grouped by threads: {}\n".format(
             counter_all, counter_original, counter_threads
         )
     )
+    if empty_warn:
+        print("The following files are empty:")
+        for f in empty_warn:
+            print(f)
+        print()
 
 
 def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False):
