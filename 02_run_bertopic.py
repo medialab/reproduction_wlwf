@@ -1,9 +1,7 @@
 import os
-import csv
 import sys
 import json
 import argparse
-from collections import defaultdict
 from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
 from umap import UMAP
@@ -16,8 +14,9 @@ from utils import (
     create_dir,
     existing_dir_path,
     vectorizer,
-    preprocess,
-    load_embeddings,
+    load_docs_embeddings,
+    count_topics_info,
+    write_bertopic_TS,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
@@ -35,14 +34,8 @@ parser.add_argument(
     help="Path to a folder containing .npz embeddings. It is the cd  arg in 01_encode_with_sbert.py",
 )
 parser.add_argument(
-    "output_folder_model",
+    "output_folder",
     help="Path to a folder that will be created and contain the BERTopic model",
-    type=create_dir,
-)
-
-parser.add_argument(
-    "output_folder_TS",
-    help="Path to a folder that will be created and contain the time series linked to BERTopic model",
     type=create_dir,
 )
 
@@ -54,7 +47,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--small",
-    help=("run the script on one week of data"),
+    help=("run the script on a reduced number of tweets fixed in utils by NB_DOCS_SMALL variable"),
     action="store_true",
 )
 args = parser.parse_args()
@@ -142,34 +135,24 @@ save_utils.save_ctfidf_config = save_ctfidf_config
 
 party_day_counts = []
 
-docs = np.array(
-    [
-        doc  # Stocke uniquement group_name et filename
-        for doc in preprocess(
-            args.input_path,
-            count_nb_files(args.input_path),
-            party_day_counts=party_day_counts,
-            apply_unidecode=True,
-            small=args.small,
-        )
-    ]
-)
-
-max_index, embeddings = load_embeddings(
+docs, max_index, embeddings = load_docs_embeddings(
+    args.input_path, 
+    count_nb_files(args.input_path),
     embeddings_path,
     args.save_size,
-    docs.shape[0],
+    party_day_counts=party_day_counts,
+    apply_unidecode=True,
     small=args.small,
-)
+    )
 
 print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
 topics, probs = topic_model.fit_transform(docs, embeddings)
 print(topic_model.get_topic_info())
 
 if args.small:
-    output_folder = os.path.join(args.output_folder_model, "_small")
+    output_folder = os.path.join(args.output_folder, "_small")
 else:
-    output_folder = args.output_folder_model
+    output_folder = args.output_folder
 
 topic_model.save(
     output_folder,
@@ -195,9 +178,7 @@ for i, row in topic_model.get_topic_info().iterrows():
     top_words, top_ctfidf = zip(*top_list)
     draw_topic_keywords(topic, top_words, top_ctfidf)
 
-# Création du tableau au format adapté pour les graphiques TS
-
-file_index = 0
+# Create tables in a format adapted to Time Series
 """
 party_day_count is a list with the following structure:
 [
@@ -208,36 +189,9 @@ party_day_count is a list with the following structure:
     ...
 ]
 """
-doc_count, party, day = party_day_counts[file_index]
 
-
-topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-for i, topic in enumerate(topics):
-    while i >= doc_count:
-        file_index += 1
-
-        doc_count, party, day = party_day_counts[file_index]
-
-    topics_info[topic][party][day] += 1
+topics_info = count_topics_info(topics, party_day_counts, 'deputes')
 
 # Open one CSV file per topic
-for topic, info in topics_info.items():
-    with open(
-        os.path.join(
-            args.output_folder_TS,
-            "bertopic_ts_{}_deputes.csv".format(topic),
-        ),
-        "w",
-    ) as f:
-        writer = csv.writer(f)
-        writer.writerow(["date", "party", "prop"])
-        previous_doc_count = 0
-        for doc_count, party, day in party_day_counts:
-            writer.writerow(
-                [
-                    day,
-                    party,
-                    round(info[party][day] / (doc_count - previous_doc_count), 5),
-                ]
-            )
-            previous_doc_count = doc_count
+
+write_bertopic_TS(topics_info, 'deputes', party_day_counts)

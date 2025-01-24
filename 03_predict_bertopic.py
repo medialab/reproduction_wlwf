@@ -1,24 +1,19 @@
 import os
-import json
-import csv
-import random
 import argparse
-from collections import defaultdict
+import pandas as pd
 
 from bertopic import BERTopic
-import bertopic._save_utils as save_utils
 import numpy as np
 
 from utils import (
-    count_nb_files,
-    create_dir,
     existing_dir_path,
-    vectorizer,
-    preprocess,
-    load_embeddings,
+    count_nb_files,
+    load_docs_embeddings,
+    count_topics_info,
+    write_bertopic_TS, 
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
-    RANDOM_SEED,
+    NB_DOCS_SMALL_SCRIPT03,
 )
 
 parser = argparse.ArgumentParser()
@@ -39,7 +34,7 @@ parser.add_argument(
 
 parser.add_argument(
     "output_folder",
-    help="Path to a folder that will be created and contain the time series data after prediction",
+    help="Path to a folder that will be used to contain the time series data after prediction",
     type=existing_dir_path, #We want to put TS in the same folder than Times Series from script 02 
 )
 
@@ -51,7 +46,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--small",
-    help=("run the script on one week of data"),
+    help=("run the script on a reduced number of tweets fixed in utils by NB_DOCS_SMALL03 variable"),
     action="store_true",
 )
 args = parser.parse_args()
@@ -62,117 +57,35 @@ embeddings_path = os.path.join(
 
 party_day_counts = []
 
-docs = np.array(
-    [
-        doc 
-        for doc in preprocess(
-            args.input_path,
-            count_nb_files(args.input_path),
-            party_day_counts=party_day_counts,
-            apply_unidecode=True,
-            small = args.small
-        )
-    ]
-)
-
-max_index, embeddings = load_embeddings(
+docs, max_index, embeddings = load_docs_embeddings(
+    args.input_path, 
+    count_nb_files(args.input_path),
     embeddings_path,
     args.save_size,
-    docs.shape[0], 
-    small=args.small
-)
+    party_day_counts=party_day_counts,
+    apply_unidecode=True,
+    small=args.small,
+    small_size= NB_DOCS_SMALL_SCRIPT03, 
+    )
 
-print(f"Predict model from _{args.model_path}")
+
+print(f"Predict model from {args.model_path}")
 
 topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
 topics, probs = topic_model.transform(docs, embeddings)
 
-# Get infos about topic
-topic_info = topic_model.get_topic_info()
-#We add a code to determine a representative document (the most probable one related to the considered topic)
+# Get infos about topic, and extract documents in another way. Warning : the 4 following lines change the topic names and representations. 
+documents_df = pd.DataFrame({"Document": docs, "ID": range(len(docs)), "Topic": topics, "Image": None})
+topic_model._extract_topics(documents_df, embeddings=embeddings, verbose=True)
+topic_model._save_representative_docs(documents_df)
+topic_model.get_representative_docs()
 
-for topic in topic_info['Topic']: 
-    topic_docs_indices = [i for i, t in enumerate(topics) if t == topic] #Collection of the document associated to a topic
-    topic_probs = [probs[i][topic] for i in topic_docs_indices] #Collection of associated probabilities
-    #Take the max value of probability 
-    if topic_probs != []:
-        max_prob_index = topic_docs_indices[np.argmax(topic_probs)]
-        representative_doc = docs[max_prob_index]
-    else:
-        representative_doc = None
-    
-    topic_info.loc[topic_info['Topic'] == topic, 'Representative_Docs'] = representative_doc #Update Representative_Docs column according to this most probable tweet
-
-print(topic_info)
+print(topic_model.get_topic_info())
 
 #Time Series Results 
-file_index = 0
+last_part = os.path.basename(args.embeddings_folder.rstrip('/')) #Give the group category 
 
-last_part = os.path.basename(args.embeddings_folder.rstrip('/'))
+topics_info = count_topics_info(topics, party_day_counts, last_part, topic_model.topics_)
 
-topics_unique = sorted(set(topic_model.topics_))
-not_mentionned_topics = [topic for topic in topics_unique if topic not in topics]
-
-if last_part=='supporters_public':
-    doc_count, party, day = party_day_counts[file_index]
-    topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-    for i, topic in enumerate(topics):
-        while i >= doc_count:
-            file_index += 1
-
-            doc_count, party, day = party_day_counts[file_index]
-
-        topics_info[topic][party][day] += 1
-
-else:
-    doc_count, day = party_day_counts[file_index]
-    topics_info = defaultdict(lambda: defaultdict(int))
-    for i, topic in enumerate(topics):
-        doc_index = i
-
-        while doc_index >= doc_count:
-            file_index += 1
-
-            doc_count, day = party_day_counts[file_index]
-
-        topics_info[topic][day] += 1
-
-#Create keys in the dictionnary also for topics that were not mentionned in the group
-for topic in not_mentionned_topics:
-    if last_part=='supporters_public':
-        topics_info[topic][party][day] = 0
-    else:
-        topics_info[topic][day] =0
-        
-for topic, info in topics_info.items():
-    with open(
-    os.path.join(
-        args.output_folder,
-        f"bertopic_ts_{topic}_{last_part}.csv", 
-    ),
-    "w",
-    ) as f:
-        writer = csv.writer(f)
-        writer.writerow(["date", "party", "prop"])
-        previous_doc_count = 0
-        if last_part=='supporters_public':
-            for doc_count, party, day in party_day_counts:
-                writer.writerow(
-                    [
-                        day,
-                        f'{party}_supp',
-                        round(info[party][day] / (doc_count - previous_doc_count), 5),
-                    ]
-                )
-                previous_doc_count = doc_count
-        else: 
-            for doc_count, day in party_day_counts:
-                writer.writerow(
-                    [
-                        day,
-                        last_part,
-                        round(info[day] / (doc_count - previous_doc_count), 5),
-                    ]
-                )
-                previous_doc_count = doc_count
+write_bertopic_TS(topics_info, last_part, party_day_counts)
