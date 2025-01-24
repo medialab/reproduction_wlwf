@@ -22,7 +22,10 @@ EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
-NB_DOCS_SMALL = 1000 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
+
+# Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
+NB_DOCS_SMALL = 1000
+
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"
@@ -490,6 +493,10 @@ def count_nb_files(folder):
     return count
 
 
+def format_npz_output(save_path, size):
+    return save_path.replace(".npz", "_" + str(size) + ".npz")
+
+
 def grep_group_name(filename):
     # We search for 'LREM' before searching for 'LR'
     for group in GROUPS:
@@ -543,7 +550,7 @@ def preprocess(
     party_day_counts=None,
     apply_unidecode=False,
     write_files=False,
-    small=False
+    small=False,
 ):
     counter_all = 0
     counter_original = 0
@@ -641,6 +648,8 @@ def preprocess(
                     if write_files:
                         row[text_pos] = doc
                         enricher.writerow(row, [is_thread, group_name])
+                    if small and counter_threads >= NB_DOCS_SMALL:
+                        break
                     counter_threads += 1
                     yield doc
         if party_day_counts is not None:
@@ -663,21 +672,25 @@ def preprocess(
     )
 
 
-def load_embeddings(path, save_size, nb_docs, resume_encoding=False):
+def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False):
     max_index = 0
     embeddings = (
         np.empty((save_size, EMB_DIMENSION))
         if resume_encoding
         else np.empty((nb_docs, EMB_DIMENSION))
     )
+
+    if small:
+        # In the --small case, return only the first npz file
+        file = format_npz_output(path, save_size)
+        return None, np.load(file)["embeddings"][:nb_docs]
+
     for file in glob.glob(path.replace(".npz", "_*")):
         index = int(file[len(path) - 3 : -len(".npz")])
         if index > max_index:
             max_index = index
 
         if not resume_encoding:
-            if index == save_size and nb_docs < save_size: # deal with --small case
-                return None, np.load(file)["embeddings"][:nb_docs]
             if index % save_size == 0:
                 embeddings[index - save_size : index] = np.load(file)["embeddings"]
             else:
