@@ -26,8 +26,8 @@ DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
-NB_DOCS_SMALL = 1000 #Choose a small number to have a fast computation
-NB_DOCS_SMALL_SCRIPT03 = 90000 #You need a larger one in script 03 to have various days in your small version
+NB_DOCS_SMALL_SCRIPT02 = 1000  # Choose a small number to have a fast computation
+NB_DOCS_SMALL_SCRIPT03 = 90000  # You need a larger one in script 03 to have various days in your small version
 
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
@@ -538,6 +538,7 @@ def iter_on_files(root, nb_files):
         )
     return tar, loop, compressed
 
+
 def preprocess(
     root,
     nb_files,
@@ -545,7 +546,7 @@ def preprocess(
     apply_unidecode=False,
     write_files=False,
     small=False,
-    small_size = NB_DOCS_SMALL,
+    small_size=NB_DOCS_SMALL_SCRIPT02,
 ):
     counter_all = 0
     counter_original = 0
@@ -653,7 +654,7 @@ def preprocess(
         if party_day_counts is not None:
             if group_name != "":
                 party_day_counts.append((counter_threads, group_name, file_date))
-            else: 
+            else:
                 party_day_counts.append((counter_threads, file_date))
 
         if write_files:
@@ -720,30 +721,30 @@ vectorizer = CountVectorizer(
     min_df=10,
 )
 
+
 def load_docs_embeddings(
-    root_doc,   
+    root_doc,
     nb_files,
-    path_embed, 
-    save_size, 
+    path_embed,
+    save_size,
     party_day_counts=None,
     apply_unidecode=False,
     write_files=False,
     small=False,
-    small_size = NB_DOCS_SMALL,
+    small_size=NB_DOCS_SMALL_SCRIPT02,
     resume_encoding=False,
 ):
-
     docs = np.array(
         [
-            doc 
+            doc
             for doc in preprocess(
                 root_doc,
                 nb_files,
                 party_day_counts,
                 apply_unidecode,
                 write_files,
-                small, 
-                small_size, 
+                small,
+                small_size,
             )
         ]
     )
@@ -758,9 +759,22 @@ def load_docs_embeddings(
 
     return docs, max_index, embeddings
 
+
 def count_topics_info(topics, party_day_counts, group_type, topic_base=None):
     file_index = 0
-    if group_type=='supporters_public' or group_type=='deputes':
+
+    """
+    party_day_count is a list with the following structure:
+    [
+        (29, 'lr', '2022-06-20'),
+        (46, 'lr', '2022-06-21'),
+        (83, 'lr', '2022-06-22'),
+        (117, 'lr', '2022-06-23'),
+        ...
+    ]
+    """
+
+    if group_type == "supporters_public" or group_type == "deputes":
         doc_count, party, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         for i, topic in enumerate(topics):
@@ -784,42 +798,47 @@ def count_topics_info(topics, party_day_counts, group_type, topic_base=None):
 
             topics_info[topic][day] += 1
 
-    if group_type!=('deputes'):
+    if group_type != ("deputes"):
         topics_unique = sorted(set(topic_base))
         for topic in topics_unique:
-            if group_type=='supporters_public':
-                topics_info[topic][party][day] = topics_info[topic][party][day] 
+            if group_type == "supporters_public":
+                topics_info[topic][party][day] = topics_info[topic][party][day]
             else:
-                topics_info[topic][day] = topics_info[topic][day] 
+                topics_info[topic][day] = topics_info[topic][day]
 
     return topics_info
+
 
 def write_bertopic_TS(topics_info, group_type, party_day_counts):
     for topic, info in topics_info.items():
         with open(
-        os.path.join(
-            "data_prod",
-            "dashboard", 
-            "bertopic",
-            "data", 
-            f"bertopic_ts_{topic}_{group_type}.csv", 
-        ),
-        "w",
+            os.path.join(
+                "data_prod",
+                "dashboard",
+                "bertopic",
+                "data",
+                f"bertopic_ts_{topic}_{group_type}.csv",
+            ),
+            "w",
         ) as f:
             writer = csv.writer(f)
             writer.writerow(["date", "party", "prop"])
             previous_doc_count = 0
-            if group_type=='supporters_public' or group_type=='deputes':
+            if group_type == "supporters_public" or group_type == "deputes":
                 for doc_count, party, day in party_day_counts:
                     writer.writerow(
                         [
                             day,
-                            f'{party}_supp' if group_type=='supporters_public' else party,
-                            round(info[party][day] / (doc_count - previous_doc_count), 5),
+                            f"{party}_supp"
+                            if group_type == "supporters_public"
+                            else party,
+                            round(
+                                info[party][day] / (doc_count - previous_doc_count), 5
+                            ),
                         ]
-                    )   
+                    )
                     previous_doc_count = doc_count
-            else: 
+            else:
                 for doc_count, day in party_day_counts:
                     writer.writerow(
                         [

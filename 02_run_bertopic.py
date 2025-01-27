@@ -20,7 +20,7 @@ from utils import (
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
-    NB_DOCS_SMALL,
+    NB_DOCS_SMALL_SCRIPT02,
 )
 
 parser = argparse.ArgumentParser()
@@ -31,14 +31,13 @@ parser.add_argument(
 )
 parser.add_argument(
     "embeddings_folder",
-    help="Path to a folder containing .npz embeddings. It is the cd  arg in 01_encode_with_sbert.py",
+    help="Path to a folder containing .npz embeddings. It is the output_folder arg in 01_encode_with_sbert.py",
 )
 parser.add_argument(
     "output_folder",
     help="Path to a folder that will be created and contain the BERTopic model",
     type=create_dir,
 )
-
 parser.add_argument(
     "--save-size",
     help="Size of saved files (in embeddings_folder) in number of vectors",
@@ -47,7 +46,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "--small",
-    help=("run the script on a reduced number of tweets fixed in utils by NB_DOCS_SMALL variable"),
+    help=(
+        "run the script on a reduced number of tweets fixed in utils.py by NB_DOCS_SMALL_SCRIPT02 variable"
+    ),
     action="store_true",
 )
 args = parser.parse_args()
@@ -56,10 +57,10 @@ embeddings_path = os.path.join(
     args.embeddings_folder, "{}.npz".format(sbert_name_string)
 )
 
-if args.small and DEFAULT_SAVE_SIZE < NB_DOCS_SMALL:
+if args.small and DEFAULT_SAVE_SIZE < NB_DOCS_SMALL_SCRIPT02:
     print(
-        """Please change value of DEFAULT_SAVE_SIZE or NB_DOCS_SMALL in file utils.py.
-        DEFAULT_SAVE_SIZE should be greater than NB_DOCS_SMALL"""
+        """Please change value of DEFAULT_SAVE_SIZE or NB_DOCS_SMALL_SCRIPT02 in file utils.py.
+        DEFAULT_SAVE_SIZE should be greater than NB_DOCS_SMALL_SCRIPT02"""
     )
     sys.exit(1)
 
@@ -136,14 +137,14 @@ save_utils.save_ctfidf_config = save_ctfidf_config
 party_day_counts = []
 
 docs, max_index, embeddings = load_docs_embeddings(
-    args.input_path, 
+    args.input_path,
     count_nb_files(args.input_path),
     embeddings_path,
     args.save_size,
     party_day_counts=party_day_counts,
     apply_unidecode=True,
     small=args.small,
-    )
+)
 
 print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
 topics, probs = topic_model.fit_transform(docs, embeddings)
@@ -179,19 +180,9 @@ for i, row in topic_model.get_topic_info().iterrows():
     draw_topic_keywords(topic, top_words, top_ctfidf)
 
 # Create tables in a format adapted to Time Series
-"""
-party_day_count is a list with the following structure:
-[
-    (29, 'lr', '2022-06-20'),
-    (46, 'lr', '2022-06-21'),
-    (83, 'lr', '2022-06-22'),
-    (117, 'lr', '2022-06-23'),
-    ...
-]
-"""
 
-topics_info = count_topics_info(topics, party_day_counts, 'deputes')
+topics_info = count_topics_info(topics, party_day_counts, "deputes")
 
 # Open one CSV file per topic
 
-write_bertopic_TS(topics_info, 'deputes', party_day_counts)
+write_bertopic_TS(topics_info, "deputes", party_day_counts)
