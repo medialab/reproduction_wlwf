@@ -37,11 +37,6 @@ ui <- fluidPage(
                              #brush = brushOpts("plot_brush"),
                              )),
         column(4, imageOutput("topwords_image"))
-      #,
-      # fluidRow(
-      #   h3("Tweets Représentatifs"),
-      #   uiOutput("tweets_mostrep")
-      # )
     ),
  fluidRow(
     checkboxGroupInput("acteurs", "Afficher :",
