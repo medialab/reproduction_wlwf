@@ -555,6 +555,7 @@ def preprocess(
     tar, loop, compressed = iter_on_files(root, nb_files)
     empty_warn = []
     for file in loop:
+        counter_line = 0
         if compressed:
             filename = file.name
         else:
@@ -586,6 +587,7 @@ def preprocess(
         to_id_pos = reader.headers.to_tweetid
 
         for row in reader:
+            counter_line +=1
             counter_all += 1
             if not row[rt_pos]:
                 counter_original += 1
@@ -653,9 +655,9 @@ def preprocess(
                     yield doc
         if party_day_counts is not None:
             if group_name != "":
-                party_day_counts.append((counter_threads, group_name, file_date))
+                party_day_counts.append((counter_line, group_name, file_date))
             else:
-                party_day_counts.append((counter_threads, file_date))
+                party_day_counts.append((counter_line, file_date))
 
         if write_files:
             output_file.close()
@@ -760,8 +762,9 @@ def load_docs_embeddings(
     return docs, max_index, embeddings
 
 
-def count_topics_info(topics, party_day_counts, group_type, topic_base=None):
+def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
     file_index = 0
+    count_index = 0
 
     """
     party_day_count is a list with the following structure:
@@ -778,33 +781,38 @@ def count_topics_info(topics, party_day_counts, group_type, topic_base=None):
         doc_count, party, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         for i, topic in enumerate(topics):
-            while i >= doc_count:
-                file_index += 1
-
-                doc_count, party, day = party_day_counts[file_index]
+            while i >= count_index:
+                 doc_count, party, day = party_day_counts[file_index]
+                 file_index += 1
+                 count_index += + doc_count
 
             topics_info[topic][party][day] += 1
+
+            for party in set([p[1] for p in party_day_counts]):
+                for day in set([p[2] for p in party_day_counts]):
+                    topics_info[topic][party][day] = topics_info[topic][party][day]
 
     else:
         doc_count, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(int))
         for i, topic in enumerate(topics):
-            doc_index = i
-
-            while doc_index >= doc_count:
-                file_index += 1
-
+            while i >= count_index:
                 doc_count, day = party_day_counts[file_index]
+                file_index += 1
+                count_index += doc_count
 
             topics_info[topic][day] += 1
-
-    if group_type != ("deputes"):
-        topics_unique = sorted(set(topic_base))
-        for topic in topics_unique:
-            if group_type == "supporters_public":
-                topics_info[topic][party][day] = topics_info[topic][party][day]
-            else:
-                topics_info[topic][day] = topics_info[topic][day]
+            
+    if topics_base != None:
+        if group_type == "supporters_public": 
+            for topic in sorted(set(topics_base)):
+                for party in set([p[1] for p in party_day_counts]):
+                    for day in set([p[2] for p in party_day_counts]):
+                        topics_info[topic][party][day] = topics_info[topic][party][day]
+        else:
+            for topic in sorted(set(topics_base)):
+                for day in set([p[1] for p in party_day_counts]):
+                    topics_info[topic][day] = topics_info[topic][day]
 
     return topics_info
 
@@ -817,13 +825,13 @@ def write_bertopic_TS(topics_info, group_type, party_day_counts):
                 "dashboard",
                 "bertopic",
                 "data",
-                f"bertopic_ts_{topic}_{group_type}.csv",
+                f"bertopic_ts_{topic}.csv",
             ),
-            "w",
+            "w" if group_type == 'deputes' else "a",
         ) as f:
             writer = csv.writer(f)
-            writer.writerow(["date", "party", "prop"])
-            previous_doc_count = 0
+            if group_type == 'deputes':
+                writer.writerow(["date", "party", "topic", "prop"]) 
             if group_type == "supporters_public" or group_type == "deputes":
                 for doc_count, party, day in party_day_counts:
                     writer.writerow(
@@ -832,19 +840,19 @@ def write_bertopic_TS(topics_info, group_type, party_day_counts):
                             f"{party}_supp"
                             if group_type == "supporters_public"
                             else party,
+                            topic,
                             round(
-                                info[party][day] / (doc_count - previous_doc_count), 5
+                                info[party][day] / (doc_count), 5
                             ),
                         ]
                     )
-                    previous_doc_count = doc_count
             else:
                 for doc_count, day in party_day_counts:
                     writer.writerow(
                         [
                             day,
                             group_type,
-                            round(info[day] / (doc_count - previous_doc_count), 5),
+                            topic, 
+                            round(info[day] / (doc_count), 5),
                         ]
                     )
-                    previous_doc_count = doc_count
