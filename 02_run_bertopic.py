@@ -9,7 +9,7 @@ from umap import UMAP
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
-import pandas as pd
+#import pandas as pd (put in comment because pandas part code is currently in comments)
 
 from utils import (
     count_nb_files,
@@ -42,6 +42,15 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--group",
+    help=(
+        "List the groups you want to compute in the following format : group1,group2,group3. Choose group names in the following terms : congress, general_public, attentive_public, supporters_public, medias"
+    ), 
+    default='congress,general_public,attentive_public,supporters_public,medias', 
+)
+
+
+parser.add_argument(
     "--save-size",
     help="Size of saved files (in embeddings_folder) in number of vectors",
     type=int,
@@ -55,38 +64,23 @@ parser.add_argument(
     action="store_true",
 )
 
-parser.add_argument(
-    "--infer",
-    help=(
-        "Run only prediction. You need to have trained model ready to choose this option."
-    ),
-    action="store_true",
-)
-
-parser.add_argument(
-    "--predict",
-    help=(
-        "Run train and prediction"
-    ),
-    action="store_true",
-)
-
-'''
-
-'''
-
 
 args = parser.parse_args()
 
-if args.justpredict and args.predict:
-    raise ValueError("Choose between predict and justpredict option. Predict will run the traning part of the script, justpredict skip the training part and take a trained model")
+group_list = args.group.split(",")
+group_list = set(group_list)
+normal_elem = ['congress', 'general_public', 'attentive_public', 'supporters_public', 'medias']
+
+for elem in group_list:
+    if elem not in normal_elem:
+        raise ValueError('You used an innacurate name of group in your group argument. Choose group names in the following terms : congress, general_public, attentive_public, supporters_public, medias')
 
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-if not args.justpredict:
-    input_path = os.path.join(args.origin_path, "data_source/selected_deputesXVI/")
+if 'congress' in group_list:
+    input_path = os.path.join(args.origin_path, "data_source/congress/")
     embeddings_path = os.path.join(args.origin_path,
-        "data_prod/embeddings/deputes/", "{}.npz".format(sbert_name_string)
+        "data_prod/embeddings/congress/", "{}.npz".format(sbert_name_string)
     )
 
     if args.small and DEFAULT_SAVE_SIZE < NB_DOCS_SMALL_SCRIPT02:
@@ -213,25 +207,38 @@ if not args.justpredict:
 
     # Create tables in a format adapted to Time Series
 
-    topics_info = count_topics_info(topics, party_day_counts, "deputes")
+    topics_info = count_topics_info(topics, party_day_counts, "congress")
     party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
 
-    # Open one CSV file per topic for deputes
+    # Open one CSV file per topic for congress
 
-    write_bertopic_TS(topics_info, "deputes", party_day_counts)
+    write_bertopic_TS(topics_info, "congress", party_day_counts)
 
-if args.justpredict or args.predict:
+    normal_elem.remove('congress')
+    group_list.remove('congress')
+
+else:
+    if os.listdir(args.model_path)==[]:
+        raise ValueError('Not trained model was found in the model path directory')
+
+infer = False
+
+for elem in group_list:
+    if elem in normal_elem:
+        infer = True
+
+if infer==True:
     if args.small:
         model_path = os.path.join(args.model_path, "_small/")
         topic_model = BERTopic.load(model_path, embedding_model = SBERT_NAME) 
     else:
         topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
-    for input_files, group_type in zip(['attentive_public_nort', 'general_public_clean', 'media_IPG', 'supporters_public'] ,['attentive_public', 'general_public', 'medias', 'supporters_public']): 
-        input_path = os.path.join(args.origin_path, f"data_source/{input_files}/")
+    for group in group_list:
+        input_path = os.path.join(args.origin_path, f"data_source/{group}/")
         
         embeddings_path = os.path.join(args.origin_path, 
-        f"data_prod/embeddings/{group_type}/", "{}.npz".format(sbert_name_string)
+        f"data_prod/embeddings/{group}/", "{}.npz".format(sbert_name_string)
         )
         
         party_day_counts = []
@@ -249,17 +256,21 @@ if args.justpredict or args.predict:
             
         print(f"Predict model from {model_path}")
         topics, probs = topic_model.transform(docs, embeddings)
+
+        print(topic_model.get_topic_info())
+
+        #Time Series Results 
+        topics_info = count_topics_info(topics, party_day_counts, group, topic_model.topics_)
+
+        #Complet TS data base with the new counts : 
+        write_bertopic_TS(topics_info, group, party_day_counts)
 '''
+To add representative docs 
+
         # Get infos about topic, and extract documents in another way. Warning : the 4 following lines change the topic names and representations. 
         documents_df = pd.DataFrame({"Document": docs, "ID": range(len(docs)), "Topic": topics, "Image": None})
         topic_model._extract_topics(documents_df, embeddings=embeddings, verbose=True)
         topic_model._save_representative_docs(documents_df)
         topic_model.get_representative_docs()
 '''
-        print(topic_model.get_topic_info())
-
-        #Time Series Results 
-        topics_info = count_topics_info(topics, party_day_counts, group_type, topic_model.topics_)
-
-        #Complet TS data base with the new counts : 
-        write_bertopic_TS(topics_info, group_type, party_day_counts)
+        
