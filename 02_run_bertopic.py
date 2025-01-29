@@ -35,7 +35,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "origin_path",
+    "--origin_path",
     help="Path to an origin of your code",
     type=existing_dir_path,
     default=os.getcwd(), 
@@ -232,6 +232,7 @@ if infer==True:
         model_path = os.path.join(args.model_path, "_small/")
         topic_model = BERTopic.load(model_path, embedding_model = SBERT_NAME) 
     else:
+        model_path = args.model_path
         topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
 
     for group in group_list:
