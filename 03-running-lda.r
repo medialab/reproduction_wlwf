@@ -13,13 +13,19 @@
 #  Data Out:
 #           LDA output
 #===============================================================================
-# PACKAGES
+# PACKAGES AND PERSONNAL FUNCTIONS
 #===============================================================================
 library(slam)
 library(Matrix)
 library(tm)
 library(topicmodels)
 
+ check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
+   if (nrow(mat) != expected_rows | ncol(mat) != expected_cols) {
+     stop(sprintf("La matrice a des dimensions incorrectes : attendu %d lignes et %d colonnes, mais obtenu %d lignes et %d colonnes.",
+                  expected_rows, expected_cols, nrow(mat), ncol(mat)))
+   }
+ }
 #===============================================================================
 # DATA
 #===============================================================================
@@ -55,7 +61,9 @@ lda.fit <- LDA(dtm, k=100, method="Gibbs",
     	control=list(verbose=50L, iter=2000))
 
 save(lda.fit, file="data_prod/topics/lda_results-twokenizer.Rdata")
-}
+} else{
+   cat("results file from the lda run on deputies already present. Not running again")
+ }
 
 #===============================================================================
 # OTHER GROUPS
@@ -81,7 +89,8 @@ X <- sparseMatrix(j=ind,
                   p=pointers,
                   x=values,
 	dims=c(nb_fls,
-	  length(words)), index1=FALSE)
+	  length(words)), 
+	index1=FALSE)
 
 dimnames(X)[[2]] <- words
 #
@@ -109,7 +118,9 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 }
 
 # saving output
-save(results, file='data_prod/topics/lda-output/lda-media-results.Rdata')
+save(results, file = 'data_prod/topics/lda-output/lda-media-results.Rdata')
+} else{
+  cat("results file from lda applied to media documents already present. Not running again. \n")
 }
 
 # ########################################
@@ -124,11 +135,24 @@ ind <- scan("data_prod/dfm/media-rs-dtm-indices.txt")
 pointers <- scan("data_prod/dfm/media-rs-dtm-pointers.txt")
 values <- scan("data_prod/dfm/media-rs-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
+
 tweets <- read.csv("data_prod/dfm/media-rs-tweet-list.csv", stringsAsFactors=F, colClasses="character")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
-    dims=c(nrow(tweets), length(words)), index1=FALSE)
+                  repr = "R",
+                  # prefixing dims produce a (mysterious) error. It is now directly inferred from j, p and x.
+    dims=c(
+      nrow(tweets),
+      length(words)
+      ),
+    index1=FALSE)
 dimnames(X)[[2]] <- words
+
+# check matrix dimension
+X |> check_matrix_dimensions(expected_rows =  nrow(tweets),
+                            expected_cols = length(words)
+                            )
+# an error occurred probably due to  floating number : see nrow(X) == nrow(tweets) and all.equal(nrow(X), 10000)
 
 # deleting empty rows
 todelete <- which(rowSums(X)==0)
@@ -153,6 +177,8 @@ if (!dir.exists("data_prod/topics/lda-output")) {
              recursive = TRUE)
 }
 save(results, file='data_prod/topics/lda-output/lda-media-rs-results.Rdata')
+} else{
+  cat("results file from lda applied to the random sample of media tweets already present. Not running again. \n")
 }
 #
 # #################################
@@ -168,11 +194,19 @@ ind <- scan("data_prod/dfm/congress-rs-dtm-indices.txt")
 pointers <- scan("data_prod/dfm/congress-rs-dtm-pointers.txt")
 values <- scan("data_prod/dfm/congress-rs-dtm-values.txt")
 words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
-tweets <- read.csv("data_prod/dfm/congress-rs-tweet-list.csv", stringsAsFactors=F, colClasses="character")
+tweets <- read.csv("data_prod/dfm/congress-rs-tweet-list.csv", stringsAsFactors=F, colClasses="character"
+                   )
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
-	dims=c(nrow(tweets), length(words)), index1=FALSE)
+                  # the dims are directly inferred to avoid a so-far unexplained error
+	dims=c(nrow(tweets), length(words)), 
+	index1=FALSE)
 dimnames(X)[[2]] <- words
+
+# check the dimensions of the matrix
+X |> check_matrix_dimensions(expected_rows =  nrow(tweets),
+                             expected_cols = length(words)
+)
 
 # deleting empty rows
 todelete <- which(rowSums(X)==0)
@@ -198,6 +232,8 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 }
 
 save(results, file='data_prod/topics/lda-output/lda-rs-results.Rdata')
+} else{
+  cat("results file from lda applied to media tweets sample already present. Not running again. \n")
 }
 
 # ########################
@@ -265,7 +301,8 @@ users <- scan("data_prod/dfm/supporter-day-party-list.txt", what='character')
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
 	dims=c(nb_fls,
-	       length(words)), index1=FALSE)
+	       length(words)), 
+	index1=FALSE)
 
 dimnames(X)[[2]] <- words
 
@@ -300,6 +337,8 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 }
 
 save(results, file='data_prod/topics/lda-output/lda-lr_supporters-results.Rdata')
+} else{
+  cat("results file from lda applied to LR supporters' documents already present. Not running again. \n")
 }
 #
 # # #################
@@ -322,6 +361,8 @@ if (!dir.exists("data_prod/topics/lda-output")) {
              recursive = TRUE)
 }
 save(results, file='data_prod/topics/lda-output/lda-majority_supporters-results.Rdata')
+} else{
+  cat("results file from lda applied to majority supporters' documents already present. Not running again. \n")
 }
 #
 # # #################
@@ -345,6 +386,8 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 }
 
 save(results, file='data_prod/topics/lda-output/lda-nupes_supporters-results.Rdata')
+} else{
+  cat("results file from lda applied to NUPES supporters' documents already present. Not running again. \n")
 }
 
 # # #################
@@ -367,7 +410,10 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 }
 
 save(results, file='data_prod/topics/lda-output/lda-rn_supporters-results.Rdata')
+} else{
+  cat("results file from lda applied to RN supporters' documents already present. Not running again. \n")
 }
+ 
 # #################################
 # #### GENERAL PUBLIC            ####
 # #################################
@@ -411,6 +457,8 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 }
 
 save(results, file='data_prod/topics/lda-output/lda-general-results.Rdata')
+} else{
+  cat("results file from lda applied to general public's documents already present. Not running again. \n")
 }
 
 # #################################
@@ -457,4 +505,6 @@ if (!dir.exists("data_prod/topics/lda-output")) {
 
 save(results, file='data_prod/topics/lda-output/lda-attentive-results.Rdata')
 
+} else{
+  cat("results file from lda applied to attentive public's documents already present. Not running again. \n")
 }
