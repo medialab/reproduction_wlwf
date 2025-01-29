@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import argparse
+import pandas as pd
 from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
 from umap import UMAP
@@ -13,12 +14,14 @@ import numpy as np
 from utils import (
     choices,
     count_nb_files,
+    count_topics_info,
     create_dir,
     existing_dir_path,
-    vectorizer,
+    extract_representative_docs,
     load_docs_embeddings,
-    count_topics_info,
+    vectorizer,
     write_bertopic_TS,
+    write_representative_docs,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
@@ -207,6 +210,11 @@ if "congress" in group_list:
     )
     topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
 
+    repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
+
+    # Write representative docs for one public in one file
+    write_representative_docs(repr_docs_ids, party_day_counts, "congress")
+
     print(topic_model.get_topic_info())
     topic_ids_list = []
     for i, row in topic_model.get_topic_info().iterrows():
@@ -261,6 +269,11 @@ if group_list & set(choices):
         print(f"Predict model from {model_path}")
         topics, probs = topic_model.transform(docs, embeddings)
 
+        repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
+
+        # Write representative docs for one public in one file
+        write_representative_docs(repr_docs_ids, party_day_counts, group)
+
         print(topic_model.get_topic_info())
 
         # Time Series Results
@@ -272,12 +285,3 @@ if group_list & set(choices):
         write_bertopic_TS(
             topic_ids_list, topics_info, group, party_day_counts, args.origin_path
         )
-"""
-To add representative docs
-
-        # Get infos about topic, and extract documents in another way. Warning : the 4 following lines change the topic names and representations.
-        documents_df = pd.DataFrame({"Document": docs, "ID": range(len(docs)), "Topic": topics, "Image": None})
-        topic_model._extract_topics(documents_df, embeddings=embeddings, verbose=True)
-        topic_model._save_representative_docs(documents_df)
-        topic_model.get_representative_docs()
-"""
