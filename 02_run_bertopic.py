@@ -44,9 +44,9 @@ parser.add_argument(
 parser.add_argument(
     "--group",
     help=(
-        "List the groups you want to compute in the following format : group1,group2,group3. Choose group names in the following terms : congress, general_public, attentive_public, supporters_public, medias"
+        "List the groups you want to compute in the following format : group1,group2,group3. Choose group names in the following terms : congress, general, attentive, supporters, media"
     ), 
-    default='congress,general_public,attentive_public,supporters_public,medias', 
+    default='congress,general,attentive,supporters,media', 
 )
 
 
@@ -69,11 +69,11 @@ args = parser.parse_args()
 
 group_list = args.group.split(",")
 group_list = set(group_list)
-normal_elem = ['congress', 'general_public', 'attentive_public', 'supporters_public', 'medias']
+normal_elem = ['congress', 'general', 'attentive', 'supporters', 'media']
 
 for elem in group_list:
     if elem not in normal_elem:
-        raise ValueError('You used an innacurate name of group in your group argument. Choose group names in the following terms : congress, general_public, attentive_public, supporters_public, medias')
+        raise ValueError('You used an innacurate name of group in your group argument. Choose group names in the following terms : congress, general, attentive, supporters, media')
 
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
@@ -177,9 +177,9 @@ if 'congress' in group_list:
     print(topic_model.get_topic_info())
 
     if args.small:
-        output_folder = os.path.join(args.model_path, "_small")
+        output_folder = create_dir(os.path.join(args.model_path, "_small"))
     else:
-        output_folder = args.model_path
+        output_folder = create_dir(args.model_path)
 
     topic_model.save(
         output_folder,

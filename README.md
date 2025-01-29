@@ -10,9 +10,10 @@ cd reproduction_wlwf
 pip install -r requirements.txt
 ```
 ## Format your data in the following trees
+These folders have to be put in a data_source folder in your actual repository.
 
 ```
-deputes
+congress
 ├── lr
 │   ├── 2022-06-20.csv
 │   ├── 2022-06-21.csv
@@ -86,5 +87,15 @@ Etc.
 
 ## Encoding with Sentence-BERT
 ```bash
-python 01_encode_with_sbert.py data_source/tweets_from_deputes data_prod/embeddings/deputes/
+python 01_encode_with_sbert.py group --origin_path
 ```
+With a group in the following categories : congress, attentive, media, supporters, general. 
+--origin_path is by default your current repository, but you can also select another origin to your file tree, as long as the targeted origin allows a file structure that conforms to this repository.
+
+## Run BERTopic model 
+```bash
+python 02_run_bertopic.py model_path --origin_path --group 
+```
+With model_path as a directory where you want to find or export your trained BERTopic model. 
+--origin_path has the same function as in 01_encode_with_sbert.py script. Be careful to keep the same origin-path between the two scripts. 
+--group allows choosing the group(s) you want to use to run the model (by default, all groups are included). You can write a group between : congress, attentive, media, supporters, general. You can write several groups by separating them by a comma (for example: python 02_run_bertopic.py model_path congress,media). Be careful to include congress if you haven't used the script before (otherwise, you won't have a trained model).

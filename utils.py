@@ -777,7 +777,7 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
     ]
     """
 
-    if group_type == "supporters_public" or group_type == "congress":
+    if group_type == "supporters" or group_type == "congress":
         doc_count, party, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         for i, topic in enumerate(topics):
@@ -804,7 +804,7 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
             topics_info[topic][day] += 1
             
     if topics_base != None:
-        if group_type == "supporters_public": 
+        if group_type == "supporters": 
             for topic in sorted(set(topics_base)):
                 for party in set([p[1] for p in party_day_counts]):
                     for day in set([p[2] for p in party_day_counts]):
@@ -832,13 +832,13 @@ def write_bertopic_TS(topics_info, group_type, party_day_counts, origin_path):
             writer = csv.writer(f)
             if group_type == 'congress':
                 writer.writerow(["date", "party", "topic", "prop"]) 
-            if group_type == "supporters_public" or group_type == "congress":
+            if group_type == "supporters" or group_type == "congress":
                 for doc_count, party, day in party_day_counts:
                     writer.writerow(
                         [
                             day,
                             f"{party}_supp"
-                            if group_type == "supporters_public"
+                            if group_type == "supporters"
                             else party,
                             topic,
                             round(
