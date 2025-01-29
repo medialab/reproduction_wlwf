@@ -817,10 +817,10 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
     return topics_info
 
 
-def write_bertopic_TS(topics_info, group_type, party_day_counts):
+def write_bertopic_TS(topics_info, group_type, party_day_counts, origin_path):
     for topic, info in topics_info.items():
         with open(
-            os.path.join(
+            os.path.join(origin_path,
                 "data_prod",
                 "dashboard",
                 "bertopic",

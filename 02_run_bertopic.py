@@ -212,7 +212,7 @@ if 'congress' in group_list:
 
     # Open one CSV file per topic for congress
 
-    write_bertopic_TS(topics_info, "congress", party_day_counts)
+    write_bertopic_TS(topics_info, "congress", party_day_counts, args.origin_path)
 
     normal_elem.remove('congress')
     group_list.remove('congress')
@@ -263,7 +263,7 @@ if infer==True:
         topics_info = count_topics_info(topics, party_day_counts, group, topic_model.topics_)
 
         #Complet TS data base with the new counts : 
-        write_bertopic_TS(topics_info, group, party_day_counts)
+        write_bertopic_TS(topics_info, group, party_day_counts, args.origin_path)
 '''
 To add representative docs 
 
