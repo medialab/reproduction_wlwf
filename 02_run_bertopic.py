@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import argparse
+import pandas as pd
 from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
 from umap import UMAP
@@ -17,6 +18,7 @@ from utils import (
     load_docs_embeddings,
     count_topics_info,
     write_bertopic_TS,
+    write_representative_docs,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
@@ -171,7 +173,23 @@ new_topics = topic_model.reduce_outliers(
 )
 topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
 
+documents_df = pd.DataFrame(
+    {"Document": docs, "ID": range(len(docs)), "Topic": topics, "Image": None}
+)
+
+# Extract 10 representative docs per topic
+_, _, _, repr_docs_ids = topic_model._extract_representative_docs(
+    c_tf_idf=topic_model.c_tf_idf_,
+    documents=documents_df,
+    topics=topic_model.topic_representations_,
+    nr_samples=500,
+    nr_repr_docs=10,
+)
+
 print(topic_model.get_topic_info())
+
+# Write representative docs for one public in one file
+write_representative_docs(repr_docs_ids, party_day_counts, "deputes")
 
 for i, row in topic_model.get_topic_info().iterrows():
     topic = row["Topic"]
