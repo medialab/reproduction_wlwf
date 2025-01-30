@@ -55,7 +55,9 @@ args = parser.parse_args()
 embedding_model = SentenceTransformer(SBERT_NAME)
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-SAVE_PATH = create_dir(os.path.join(args.origin_path, f"data_prod/embeddings/{args.group}", "{}.npz".format(sbert_name_string)))
+output_folder = create_dir(os.path.join(args.origin_path, f"data_prod/embeddings/{args.group}"))
+
+SAVE_PATH = os.path.join(output_folder, "{}.npz".format(sbert_name_string))
 
 if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     answer = input(
@@ -76,7 +78,7 @@ if len(docs) == 0:
     if count_nb_files(input_path) == 0:
         raise ValueError(f"No csv files found in {input_path}")
 
-'''
+
 # Here, loading means checking what part of the data was already encoded,
 # hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
@@ -108,4 +110,3 @@ np.savez_compressed(
     format_npz_output(SAVE_PATH, len(docs)),
     embeddings=embeddings[: i % DEFAULT_SAVE_SIZE + len(docs) % batch_size],
 )
-'''
