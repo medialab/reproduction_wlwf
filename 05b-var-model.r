@@ -24,29 +24,35 @@ topic_values <- unique(db$topic)
 for (v in variables) {
   # - pulling the series-agenda for that group
   db[[v]] <- as.numeric(db[[v]])
+
   x <- db[,v]
   #     making these a 0 
   x[which(is.na(x))] <- 0.01
   # - adding 1 percentage point to avoid 0s before the logit transformation
-  #x <- x + 0.01
+  x <- x + 0.01
+
+ 
+  
   # - applying the non-linear transformation
   logit_x <- log(x / (1 - x))
+
+  na_positions <- which(is.na(logit_x))  # Récupérer les positions des NA
+  print(c("step 1", v, na_positions))
   db[,v] <- logit_x
 
+  na_positions <- which(is.na(db[[v]]))  # Récupérer les positions des NA
+  print(c("step 2", v, na_positions))
+
+'
   for (topic_n in topic_values) { 
     # Augmented Dickey-Fuller (ADF) test for stationarity
     db_topic <- db[db$topic == topic_n, ]
     data <- db_topic[[v]]
 
-    if (sum(!is.na(data)) > 1) {
-      cat("ADF Test for variable:", v, "topic", topic_n, "\n")
-      print(adf.test(data))
+    cat("ADF Test for variable:", v, "topic", topic_n, "\n")
+    print(adf.test(data))
     } 
-    else {
-      cat("Not enough non-NA data for ADF Test on variable:", v, "topic", topic_n, "\n")
-    }
-  }
-  }
+    '
 }
 
 maindb$topic <- as.character(maindb$topic)
