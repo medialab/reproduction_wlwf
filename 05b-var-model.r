@@ -1,5 +1,7 @@
+#install.packages(c("rio", "vars", "tseries"))
 
 library(dplyr)
+library(tidyverse)
 library(tidyr)
 library(ggplot2)
 library(vars)
@@ -8,36 +10,44 @@ library(rio)
 library(tseries)
 
 #Put our main databse generated thanks to script 05a 
-db <- read_csv("data_prod/var/bertopic/general_TS.csv")
+db <- read_csv("/store/medialex/reproduction_wlwf/data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
 
 #Keep only political topics
-pol_issues <- c() #Insert numbers
+pol_issues <- c(0,1,2,3,4,5,6) #Insert numbers
 
 db <- db %>%
   filter(topic %in% pol_issues)
 
-#variables <- c("lr", "majority", "nupes", "rn", "publr", "pubmajority",, "pubnupes", "pubrn", "att_public", "gen_public", "media")
-
-variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive_public', 'general_public', 'medias')
-
+variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
+topic_values <- unique(db$topic)
 # - logit transform all series
 for (v in variables) {
   # - pulling the series-agenda for that group
+  db[[v]] <- as.numeric(db[[v]])
   x <- db[,v]
-  # - for some groups the last couple observations for each issues are NA,
   #     making these a 0 
-  x[which(is.na(x))] <-0.01
+  x[which(is.na(x))] <- 0.01
   # - adding 1 percentage point to avoid 0s before the logit transformation
   #x <- x + 0.01
   # - applying the non-linear transformation
-  logit_x <- log(x / (1-x))
+  logit_x <- log(x / (1 - x))
   db[,v] <- logit_x
-}
 
-#We add a Augmented Dickey-Fuller check so as to check time series stationarity
-cat("ADF Test for variable:", v, "\n")
-data <- db$v
-adf.test(data)
+  for (topic_n in topic_values) { 
+    # Augmented Dickey-Fuller (ADF) test for stationarity
+    db_topic <- db[db$topic == topic_n, ]
+    data <- db_topic[[v]]
+
+    if (sum(!is.na(data)) > 1) {
+      cat("ADF Test for variable:", v, "topic", topic_n, "\n")
+      print(adf.test(data))
+    } 
+    else {
+      cat("Not enough non-NA data for ADF Test on variable:", v, "topic", topic_n, "\n")
+    }
+  }
+  }
+}
 
 maindb$topic <- as.character(maindb$topic)
 mformula <- formula(paste0("~", 
