@@ -555,7 +555,7 @@ def preprocess(
     tar, loop, compressed = iter_on_files(root, nb_files)
     empty_warn = []
     for file in loop:
-        counter_line = 0
+        counter_tweets = 0
         if compressed:
             filename = file.name
         else:
@@ -587,7 +587,6 @@ def preprocess(
         to_id_pos = reader.headers.to_tweetid
 
         for row in reader:
-            counter_line +=1
             counter_all += 1
             if not row[rt_pos]:
                 counter_original += 1
@@ -652,12 +651,13 @@ def preprocess(
                     if small and counter_threads >= small_size:
                         break
                     counter_threads += 1
+                    counter_tweets += 1
                     yield doc
         if party_day_counts is not None:
             if group_name != "":
-                party_day_counts.append((counter_line, group_name, file_date))
+                party_day_counts.append((counter_tweets, group_name, file_date))
             else:
-                party_day_counts.append((counter_line, file_date))
+                party_day_counts.append((counter_tweets, file_date))
 
         if write_files:
             output_file.close()
