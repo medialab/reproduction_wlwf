@@ -206,7 +206,6 @@ if 'congress' in group_list:
         draw_topic_keywords(topic, top_words, top_ctfidf)
 
     # Create tables in a format adapted to Time Series
-
     topics_info = count_topics_info(topics, party_day_counts, "congress")
     party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
 

@@ -763,28 +763,33 @@ def load_docs_embeddings(
 
 
 def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
-    file_index = 0
-    count_index = 0
 
     """
     party_day_count is a list with the following structure:
     [
         (29, 'lr', '2022-06-20'),
         (46, 'lr', '2022-06-21'),
-        (83, 'lr', '2022-06-22'),
-        (117, 'lr', '2022-06-23'),
+        (13, 'lr', '2022-06-22'),
+        (17, 'lr', '2022-06-23'),
         ...
     ]
     """
 
+    file_index=0
+
     if group_type == "supporters" or group_type == "congress":
         doc_count, party, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+        count_index = 0
+        file_swap=True
         for i, topic in enumerate(topics):
-            while i >= count_index:
-                 doc_count, party, day = party_day_counts[file_index]
-                 file_index += 1
-                 count_index += + doc_count
+            doc_count, party, day = party_day_counts[file_index]
+            if file_swap==True:
+                count_index += doc_count
+                file_swap=False 
+            if i==count_index-1:
+                file_index += 1
+                file_swap = True
 
             topics_info[topic][party][day] += 1
 
@@ -795,11 +800,16 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
     else:
         doc_count, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(int))
+        count_index = 0
+        file_swap = True
         for i, topic in enumerate(topics):
-            while i >= count_index:
-                doc_count, day = party_day_counts[file_index]
-                file_index += 1
+            doc_count, day = party_day_counts[file_index]
+            if file_swap==True:
                 count_index += doc_count
+                file_swap=False 
+            if i==count_index-1:
+                file_index += 1
+                file_swap = True
 
             topics_info[topic][day] += 1
             
