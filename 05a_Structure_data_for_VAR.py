@@ -6,11 +6,9 @@ import os
 import numpy as np 
 import csv
 import casanova
-import re
 import argparse
 from collections import defaultdict
 from datetime import datetime, timedelta
-from itertools import islice
 
 from utils import (
     existing_dir_path,
