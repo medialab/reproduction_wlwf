@@ -12,11 +12,17 @@ from datetime import datetime, timedelta
 
 from utils import (
     existing_dir_path,
+    create_dir,
     count_nb_files, 
     iter_on_files,
 )
 
 parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    "topic_model",
+    help="Name of the topic model chosen. Write lda or bertopic",
+)
 
 parser.add_argument(
     "--origin_path",
@@ -27,8 +33,10 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-input_path = os.path.join(args.origin_path, "data_prod/dashboard/bertopic/data")
+if args.topic_model not in ['lda', 'bertopic']:
+    raise ValueError("The current topic model is incorrect. Choose lda or bertopic as input for model type")
 
+input_path = os.path.join(args.origin_path, "data_prod", "dashboard", str(args.topic_model), "data")
 files_TS =list(iter_on_files(input_path, count_nb_files(input_path))[1]) 
 
 def count_dates(start_date, end_date):
@@ -40,17 +48,28 @@ def count_dates(start_date, end_date):
 
 nb_dates = count_dates('2022-06-20', '2023-03-14')
 reader = casanova.reader(files_TS[0])
-group_types = list(dict.fromkeys(list(reader.cells('party'))))
+if args.topic_model=='bertopic':
+    group_types = list(dict.fromkeys(list(reader.cells('party'))))
+    index_attentive = group_types.index('attentive')
+    index_general = group_types.index('general')
+    index_media = group_types.index('media')
+    index_lrsupp = group_types.index('lr_supp')
+    index_majsupp = group_types.index('majority_supp')
+    index_nupessupp = group_types.index('nupes_supp')
+    index_rnsupp = group_types.index('rn_supp')
+else:
+    group_types = list(dict.fromkeys(list(reader.cells('actor'))))
+    index_attentive = group_types.index('pub. attentif')
+    index_general = group_types.index('pub. general')
+    index_media = group_types.index('medias')
+    index_lrsupp = group_types.index('sup. lr')
+    index_majsupp = group_types.index('sup. majo.')
+    index_nupessupp = group_types.index('sup. nupes')
+    index_rnsupp = group_types.index('sup. rn')
 
-index_attentive = group_types.index('attentive')
-index_general = group_types.index('general')
-index_media = group_types.index('media')
-index_lrsupp = group_types.index('lr_supp')
-index_majsupp = group_types.index('majority_supp')
-index_nupessupp = group_types.index('nupes_supp')
-index_rnsupp = group_types.index('rn_supp')
 
-with open(os.path.join(args.origin_path, 'data_prod/var/bertopic/general_TS.csv'), 'w') as f: 
+
+with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "general_TS.csv"), 'w') as f: 
     fieldnames = ['date', 'topic', 'lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media']
     writer = csv.DictWriter(f, fieldnames=fieldnames)
     writer.writeheader()
@@ -81,7 +100,3 @@ with open(os.path.join(args.origin_path, 'data_prod/var/bertopic/general_TS.csv'
                         'media': rows[iter_dates + index_media * nb_dates]['prop'],
                     })
                 iter_dates += 1
-
-
-# Ouvre ton fichier pour compter les lignes et les colonnes
-file_path = os.path.join(args.origin_path, 'data_prod/var/bertopic/general_TS.csv')

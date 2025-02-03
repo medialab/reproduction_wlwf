@@ -301,8 +301,8 @@ general <- build_ts(
 )
 
 # créé le répertoire data si besoin
-if (!dir.exists("data_prod/dashboard/files/data")) {
-  dir.create("data_prod/dashboard/files/data",
+if (!dir.exists("data_prod/dashboard/lda/data")) {
+  dir.create("data_prod/dashboard/lda/data",
              recursive = TRUE)
 }
 
