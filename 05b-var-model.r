@@ -77,4 +77,3 @@ var_irfs_cum_merged <- irf(var_model_merged, n.ahead = 60, cumulative = TRUE)
 #Save
 save(var_model_merged, file = "data_prod/var/bertopic/var_model-MAIN.Rdata")
 save(var_irfs_cum_merged, file = "data_prod/var/bertopic/var_irfs-MAIN.Rdata")
-'
