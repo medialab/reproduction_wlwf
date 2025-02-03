@@ -8,12 +8,26 @@ library(vars)
 library(boot)
 library(rio)
 library(tseries)
+library(argparse)
+
+parser <- ArgumentParser()
+
+parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
+
+args <- parser$parse_args()
+
+if (!(args$topic_model %in% c('bertopic', 'lda'))){
+  stop("The model name is incorrect. Choose between lda and bertopic")
+}
 
 #Put our main databse generated thanks to script 05a 
-db <- read_csv("/store/medialex/reproduction_wlwf/data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
-
-#Keep only political topics
-pol_issues <- c(0,1,2,3,4,5,6,9,10,14,67,87,90,150,201) #Insert numbers for political issues 
+if (args$topic_model == 'lda') {
+  db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
+  pol_issues <- c(1,2,3,4,5,6,9,10,14,67,87) 
+} else {
+  db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
+  pol_issues <- c(0,1,2,3,4,5,6,9,10,14,67,87, 108, 141, 202) 
+}
 
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
@@ -23,6 +37,7 @@ results_list <- list()
 for (v in variables) {
   # - pulling the series-agenda for that group
   db[[v]] <- as.numeric(db[[v]])
+
 
   x <- db[,v]
   #     making these a 0 
@@ -75,5 +90,10 @@ var_model_merged <- VAR(y = X_endogenous, p = 7, exogen = X_exogenous)
 var_irfs_cum_merged <- irf(var_model_merged, n.ahead = 60, cumulative = TRUE)
 
 #Save
-save(var_model_merged, file = "data_prod/var/bertopic/var_model-MAIN.Rdata")
-save(var_irfs_cum_merged, file = "data_prod/var/bertopic/var_irfs-MAIN.Rdata")
+if (args$topic_model == 'bertopic') {
+  save(var_model_merged, file = "data_prod/var/bertopic/var_model-MAIN.Rdata")
+  save(var_irfs_cum_merged, file = "data_prod/var/bertopic/var_irfs-MAIN.Rdata")
+} else {
+  save(var_model_merged, file = "data_prod/var/lda/var_model-MAIN.Rdata")
+  save(var_irfs_cum_merged, file = "data_prod/var/lda/var_irfs-MAIN.Rdata")
+}
