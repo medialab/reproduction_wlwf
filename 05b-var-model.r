@@ -23,7 +23,7 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 #Put our main databse generated thanks to script 05a 
 if (args$topic_model == 'lda') {
   db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-  pol_issues <- c(1,2,3,4,5,6,9,10,14,67,87) 
+  pol_issues <- c(1,2,3,4,5) 
 } else {
   db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
   pol_issues <- c(0,1,2,3,4,5,6,9,10,14,67,87, 108, 141, 202) 
@@ -80,12 +80,16 @@ mformula <- formula(paste0("~",
 model_data <- model.matrix(mformula, maindb[, variables])
 model_data <- model_data[, 2:ncol(model_data)] # removing intercept
 
+
 # - splitting the covariates of interest from the issue dummy variables
 X_endogenous <- model_data[, which(!grepl("topic", colnames(model_data)))]
+print(head(X_endogenous, 10))
 X_exogenous <- model_data[, which(grepl("topic", colnames(model_data)))]
-
+print(head(X_exogenous, 10))
 # - estimating the model: 7 lags
 var_model_merged <- VAR(y = X_endogenous, p = 7, exogen = X_exogenous)
+
+#Inverser le log avant impélmentation 
 
 var_irfs_cum_merged <- irf(var_model_merged, n.ahead = 60, cumulative = TRUE)
 
