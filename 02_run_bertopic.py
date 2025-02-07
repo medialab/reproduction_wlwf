@@ -205,7 +205,7 @@ if 'congress' in group_list:
         topic = row["Topic"]
         top_list = topic_model.get_topic(topic)
         top_words, top_ctfidf = zip(*top_list)
-        draw_topic_keywords(topic, top_words, top_ctfidf)
+        draw_topic_keywords(topic, top_words, top_ctfidf, args.origin_path)
 
     # Create tables in a format adapted to Time Series
     topics_info = count_topics_info(topics, party_day_counts, "congress")
