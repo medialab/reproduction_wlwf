@@ -836,7 +836,6 @@ def write_bertopic_TS(topics_info, group_type, party_day_counts, origin_path):
                 "dashboard",
                 "bertopic",
                 "data",
-                "test", 
                 f"bertopic_ts_{topic}.csv",
             ),
             "w" if group_type == 'congress' else "a",
