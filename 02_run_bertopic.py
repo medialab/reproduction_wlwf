@@ -8,6 +8,16 @@ from umap import UMAP
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
+from typing import List, Tuple, Union
+from bertopic._utils import (
+     MyLogger,
+    check_documents_type,
+    check_embeddings_shape,
+)
+from bertopic.backend._utils import select_backend
+from bertopic.cluster import BaseCluster
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd 
 
 from utils import (
     count_nb_files,
@@ -134,6 +144,120 @@ def save_ctfidf_config(model, path):
 
 save_utils.save_ctfidf_config = save_ctfidf_config
 
+def fit_transform(
+    self,
+    documents: List[str],
+    embeddings: np.ndarray = None,
+    images: List[str] = None,
+    y: Union[List[int], np.ndarray] = None,
+) -> Tuple[List[int], Union[np.ndarray, None]]:
+    """Fit the model and allow to return umap_embeddings 
+    """
+    if documents is not None:
+        check_documents_type(documents)
+        check_embeddings_shape(embeddings, documents)
+
+    doc_ids = range(len(documents)) if documents is not None else range(len(images))
+    documents = pd.DataFrame({"Document": documents, "ID": doc_ids, "Topic": None, "Image": images})
+
+    # Extract embeddings
+    if embeddings is None:
+        logger.info("Embedding - Transforming documents to embeddings.")
+        self.embedding_model = select_backend(self.embedding_model, language=self.language, verbose=self.verbose)
+        embeddings = self._extract_embeddings(
+            documents.Document.values.tolist(),
+            images=images,
+            method="document",
+            verbose=self.verbose,
+        )
+        logger.info("Embedding - Completed \u2713")
+    else:
+        if self.embedding_model is not None:
+            self.embedding_model = select_backend(
+                self.embedding_model, language=self.language, verbose=self.verbose
+            )
+
+    # Guided Topic Modeling
+    if self.seed_topic_list is not None and self.embedding_model is not None:
+        y, embeddings = self._guided_topic_modeling(embeddings)
+
+    # Reduce dimensionality and fit UMAP model
+    umap_embeddings = self._reduce_dimensionality(embeddings, y)
+
+    # Zero-shot Topic Modeling
+    if self._is_zeroshot():
+        documents, embeddings, assigned_documents, assigned_embeddings = self._zeroshot_topic_modeling(
+            documents, embeddings
+        )
+        # Filter UMAP embeddings to only non-assigned embeddings to be used for clustering
+        umap_embeddings = self.umap_model.transform(embeddings)
+
+    if len(documents) > 0:  # No zero-shot topics matched
+        # Cluster reduced embeddings
+        documents, probabilities = self._cluster_embeddings(umap_embeddings, documents, y=y)
+        if self._is_zeroshot() and len(assigned_documents) > 0:
+            documents, embeddings = self._combine_zeroshot_topics(
+                documents, embeddings, assigned_documents, assigned_embeddings
+            )
+    else:
+        # All documents matches zero-shot topics
+        documents = assigned_documents
+        embeddings = assigned_embeddings
+    topics_before_reduction = self.topics_
+
+    # Sort and Map Topic IDs by their frequency
+    if not self.nr_topics:
+        documents = self._sort_mappings_by_frequency(documents)
+
+    # Create documents from images if we have images only
+    if documents.Document.values[0] is None:
+        custom_documents = self._images_to_text(documents, embeddings)
+
+        # Extract topics by calculating c-TF-IDF
+        self._extract_topics(custom_documents, embeddings=embeddings)
+        self._create_topic_vectors(documents=documents, embeddings=embeddings)
+
+        # Reduce topics
+        if self.nr_topics:
+            custom_documents = self._reduce_topics(custom_documents)
+
+        # Save the top 3 most representative documents per topic
+        self._save_representative_docs(custom_documents)
+    else:
+        # Extract topics by calculating c-TF-IDF
+        self._extract_topics(documents, embeddings=embeddings, verbose=self.verbose)
+
+        # Reduce topics
+        if self.nr_topics:
+            documents = self._reduce_topics(documents)
+
+        # Save the top 3 most representative documents per topic
+        self._save_representative_docs(documents)
+
+    # In the case of zero-shot topics, probability will come from cosine similarity,
+    # and the HDBSCAN model will be removed
+    if self._is_zeroshot() and len(assigned_documents) > 0:
+        self.hdbscan_model = BaseCluster()
+        sim_matrix = cosine_similarity(embeddings, np.array(self.topic_embeddings_))
+
+        if self.calculate_probabilities:
+            probabilities = sim_matrix
+        else:
+            # Use `topics_before_reduction` because `self.topics_` may have already been updated from
+            # reducing topics, and the original probabilities are needed for `self._map_probabilities()`
+            probabilities = sim_matrix[
+                np.arange(len(documents)),
+                np.array(topics_before_reduction) + self._outliers,
+            ]
+
+    # Resulting output
+    self.probabilities_ = self._map_probabilities(probabilities, original_topics=True)
+    predictions = documents.Topic.to_list()
+
+    return predictions, self.probabilities_, umap_embeddings
+
+BERTopic.fit_transform = fit_transform
+
 party_day_counts = []
 
 docs, max_index, embeddings = load_docs_embeddings(
@@ -147,7 +271,8 @@ docs, max_index, embeddings = load_docs_embeddings(
 )
 
 print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
-topics, probs = topic_model.fit_transform(docs, embeddings)
+topics, probs, umap_embeddings = topic_model.fit_transform(docs, embeddings)
+np.savetxt('data_prod/embeddings/umap/umap_embeddings.csv', umap_embeddings, delimiter =",")
 print(topic_model.get_topic_info())
 
 if args.small:
