@@ -1,0 +1,4 @@
+Nature of element,directory,elem 1 of directory,elem 2 of directory,elem 3 of directory,elem 4 of directory,elem 5 of directory
+BERTopic model,Chosen by the user,config.json,ctfidf_config.json,ctidf.safetensors,topic_embedding.safetensors,topics.json
+Time Series Topics,data_prod/dashboard/bertopic/data,bertopic_ts_-1.csv,bertopic_ts_0.csv,bertopic_ts_1.csv,bertopic_ts_2.csv,bertopic_ts_{number}.csv
+Top words graphs,data_prod/dashboard/bertopic/img,bertopic_-1.png,bertopic_0.png,bertopic_1.png,bertopic_2.png,bertopic_{number}.png
