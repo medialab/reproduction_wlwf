@@ -35,6 +35,7 @@ from unidecode import unidecode
 from collections import defaultdict
 
 from utils import (
+    choices,
     vectorizer,
     count_nb_files,
     clean_text,
@@ -233,7 +234,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "public",
-        choices=["congress", "media", "supporter", "attentive", "general"],
+        choices=choices,
         help="""Name of the publics. For example, if the public is 'congress',
         the output files will be 'congress-day-dtm-indices.txt', etc.""",
     )

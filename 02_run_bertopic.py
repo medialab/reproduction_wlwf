@@ -12,6 +12,7 @@ import numpy as np
 #import pandas as pd (put in comment because pandas part code is currently in comments)
 
 from utils import (
+    choices,
     count_nb_files,
     create_dir,
     existing_dir_path,
@@ -22,9 +23,16 @@ from utils import (
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
-    NB_DOCS_SMALL_SCRIPT02,
-    NB_DOCS_SMALL_SCRIPT03
+    NB_DOCS_SMALL_TRAIN,
+    NB_DOCS_SMALL_INFER,
 )
+
+sbert_name_string = SBERT_NAME.replace("/", "_")
+
+def get_paths(root, public):
+    input_path = os.path.join(f'{root}', "data_source", f'{public}')
+    embeddings_path = os.path.join(f'{root}', "data_prod", "embeddings", f'{public}', "{}.npz".format(sbert_name_string))
+    return input_path, embeddings_path
 
 parser = argparse.ArgumentParser()
 
@@ -42,11 +50,11 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--group",
+    "--public",
     help=(
-        "List the groups you want to compute in the following format : group1,group2,group3. Choose group names in the following terms : congress, general, attentive, supporters, media"
+        "List the political group you want to compute in the following format : group1,group2,group3. Choose group names in the following terms : congress, general, attentive, supporter, media"
     ), 
-    default='congress,general,attentive,supporters,media', 
+    default='congress,general,attentive,supporter,media', 
 )
 
 
@@ -59,7 +67,7 @@ parser.add_argument(
 parser.add_argument(
     "--small",
     help=(
-        "run the script on a reduced number of tweets fixed in utils.py by NB_DOCS_SMALL_SCRIPT02 variable"
+        "run the script on a reduced number of tweets fixed in utils.py by NB_DOCS_SMALL_TRAIN variable"
     ),
     action="store_true",
 )
@@ -67,26 +75,20 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-group_list = args.group.split(",")
+group_list = args.public.split(",")
 group_list = set(group_list)
-normal_elem = ['congress', 'general', 'attentive', 'supporters', 'media']
 
 for elem in group_list:
-    if elem not in normal_elem:
-        raise ValueError('You used an innacurate name of group in your group argument. Choose group names in the following terms : congress, general, attentive, supporters, media')
-
-sbert_name_string = SBERT_NAME.replace("/", "_")
+    if elem not in choices:
+        raise ValueError('You used an innacurate name of group in your group argument. Choose group names in the following terms : congress, general, attentive, supporter, media')
 
 if 'congress' in group_list:
-    input_path = os.path.join(args.origin_path, "data_source/congress/")
-    embeddings_path = os.path.join(args.origin_path,
-        "data_prod/embeddings/congress/", "{}.npz".format(sbert_name_string)
-    )
+    input_path, embeddings_path = get_paths(args.origin_path, "congress")
 
-    if args.small and DEFAULT_SAVE_SIZE < NB_DOCS_SMALL_SCRIPT02:
+    if args.small and DEFAULT_SAVE_SIZE < NB_DOCS_SMALL_TRAIN:
         print(
-            """Please change value of DEFAULT_SAVE_SIZE or NB_DOCS_SMALL_SCRIPT02 in file utils.py.
-            DEFAULT_SAVE_SIZE should be greater than NB_DOCS_SMALL_SCRIPT02"""
+            """Please change value of DEFAULT_SAVE_SIZE or NB_DOCS_SMALL_TRAIN in file utils.py.
+            DEFAULT_SAVE_SIZE should be greater than NB_DOCS_SMAL_TRAIN"""
         )
         sys.exit(1)
 
@@ -213,7 +215,7 @@ if 'congress' in group_list:
 
     write_bertopic_TS(topics_info, "congress", party_day_counts, args.origin_path)
 
-    normal_elem.remove('congress')
+    choices.remove('congress')
     group_list.remove('congress')
 
 else:
@@ -223,23 +225,18 @@ else:
 infer = False
 
 for elem in group_list:
-    if elem in normal_elem:
+    if elem in choices:
         infer = True
 
-if infer==True:
+if infer:
     if args.small:
-        model_path = os.path.join(args.model_path, "_small/")
-        topic_model = BERTopic.load(model_path, embedding_model = SBERT_NAME) 
+        model_path = os.path.join(args.model_path, "_small")   
     else:
         model_path = args.model_path
-        topic_model = BERTopic.load(args.model_path, embedding_model = SBERT_NAME)
+    topic_model = BERTopic.load(model_path, embedding_model = SBERT_NAME) 
 
     for group in group_list:
-        input_path = os.path.join(args.origin_path, f"data_source/{group}/")
-        
-        embeddings_path = os.path.join(args.origin_path, 
-        f"data_prod/embeddings/{group}/", "{}.npz".format(sbert_name_string)
-        )
+        input_path, embeddings_path = get_paths(args.origin_path, group)
         
         party_day_counts = []
 
@@ -251,7 +248,7 @@ if infer==True:
             party_day_counts=party_day_counts,
             apply_unidecode=True,
             small=args.small,
-            small_size= NB_DOCS_SMALL_SCRIPT03, 
+            small_size= NB_DOCS_SMALL_INFER, 
             )
             
         print(f"Predict model from {model_path}")

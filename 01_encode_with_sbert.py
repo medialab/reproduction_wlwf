@@ -23,6 +23,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from utils import (
+    choices,
     SBERT_NAME,
     count_nb_files,
     preprocess,
@@ -39,8 +40,9 @@ batch_size = 1_000
 parser = argparse.ArgumentParser()
 
 parser.add_argument(
-    "group",
-    help="Choose the group you want to encode : congress, attentive, media, general, supporters",
+    "public",
+    choices=choices,
+    help="Choose the political group you want to encode : congress, attentive, media, general, supporter",
 )
 
 parser.add_argument(
@@ -55,8 +57,7 @@ args = parser.parse_args()
 embedding_model = SentenceTransformer(SBERT_NAME)
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-output_folder = create_dir(os.path.join(args.origin_path, f"data_prod/embeddings/{args.group}"))
-
+output_folder = create_dir(os.path.join(args.origin_path, "data_prod", "embeddings", f"{args.public}"))
 SAVE_PATH = os.path.join(output_folder, "{}.npz".format(sbert_name_string))
 
 if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
@@ -70,7 +71,7 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     if answer == "n" or answer == "no":
         sys.exit(0)
 
-input_path = os.path.join(args.origin_path, f"data_source/{args.group}")
+input_path = os.path.join(args.origin_path, "data_source", f"{args.public}")
 
 docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
 

@@ -24,10 +24,11 @@ EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
+choices=["congress", "media", "supporter", "attentive", "general"]
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
-NB_DOCS_SMALL_SCRIPT02 = 1000  # Choose a small number to have a fast computation
-NB_DOCS_SMALL_SCRIPT03 = 90000  # You need a larger one in script 03 to have various days in your small version
+NB_DOCS_SMALL_TRAIN = 1000  # Choose a small number to have a fast computation
+NB_DOCS_SMALL_INFER = 90000  # You need a larger one in script 03 to have various days in your small version
 
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
@@ -546,7 +547,7 @@ def preprocess(
     apply_unidecode=False,
     write_files=False,
     small=False,
-    small_size=NB_DOCS_SMALL_SCRIPT02,
+    small_size=NB_DOCS_SMALL_TRAIN,
 ):
     counter_all = 0
     counter_original = 0
@@ -555,7 +556,7 @@ def preprocess(
     tar, loop, compressed = iter_on_files(root, nb_files)
     empty_warn = []
     for file in loop:
-        counter_tweets = 0
+        counter_threads_file = 0
         if compressed:
             filename = file.name
         else:
@@ -651,13 +652,13 @@ def preprocess(
                     if small and counter_threads >= small_size:
                         break
                     counter_threads += 1
-                    counter_tweets += 1
+                    counter_threads_file += 1
                     yield doc
         if party_day_counts is not None:
             if group_name != "":
-                party_day_counts.append((counter_tweets, group_name, file_date))
+                party_day_counts.append((counter_threads_file, group_name, file_date))
             else:
-                party_day_counts.append((counter_tweets, file_date))
+                party_day_counts.append((counter_threads_file, file_date))
 
         if write_files:
             output_file.close()
@@ -733,7 +734,7 @@ def load_docs_embeddings(
     apply_unidecode=False,
     write_files=False,
     small=False,
-    small_size=NB_DOCS_SMALL_SCRIPT02,
+    small_size=NB_DOCS_SMALL_TRAIN,
     resume_encoding=False,
 ):
     docs = np.array(
@@ -777,14 +778,14 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
 
     file_index=0
 
-    if group_type == "supporters" or group_type == "congress":
+    if group_type == "supporter" or group_type == "congress":
         doc_count, party, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         count_index = 0
         file_swap=True
         for i, topic in enumerate(topics):
             doc_count, party, day = party_day_counts[file_index]
-            if file_swap==True:
+            if file_swap:
                 count_index += doc_count
                 file_swap=False 
             if i==count_index-1:
@@ -804,7 +805,7 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
         file_swap = True
         for i, topic in enumerate(topics):
             doc_count, day = party_day_counts[file_index]
-            if file_swap==True:
+            if file_swap:
                 count_index += doc_count
                 file_swap=False 
             if i==count_index-1:
@@ -814,7 +815,7 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
             topics_info[topic][day] += 1
             
     if topics_base != None:
-        if group_type == "supporters": 
+        if group_type == "supporter": 
             for topic in sorted(set(topics_base)):
                 for party in set([p[1] for p in party_day_counts]):
                     for day in set([p[2] for p in party_day_counts]):
@@ -835,6 +836,7 @@ def write_bertopic_TS(topics_info, group_type, party_day_counts, origin_path):
                 "dashboard",
                 "bertopic",
                 "data",
+                "test", 
                 f"bertopic_ts_{topic}.csv",
             ),
             "w" if group_type == 'congress' else "a",
@@ -842,13 +844,13 @@ def write_bertopic_TS(topics_info, group_type, party_day_counts, origin_path):
             writer = csv.writer(f)
             if group_type == 'congress':
                 writer.writerow(["date", "party", "topic", "prop"]) 
-            if group_type == "supporters" or group_type == "congress":
+            if group_type == "supporter" or group_type == "congress":
                 for doc_count, party, day in party_day_counts:
                     writer.writerow(
                         [
                             day,
                             f"{party}_supp"
-                            if group_type == "supporters"
+                            if group_type == "supporter"
                             else party,
                             topic,
                             round(
