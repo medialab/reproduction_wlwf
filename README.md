@@ -14,43 +14,44 @@ These folders have to be put in a data_source folder in your actual repository.
 
 ```
 congress
-├── lr
-│   ├── 2022-06-20.csv
-│   ├── 2022-06-21.csv
-│   ├── 2022-06-22.csv
-    ...
-├── majority
-│   ├── 2022-06-20.csv
-│   ├── 2022-06-21.csv
-│   ├── 2022-06-22.csv
-    ...
-├── nupes
-│   ├── 2022-06-20.csv
-│   ├── 2022-06-21.csv
-│   ├── 2022-06-22.csv
-    ...
-└── rn
-│   ├── 2022-06-20.csv
-│   ├── 2022-06-21.csv
-│   ├── 2022-06-22.csv
+├──  data_source
+    ├── lr
+    │   ├── 2022-06-20.csv
+    │   ├── 2022-06-21.csv
+    │   ├── 2022-06-22.csv
+        ...
+    ├── majority
+    │   ├── 2022-06-20.csv
+    │   ├── 2022-06-21.csv
+    │   ├── 2022-06-22.csv
+        ...
+    ├── nupes
+    │   ├── 2022-06-20.csv
+    │   ├── 2022-06-21.csv
+    │   ├── 2022-06-22.csv
+        ...
+    └── rn
+    │   ├── 2022-06-20.csv
+    │   ├── 2022-06-21.csv
+    │   ├── 2022-06-22.csv
 
-```
-```
-media
-├── 2022-06-20.csv
-├── 2022-06-21.csv
-├── 2022-06-22.csv
-    ...
+    ```
+    ```
+    media
+    ├── 2022-06-20.csv
+    ├── 2022-06-21.csv
+    ├── 2022-06-22.csv
+        ...
 
-```
-```
-supporter
-├── lr
-│   ├── 2022-06-20.csv
-│   ├── 2022-06-21.csv
-│   ├── 2022-06-22.csv
+    ```
+    ```
+    supporter
+    ├── lr
+    │   ├── 2022-06-20.csv
+    │   ├── 2022-06-21.csv
+    │   ├── 2022-06-22.csv
+        ...
     ...
-...
 ```
 
 The csv files should have the following columns: `id`, `local_time`, `text`, `user_screen_name`, `user_id`, `retweeted_id`
