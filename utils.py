@@ -24,7 +24,7 @@ EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
-choices=["congress", "media", "supporter", "attentive", "general"]
+choices = ["congress", "media", "supporter", "attentive", "general"]
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 NB_DOCS_SMALL_TRAIN = 1000  # Choose a small number to have a fast computation
@@ -763,8 +763,7 @@ def load_docs_embeddings(
     return docs, max_index, embeddings
 
 
-def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
-
+def count_topics_info(topics, party_day_counts, group_type):
     """
     party_day_count is a list with the following structure:
     [
@@ -776,85 +775,59 @@ def count_topics_info(topics, party_day_counts, group_type, topics_base=None):
     ]
     """
 
-    file_index=0
+    file_index = 0
 
     if group_type == "supporter" or group_type == "congress":
         doc_count, party, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-        count_index = 0
-        file_swap=True
+        doc_count_sum = doc_count
         for i, topic in enumerate(topics):
-            doc_count, party, day = party_day_counts[file_index]
-            if file_swap:
-                count_index += doc_count
-                file_swap=False 
-            if i==count_index-1:
+            while i >= doc_count_sum:
                 file_index += 1
-                file_swap = True
+                doc_count, party, day = party_day_counts[file_index]
+                doc_count_sum += doc_count
 
             topics_info[topic][party][day] += 1
-
-            for party in set([p[1] for p in party_day_counts]):
-                for day in set([p[2] for p in party_day_counts]):
-                    topics_info[topic][party][day] = topics_info[topic][party][day]
 
     else:
         doc_count, day = party_day_counts[file_index]
         topics_info = defaultdict(lambda: defaultdict(int))
-        count_index = 0
-        file_swap = True
+        doc_count_sum = doc_count
         for i, topic in enumerate(topics):
-            doc_count, day = party_day_counts[file_index]
-            if file_swap:
-                count_index += doc_count
-                file_swap=False 
-            if i==count_index-1:
+            while i >= doc_count_sum:
                 file_index += 1
-                file_swap = True
+                doc_count, day = party_day_counts[file_index]
+                doc_count_sum += doc_count
 
             topics_info[topic][day] += 1
-            
-    if topics_base != None:
-        if group_type == "supporter": 
-            for topic in sorted(set(topics_base)):
-                for party in set([p[1] for p in party_day_counts]):
-                    for day in set([p[2] for p in party_day_counts]):
-                        topics_info[topic][party][day] = topics_info[topic][party][day]
-        else:
-            for topic in sorted(set(topics_base)):
-                for day in set([p[1] for p in party_day_counts]):
-                    topics_info[topic][day] = topics_info[topic][day]
 
     return topics_info
 
 
-def write_bertopic_TS(topics_info, group_type, party_day_counts, origin_path):
-    for topic, info in topics_info.items():
+def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_path):
+    for topic in tqdm(topics, desc="Write time series"):
         with open(
-            os.path.join(origin_path,
+            os.path.join(
+                origin_path,
                 "data_prod",
                 "dashboard",
                 "bertopic",
                 "data",
                 f"bertopic_ts_{topic}.csv",
             ),
-            "w" if group_type == 'congress' else "a",
+            "w" if group_type == "congress" else "a",
         ) as f:
             writer = csv.writer(f)
-            if group_type == 'congress':
-                writer.writerow(["date", "party", "topic", "prop"]) 
+            if group_type == "congress":
+                writer.writerow(["date", "party", "topic", "prop"])
             if group_type == "supporter" or group_type == "congress":
                 for doc_count, party, day in party_day_counts:
                     writer.writerow(
                         [
                             day,
-                            f"{party}_supp"
-                            if group_type == "supporter"
-                            else party,
+                            f"{party}_supp" if group_type == "supporter" else party,
                             topic,
-                            round(
-                                info[party][day] / (doc_count), 5
-                            ),
+                            round(topics_info[topic][party][day] / (doc_count), 5),
                         ]
                     )
             else:
@@ -863,7 +836,7 @@ def write_bertopic_TS(topics_info, group_type, party_day_counts, origin_path):
                         [
                             day,
                             group_type,
-                            topic, 
-                            round(info[day] / (doc_count), 5),
+                            topic,
+                            round(topics_info[topic][day] / (doc_count), 5),
                         ]
                     )

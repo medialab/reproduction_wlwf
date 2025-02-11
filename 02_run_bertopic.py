@@ -9,7 +9,7 @@ from umap import UMAP
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
-#import pandas as pd (put in comment because pandas part code is currently in comments)
+# import pandas as pd (put in comment because pandas part code is currently in comments)
 
 from utils import (
     choices,
@@ -29,10 +29,18 @@ from utils import (
 
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
+
 def get_paths(root, public):
-    input_path = os.path.join(f'{root}', "data_source", f'{public}')
-    embeddings_path = os.path.join(f'{root}', "data_prod", "embeddings", f'{public}', "{}.npz".format(sbert_name_string))
+    input_path = os.path.join(root, "data_source", public)
+    embeddings_path = os.path.join(
+        root,
+        "data_prod",
+        "embeddings",
+        public,
+        "{}.npz".format(sbert_name_string),
+    )
     return input_path, embeddings_path
+
 
 parser = argparse.ArgumentParser()
 
@@ -46,15 +54,15 @@ parser.add_argument(
     "--origin_path",
     help="Path to an origin of your code",
     type=existing_dir_path,
-    default=os.getcwd(), 
+    default=os.getcwd(),
 )
 
 parser.add_argument(
     "--public",
     help=(
         "List the political group you want to compute in the following format : group1,group2,group3. Choose group names in the following terms : congress, general, attentive, supporter, media"
-    ), 
-    default='congress,general,attentive,supporter,media', 
+    ),
+    default=",".join(choices),
 )
 
 
@@ -75,14 +83,16 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-group_list = args.public.split(",")
-group_list = set(group_list)
+group_list = set(args.public.split(","))
 
 for elem in group_list:
     if elem not in choices:
-        raise ValueError('You used an innacurate name of group in your group argument. Choose group names in the following terms : congress, general, attentive, supporter, media')
+        raise ValueError(
+            "You used an innacurate name of group in your group argument."
+            "Choose group names in the following terms : {}".format(choices)
+        )
 
-if 'congress' in group_list:
+if "congress" in group_list:
     input_path, embeddings_path = get_paths(args.origin_path, "congress")
 
     if args.small and DEFAULT_SAVE_SIZE < NB_DOCS_SMALL_TRAIN:
@@ -121,7 +131,6 @@ if 'congress' in group_list:
         calculate_probabilities=True,
     )
 
-
     class NpEncoder(json.JSONEncoder):
         """From https://stackoverflow.com/a/57915246/6053864"""
 
@@ -133,7 +142,6 @@ if 'congress' in group_list:
             if isinstance(obj, np.ndarray):
                 return obj.tolist()
             return super(NpEncoder, self).default(obj)
-
 
     def save_ctfidf_config(model, path):
         """Save parameters to recreate CountVectorizer and c-TF-IDF."""
@@ -159,7 +167,6 @@ if 'congress' in group_list:
         with path.open("w") as f:
             json.dump(config, f, indent=2, cls=NpEncoder)
 
-
     save_utils.save_ctfidf_config = save_ctfidf_config
 
     party_day_counts = []
@@ -174,7 +181,9 @@ if 'congress' in group_list:
         small=args.small,
     )
 
-    print("Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__))
+    print(
+        "Fitting topic model with params: {}".format(topic_model.hdbscan_model.__dict__)
+    )
     topics, probs = topic_model.fit_transform(docs, embeddings)
     print(topic_model.get_topic_info())
 
@@ -200,9 +209,10 @@ if 'congress' in group_list:
     topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
 
     print(topic_model.get_topic_info())
-
+    topic_ids_list = []
     for i, row in topic_model.get_topic_info().iterrows():
         topic = row["Topic"]
+        topic_ids_list.append(topic)
         top_list = topic_model.get_topic(topic)
         top_words, top_ctfidf = zip(*top_list)
         draw_topic_keywords(topic, top_words, top_ctfidf, args.origin_path)
@@ -212,62 +222,58 @@ if 'congress' in group_list:
     party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
 
     # Open one CSV file per topic for congress
+    write_bertopic_TS(
+        topic_ids_list, topics_info, "congress", party_day_counts, args.origin_path
+    )
 
-    write_bertopic_TS(topics_info, "congress", party_day_counts, args.origin_path)
+    choices.remove("congress")
+    group_list.remove("congress")
 
-    choices.remove('congress')
-    group_list.remove('congress')
+elif os.listdir(args.model_path) == []:
+    raise ValueError("Not trained model was found in the model path directory")
 
-else:
-    if os.listdir(args.model_path)==[]:
-        raise ValueError('Not trained model was found in the model path directory')
 
-infer = False
-
-for elem in group_list:
-    if elem in choices:
-        infer = True
-
-if infer:
+if group_list & set(choices):
     if args.small:
-        model_path = os.path.join(args.model_path, "_small")   
+        model_path = os.path.join(args.model_path, "_small")
     else:
         model_path = args.model_path
-    topic_model = BERTopic.load(model_path, embedding_model = SBERT_NAME) 
+    topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
 
     for group in group_list:
         input_path, embeddings_path = get_paths(args.origin_path, group)
-        
+
         party_day_counts = []
 
         docs, max_index, embeddings = load_docs_embeddings(
-            input_path, 
+            input_path,
             count_nb_files(input_path),
             embeddings_path,
             args.save_size,
             party_day_counts=party_day_counts,
             apply_unidecode=True,
             small=args.small,
-            small_size= NB_DOCS_SMALL_INFER, 
-            )
-            
+            small_size=NB_DOCS_SMALL_INFER,
+        )
+
         print(f"Predict model from {model_path}")
         topics, probs = topic_model.transform(docs, embeddings)
 
         print(topic_model.get_topic_info())
 
-        #Time Series Results 
-        topics_info = count_topics_info(topics, party_day_counts, group, topic_model.topics_)
+        # Time Series Results
+        topics_info = count_topics_info(topics, party_day_counts, group)
 
-        #Complet TS data base with the new counts : 
-        write_bertopic_TS(topics_info, group, party_day_counts, args.origin_path)
-'''
-To add representative docs 
+        # Complet TS data base with the new counts :
+        write_bertopic_TS(
+            topic_ids_list, topics_info, group, party_day_counts, args.origin_path
+        )
+"""
+To add representative docs
 
-        # Get infos about topic, and extract documents in another way. Warning : the 4 following lines change the topic names and representations. 
+        # Get infos about topic, and extract documents in another way. Warning : the 4 following lines change the topic names and representations.
         documents_df = pd.DataFrame({"Document": docs, "ID": range(len(docs)), "Topic": topics, "Image": None})
         topic_model._extract_topics(documents_df, embeddings=embeddings, verbose=True)
         topic_model._save_representative_docs(documents_df)
         topic_model.get_representative_docs()
-'''
-        
+"""
