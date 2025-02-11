@@ -1,0 +1,5 @@
+,congress,media,supporter,attentive,general
+path,data_prod/embeddings/congress,data_prod/embeddings/media,data_prod/embeddings/supporter,data_prod/embeddings/attentive,data_prod/embeddings/general
+embeddings for tweets 0-100000,Lajavaness_sentence-camembert-large_100000.npz,save as congress in this line,save as congress in this line,save as congress in this line,save as congress in this line
+embeddings for tweets 100000-200000,Lajavaness_sentence-camembert-large_200000.npz,save as congress in this line,save as congress in this line,save as congress in this line,save as congress in this line
+embeddings for k*100 000-th tweets ,Lajavaness_sentence-camembert-large_{k*100 000}.npz,save as congress in this line,save as congress in this line,save as congress in this line,save as congress in this line
