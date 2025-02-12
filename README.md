@@ -13,8 +13,8 @@ pip install -r requirements.txt
 These folders have to be put in a data_source folder in your actual repository.
 
 ```
-congress
-├──  data_source
+data_source
+├── congress
     ├── lr
     │   ├── 2022-06-20.csv
     │   ├── 2022-06-21.csv
@@ -34,18 +34,13 @@ congress
     │   ├── 2022-06-20.csv
     │   ├── 2022-06-21.csv
     │   ├── 2022-06-22.csv
-
-    ```
-    ```
-    media
+        ...
+├── media
     ├── 2022-06-20.csv
     ├── 2022-06-21.csv
     ├── 2022-06-22.csv
         ...
-
-    ```
-    ```
-    supporter
+├── supporter
     ├── lr
     │   ├── 2022-06-20.csv
     │   ├── 2022-06-21.csv
@@ -90,25 +85,25 @@ Etc.
 ```bash
 python 01_encode_with_sbert.py public --origin_path
 ```
-Example to encode congress data from another store called distant_store where you have the repository_wlwf: 
+Example to encode congress data from another store called distant_store where you have the repository_wlwf:
 ```bash
 python 01_encode_with_sbert.py congress --origin_path /distant_store/reproduction_wlwf
 ```
-With a group in the following categories : congress, attentive, media, supporter, general. 
---origin_path is by default your current repository, but you can also select another origin to your file tree. Be careful to respect the structure of files and folders of this repository. You can find more informations in <a href="https://github.com/medialab/reproduction_wlwf/tree/main/documentation">Documentation</a>. 
+With a group in the following categories : congress, attentive, media, supporter, general.
+--origin_path is by default your current repository, but you can also select another origin to your file tree. Be careful to respect the structure of files and folders of this repository. You can find more informations in <a href="https://github.com/medialab/reproduction_wlwf/tree/main/documentation">Documentation</a>.
 
-NB : If you are using Windows, use "\" instead of "/" in your paths. 
+NB : If you are using Windows, use "\" instead of "/" in your paths.
 
-## Run BERTopic model 
+## Run BERTopic model
 ```bash
-python 02_run_bertopic.py model_path --origin_path --public 
+python 02_run_bertopic.py model_path --origin_path --public
 ```
-Example to run model for congress, media and general public: 
+Example to run model for congress, media and general public:
 ```bash
 python 02_run_bertopic.py data_prod/topics/bert-model/ --origin_path /distant_store/reproduction_wlwf/ --public congress,media,general
 ```
-With model_path as a directory where you want to find or export your trained BERTopic model. 
---origin_path has the same function as in 01_encode_with_sbert.py script. Be careful to keep the same origin-path between the two scripts. 
+With model_path as a directory where you want to find or export your trained BERTopic model.
+--origin_path has the same function as in 01_encode_with_sbert.py script. Be careful to keep the same origin-path between the two scripts.
 --group allows choosing the group(s) you want to use to run the model (by default, all groups are included). You can write a group between : congress, attentive, media, supporter, general. You can write several groups by separating them by a comma (for example: python 02_run_bertopic.py model_path congress,media). Be careful to include congress if you haven't used the script before (otherwise, you won't have a trained model).
 
-NB : If you are using Windows, use "\" instead of "/" in your paths. 
+NB : If you are using Windows, use "\" instead of "/" in your paths.
