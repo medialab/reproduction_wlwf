@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-import csv
 import argparse
 from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
