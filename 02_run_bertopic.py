@@ -219,6 +219,8 @@ if "congress" in group_list:
 
     # Create tables in a format adapted to Time Series
     topics_info = count_topics_info(topics, party_day_counts, "congress")
+
+    # Sort by day so that all resulting files have the same order
     party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
 
     # Open one CSV file per topic for congress
@@ -263,8 +265,10 @@ if group_list & set(choices):
 
         # Time Series Results
         topics_info = count_topics_info(topics, party_day_counts, group)
+        # Sort by day so that all resulting files have the same order
+        party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
 
-        # Complet TS data base with the new counts :
+        # Complete TS data base with the new counts :
         write_bertopic_TS(
             topic_ids_list, topics_info, group, party_day_counts, args.origin_path
         )
