@@ -23,7 +23,7 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 #Put our main databse generated thanks to script 05a 
 if (args$topic_model == 'lda') {
   db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-  pol_issues <- c(1,2,3,4,5) 
+  pol_issues <- c(1:99)
 } else {
   db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
   pol_issues <- c(0,1,2,3,4,5,6,9,10,14,67,87, 108, 141, 202) 
@@ -65,10 +65,12 @@ for (v in variables) {
 
 results_df <- do.call(rbind, lapply(results_list, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
 colnames(results_df) <- c("topic", "variable", "p_value")
-print("These series may be not stationary:")
-print(results_df)
+non_full_stationarity_topics <- unique(results_df$topic)
+stationary_topics <- setdiff(pol_issues, non_full_stationarity_topics)
+print(paste("Number of topics where time series for each group are stationary: ", length(stationary_topics)))
+cat("The topic numbers that satisfy this property:", stationary_topics, "\n")
 
-
+'''
 maindb <- db %>%
   filter(topic %in% pol_issues)
 
@@ -101,3 +103,4 @@ if (args$topic_model == 'bertopic') {
   save(var_model_merged, file = "data_prod/var/lda/var_model-MAIN.Rdata")
   save(var_irfs_cum_merged, file = "data_prod/var/lda/var_irfs-MAIN.Rdata")
 }
+'''
