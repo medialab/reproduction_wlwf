@@ -26,7 +26,7 @@ if (args$topic_model == 'lda') {
 } else {
     db <- read.csv("data_prod/var/bertopic/general_TS.csv") #Data from 05a script 
 
-    pol_issues <- c(1:99)
+    pol_issues <- c(seq(-1, 211))
     stationary_issues <- c(3,7, 8, 10, 15, 21, 23, 26, 30, 33, 34, 37, 39, 40, 42, 43, 46, 47, 48, 53, 54, 61, 62, 64, 65, 66, 67, 73, 77, 79, 82, 83, 84, 85, 87, 88, 89, 90, 92, 95, 98) #Obtained in 05b script
 }
 
@@ -53,7 +53,7 @@ out_db$group <- recode(factor(out_db$group),
                     `rn_supp` = "RN\nSupporters",
                     `general` = "General\nPublic",
                     `attentive` = "Attentive\nPublic",
-                        `media` = "Media"
+                    `media` = "Media"
                     )
 
 out_db$group <- factor(out_db$group,

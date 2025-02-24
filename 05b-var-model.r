@@ -26,7 +26,7 @@ if (args$topic_model == 'lda') {
   pol_issues <- c(1:99)
 } else {
   db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
-  pol_issues <- c(0,1,2,3,4,5,6,9,10,14,67,87, 108, 141, 202) 
+  pol_issues <- c(seq(-1, 211))
 }
 
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
