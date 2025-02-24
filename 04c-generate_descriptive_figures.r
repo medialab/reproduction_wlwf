@@ -96,22 +96,27 @@ for (polgroup in outgroups) {
     )
     
     # - calculate correlation
-    cor_out <- round(cor(comp_df)[2,1], 2)
-    new_cell <- data.frame(cor_out)
-    colnames(new_cell) <- polgroup
-    rownames(new_cell) <- compgroup
+    cor_out <- round(cor(comp_df)[2,1], 2) # Calcul du test t pour tester si la corrélation est significativement différente de 0
+    n <- nrow(comp_df)  # Nombre d'observations sans NA
+    t_stat <- cor_out * sqrt((n - 2) / (1 - cor_out^2))  # Calcul de la statistique t
+    p_value <- 2 * (1 - pt(abs(t_stat), df = n - 2))  # Calcul de la p-value (bilatéral)
+
+    # Test 
+    is_significant <- p_value < 0.05
+
+    # Add tests infos in DF
+    new_cell <- data.frame(correlation = round(cor_out, 2), p_value = round(p_value, 4), significant = is_significant, outgroup = polgroup, covgroup = compgroup)
+    
+    colnames(new_cell) <- c("correlation", "p_value", "significant", "outgroup", "covgroup")
     new_col <- rbind(new_col, new_cell)
   }
+  
+  # Add new column
   if (is.null(results)) {
     results <- new_col
   } else {
-    results <- cbind(results, new_col)
+    results <- rbind(results, new_col)
   }
 }
-
-# OUTPUT
-# - adding human readable labels to the column and row names
-rownames(results) <- c("LR Supporters","Majority Supporters","NUPES Supporters","RN Supporters","General Public","Attentive Public","Media")
-colnames(results) <- c("LR in Assemblée", "Majority in Assemblée", "NUPES in Assemblée", "RN in Assemblée")
 
 print(results)
