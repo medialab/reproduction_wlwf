@@ -23,6 +23,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from utils import (
+    choices,
     SBERT_NAME,
     count_nb_files,
     preprocess,
@@ -37,23 +38,27 @@ from utils import (
 batch_size = 1_000
 
 parser = argparse.ArgumentParser()
+
 parser.add_argument(
-    "input_path",
-    help="Path to a folder or to a .tar.xz archive containing all input csv files",
+    "public",
+    choices=choices,
+    help="Choose the political group you want to encode : congress, attentive, media, general, supporter",
+)
+
+parser.add_argument(
+    "--origin_path",
+    help="Path to a the source of the data you collect",
     type=existing_dir_path,
+    default=os.getcwd(),
 )
-parser.add_argument(
-    "output_folder",
-    help="Path to a folder that will be created and contain all encoded vectors",
-    type=create_dir,
-)
+
 
 args = parser.parse_args()
 embedding_model = SentenceTransformer(SBERT_NAME)
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-SAVE_PATH = os.path.join(args.output_folder, "{}.npz".format(sbert_name_string))
-
+output_folder = create_dir(os.path.join(args.origin_path, "data_prod", "embeddings", f"{args.public}"))
+SAVE_PATH = os.path.join(output_folder, "{}.npz".format(sbert_name_string))
 
 if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     answer = input(
@@ -66,11 +71,13 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     if answer == "n" or answer == "no":
         sys.exit(0)
 
-docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
+input_path = os.path.join(args.origin_path, "data_source", f"{args.public}")
+
+docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
 
 if len(docs) == 0:
-    if count_nb_files(args.input_path) == 0:
-        raise ValueError(f"No csv files found in {args.input_path}")
+    if count_nb_files(input_path) == 0:
+        raise ValueError(f"No csv files found in {input_path}")
 
 
 # Here, loading means checking what part of the data was already encoded,

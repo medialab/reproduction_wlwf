@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def draw_topic_keywords(topic, words, x):
+def draw_topic_keywords(topic, words, x, root=os.getcwd()):
     """
     topic: the topic number
     words: a list of words
@@ -44,7 +44,7 @@ def draw_topic_keywords(topic, words, x):
     ax.get_yaxis().set_tick_params(which="both", left=False, right=False)
 
     fig.savefig(
-        os.path.join(
+        os.path.join(root,
             "data_prod", "dashboard", "bertopic", "img", "bertopic_{}.png".format(topic)
         )
     )
