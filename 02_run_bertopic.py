@@ -240,6 +240,7 @@ if group_list & set(choices):
     else:
         model_path = args.model_path
     topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
+    topic_ids_list = list(topic_model.get_topic_info()["Topic"])
 
     for group in group_list:
         input_path, embeddings_path = get_paths(args.origin_path, group)
@@ -265,7 +266,7 @@ if group_list & set(choices):
         # Time Series Results
         topics_info = count_topics_info(topics, party_day_counts, group)
         # Sort by day so that all resulting files have the same order
-        party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
+        party_day_counts = sorted(party_day_counts, key=lambda x: x[-1])
 
         # Complete TS data base with the new counts :
         write_bertopic_TS(
