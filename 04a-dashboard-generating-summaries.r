@@ -33,6 +33,13 @@ library(Matrix)
 library(tm)
 })
 
+check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
+  if (nrow(mat) != expected_rows | ncol(mat) != expected_cols) {
+    stop(sprintf("La matrice a des dimensions incorrectes : attendu %d lignes et %d colonnes, mais obtenu %d lignes et %d colonnes.",
+                 expected_rows, expected_cols, nrow(mat), ncol(mat)))
+  }
+}
+
 # DATA
 #===============================================================================
 load("data_prod/topics/lda_results-twokenizer.Rdata")
@@ -405,8 +412,17 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 tweets <- data.table::fread("data_prod/dfm/congress-rs-tweet-list.csv")
 #
 X <- sparseMatrix(j=ind, p=pointers, x=values,
-  dims=c(nrow(tweets), length(words)), index1=FALSE)
+   dims=c(
+     as.numeric(nrow(tweets)), 
+          length(words)
+     ),
+  index1=FALSE)
 dimnames(X)[[2]] <- words
+
+# check the dimensions of the matrix. Stop and give an error in case of incoherence
+X |> check_matrix_dimensions(expected_rows =  nrow(tweets),
+                             expected_cols = length(words)
+)
 
 # deleting empty rows
 todelete <- which(rowSums(X)==0)
@@ -471,8 +487,15 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 tweets <- data.table::fread("data_prod/dfm/media-rs-tweet-list.csv")
 #
 X <- sparseMatrix(j=ind, p=pointers, x=values,
-  dims=c(nrow(tweets), length(words)), index1=FALSE)
+  dims=c(nrow(tweets), 
+         length(words)), 
+  index1=FALSE)
 dimnames(X)[[2]] <- words
+
+# check the dimensions of the matrix. Stop and give an error in case of incoherence
+X |> check_matrix_dimensions(expected_rows =  nrow(tweets),
+                             expected_cols = length(words)
+)
 
 # deleting empty rows
 todelete <- which(rowSums(X)==0)

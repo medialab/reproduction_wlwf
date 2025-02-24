@@ -16,7 +16,6 @@ contact the corresponding author.
 """
 
 from tqdm import tqdm
-import glob
 import os
 import sys
 import argparse
@@ -24,6 +23,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 
 from utils import (
+    choices,
     SBERT_NAME,
     count_nb_files,
     preprocess,
@@ -38,24 +38,27 @@ from utils import (
 batch_size = 1_000
 
 parser = argparse.ArgumentParser()
+
 parser.add_argument(
-    "input_path",
-    help="Path to a folder or to a .tar.xz archive containing all input csv files",
+    "public",
+    choices=choices,
+    help="Choose the political group you want to encode : congress, attentive, media, general, supporter",
+)
+
+parser.add_argument(
+    "--origin_path",
+    help="Path to a the source of the data you collect",
     type=existing_dir_path,
+    default=os.getcwd(),
 )
-parser.add_argument(
-    "output_folder",
-    help="Path to a folder that will be created and contain all encoded vectors",
-    type=create_dir,
-)
+
 
 args = parser.parse_args()
-
 embedding_model = SentenceTransformer(SBERT_NAME)
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-SAVE_PATH = os.path.join(args.output_folder, "{}.npz".format(sbert_name_string))
-
+output_folder = create_dir(os.path.join(args.origin_path, "data_prod", "embeddings", f"{args.public}"))
+SAVE_PATH = os.path.join(output_folder, "{}.npz".format(sbert_name_string))
 
 if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     answer = input(
@@ -68,24 +71,19 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     if answer == "n" or answer == "no":
         sys.exit(0)
 
-else:
-    files_contain_save_size = []
-    for file in glob.glob(SAVE_PATH.replace(".npz", "_*")):
-        index = int(file[len(SAVE_PATH) - 3 : -len(".npz")])
-        files_contain_save_size.append(index == args.save_size)
-    if len(files_contain_save_size) > 0 and not any(files_contain_save_size):
-        raise ValueError(
-            """Files in the output folder have a different save_size than the input save_size ({}).
-            It is impossible to resume from there.""".format(args.save_size)
-        )
+input_path = os.path.join(args.origin_path, "data_source", f"{args.public}")
 
+docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
 
-docs = [doc for doc in preprocess(args.input_path, count_nb_files(args.input_path))]
+if len(docs) == 0:
+    if count_nb_files(input_path) == 0:
+        raise ValueError(f"No csv files found in {input_path}")
+
 
 # Here, loading means checking what part of the data was already encoded,
 # hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
-    SAVE_PATH, args.save_size, len(docs), resume_encoding=True
+    SAVE_PATH, DEFAULT_SAVE_SIZE, len(docs), resume_encoding=True
 )
 
 
@@ -94,22 +92,22 @@ for i in tqdm(
     range(max_index, len(docs), batch_size),
     desc="Encode sentences using {}".format(sbert_name_string),
 ):
-    if i % args.save_size == 0 and i > 0:
+    if i % DEFAULT_SAVE_SIZE == 0 and i > 0:
         np.savez_compressed(
             format_npz_output(SAVE_PATH, i),
             embeddings=embeddings,
         )
 
     if i + batch_size >= len(docs):  # last iteration
-        embeddings[i % args.save_size : i % args.save_size + len(docs) % batch_size] = (
-            embedding_model.encode(docs[i : i + batch_size])
-        )
+        embeddings[
+            i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE + len(docs) % batch_size
+        ] = embedding_model.encode(docs[i : i + batch_size])
     else:
-        embeddings[i % args.save_size : i % args.save_size + batch_size] = (
+        embeddings[i % DEFAULT_SAVE_SIZE : i % DEFAULT_SAVE_SIZE + batch_size] = (
             embedding_model.encode(docs[i : i + batch_size])
         )
 
 np.savez_compressed(
     format_npz_output(SAVE_PATH, len(docs)),
-    embeddings=embeddings[: i % args.save_size + len(docs) % batch_size],
+    embeddings=embeddings[: i % DEFAULT_SAVE_SIZE + len(docs) % batch_size],
 )
