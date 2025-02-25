@@ -213,7 +213,12 @@ if "congress" in group_list:
 
     # Write representative docs for one public in one file
     write_representative_docs(
-        repr_docs_ids, party_day_counts, "congress", args.origin_path
+        repr_docs_ids,
+        party_day_counts,
+        "congress",
+        args.origin_path,
+        args.small,
+        NB_DOCS_SMALL_TRAIN,
     )
 
     print(topic_model.get_topic_info())
@@ -274,7 +279,12 @@ if group_list & set(choices):
 
         # Write representative docs for one public in one file
         write_representative_docs(
-            repr_docs_ids, party_day_counts, group, args.origin_path
+            repr_docs_ids,
+            party_day_counts,
+            group,
+            args.origin_path,
+            args.small,
+            NB_DOCS_SMALL_INFER,
         )
 
         print(topic_model.get_topic_info())

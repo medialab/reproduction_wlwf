@@ -552,6 +552,7 @@ def generate_threads(
     small,
     small_size,
     party_day_counts,
+    metadata=False,
 ):
     thread_ids = dict()
     threads = dict()
@@ -571,6 +572,8 @@ def generate_threads(
     user_pos = reader.headers.user_id
     to_user_pos = reader.headers.to_userid
     to_id_pos = reader.headers.to_tweetid
+    local_time_pos = reader.headers.local_time
+    screen_name_pos = reader.headers.user_screen_name
 
     for row in reader:
         counters["counter_all"] += 1
@@ -605,10 +608,11 @@ def generate_threads(
 
     for row in reader:
         if not row[rt_pos]:
-            if row[id_pos] in threads:
-                doc = row[text_pos] + " " + threads[row[id_pos]]
+            doc_id = row[id_pos]
+            if doc_id in threads:
+                doc = row[text_pos] + " " + threads[doc_id]
 
-            elif row[id_pos] not in thread_ids:
+            elif doc_id not in thread_ids:
                 doc = row[text_pos]
 
             else:
@@ -627,6 +631,14 @@ def generate_threads(
                 if small and counters["counter_threads"] >= small_size:
                     break
                 counters["counter_threads"] += 1
+
+                if metadata:
+                    doc = {
+                        "id": doc_id,
+                        "local_time": row[local_time_pos],
+                        "text": doc,
+                        "user_screen_name": row[screen_name_pos],
+                    }
                 yield doc
     if not compressed:
         input_file.close()
@@ -802,11 +814,14 @@ def extract_representative_docs(docs, topics, topic_model):
     return repr_docs_ids
 
 
-def write_representative_docs(repr_docs_ids, party_day_counts, group_type, path):
+def write_representative_docs(
+    repr_docs_ids, party_day_counts, group_type, path, small, small_size
+):
     inverted_index = {}
     for topic_id, doc_ids in enumerate(repr_docs_ids):
         for doc_id in doc_ids:
             inverted_index[doc_id] = topic_id
+
     with open(
         os.path.join(
             path,
@@ -821,17 +836,33 @@ def write_representative_docs(repr_docs_ids, party_day_counts, group_type, path)
         writer.writerow(["id", "local_time", "text", "user_screen_name", "topic"])
 
         file_index = 0
-        doc_count, party, day = party_day_counts[file_index]
-        for doc_id, topic_id in sorted(inverted_index.items()):
-            while doc_id >= doc_count:
-                file_index += 1
+        counters = {"counter_all": 0, "counter_original": 0, "counter_threads": 0}
+        doc_count_sum, party, day = party_day_counts[file_index]
 
+        for doc_id, topic_id in sorted(inverted_index.items()):
+            while doc_id >= doc_count_sum:
+                file_index += 1
                 doc_count, party, day = party_day_counts[file_index]
-                file_path = (
-                    os.path.join(path, "data_source", party, f"{day}.csv")
-                    if party
-                    else os.path.join(path, "data_source", f"{day}.csv")
-                )
+                doc_count_sum += doc_count
+            file_path = (
+                os.path.join(path, "data_source", group_type, party, f"{day}.csv")
+                if party
+                else os.path.join(path, "data_source", group_type, f"{day}.csv")
+            )
+            for doc in generate_threads(
+                file_path,
+                f"{day}.csv",
+                compressed=False,
+                tar=None,
+                empty_warn=[],
+                counters=counters,
+                apply_unidecode=False,
+                small=small,
+                small_size=small_size,
+                party_day_counts=party_day_counts,
+                metadata=True,
+            ):
+                print(topic_id, doc["text"])
 
 
 def count_topics_info(topics, party_day_counts, group_type):
