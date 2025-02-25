@@ -802,13 +802,20 @@ def extract_representative_docs(docs, topics, topic_model):
     return repr_docs_ids
 
 
-def write_representative_docs(path, repr_docs_ids, party_day_counts, group_type):
+def write_representative_docs(repr_docs_ids, party_day_counts, group_type, path):
     inverted_index = {}
     for topic_id, doc_ids in enumerate(repr_docs_ids):
         for doc_id in doc_ids:
             inverted_index[doc_id] = topic_id
     with open(
-        f"data_prod/dashboard/bertopic/representative_docs_{group_type}.csv", "w"
+        os.path.join(
+            path,
+            "data_prod",
+            "dashboard",
+            "bertopic",
+            f"representative_docs_{group_type}.csv",
+        ),
+        "w",
     ) as f:
         writer = csv.writer(f)
         writer.writerow(["id", "local_time", "text", "user_screen_name", "topic"])
@@ -821,9 +828,9 @@ def write_representative_docs(path, repr_docs_ids, party_day_counts, group_type)
 
                 doc_count, party, day = party_day_counts[file_index]
                 file_path = (
-                    os.path.join(path, party, f"{day}.csv")
+                    os.path.join(path, "data_source", party, f"{day}.csv")
                     if party
-                    else os.path.join(path, "{day}.csv")
+                    else os.path.join(path, "data_source", f"{day}.csv")
                 )
 
 

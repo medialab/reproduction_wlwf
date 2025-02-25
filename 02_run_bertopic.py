@@ -2,7 +2,6 @@ import os
 import sys
 import json
 import argparse
-import pandas as pd
 from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
 from umap import UMAP
@@ -213,7 +212,9 @@ if "congress" in group_list:
     repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
 
     # Write representative docs for one public in one file
-    write_representative_docs(repr_docs_ids, party_day_counts, "congress")
+    write_representative_docs(
+        repr_docs_ids, party_day_counts, "congress", args.origin_path
+    )
 
     print(topic_model.get_topic_info())
     topic_ids_list = []
@@ -272,7 +273,9 @@ if group_list & set(choices):
         repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
 
         # Write representative docs for one public in one file
-        write_representative_docs(repr_docs_ids, party_day_counts, group)
+        write_representative_docs(
+            repr_docs_ids, party_day_counts, group, args.origin_path
+        )
 
         print(topic_model.get_topic_info())
 
