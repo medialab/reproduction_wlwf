@@ -21,8 +21,8 @@ if (args$topic_model == 'lda') {
 
     db <- read.csv("data_prod/var/lda/general_TS.csv") #Data from 05a script 
 
-    pol_issues <- c(1:99)
-    stationary_issues <- c(3, 7, 8, 10, 15, 21, 23, 26, 30, 33, 34, 37, 39, 40, 42, 43, 46, 47, 48, 53, 54, 61, 64, 65, 66, 67, 73, 77, 79, 82, 83, 84, 87, 88, 89, 92, 93, 95, 98 ) #Obtained in 05b script
+    pol_issues <- c(1:100)
+    stationary_issues <- c(3, 7, 8, 10, 15, 21, 23, 26, 30, 33, 34, 37, 39, 40, 42, 43, 46, 47, 48, 53, 54, 61, 64, 65, 66, 67, 73, 77, 79, 82, 83, 84, 87, 88, 89, 92, 93, 95, 98, 100) #Obtained in 05b script
 } else {
     db <- read.csv("data_prod/var/bertopic/general_TS.csv") #Data from 05a script 
 

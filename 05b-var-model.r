@@ -9,6 +9,7 @@ library(boot)
 library(rio)
 library(tseries)
 library(argparse)
+library(stats)
 
 parser <- ArgumentParser()
 
@@ -23,7 +24,7 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 #Put our main databse generated thanks to script 05a 
 if (args$topic_model == 'lda') {
   db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-  pol_issues <- c(1:99)
+  pol_issues <- c(1:100)
 } else {
   db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
   pol_issues <- c(0:211)
@@ -32,6 +33,7 @@ if (args$topic_model == 'lda') {
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
 results_list <- list()
+results_list2 <- list()
 
 # - logit transform all series
 for (v in variables) {
@@ -53,6 +55,7 @@ for (v in variables) {
     # Augmented Dickey-Fuller (ADF) test for stationarity
     db_topic <- db[db$topic == topic_n, ]
     data <- db_topic[[v]]
+    data <- as.ts(data)
     if (sd(data) > 0) {
       adf <- adf.test(data)
       p_value <- adf$p.value
@@ -69,6 +72,43 @@ non_full_stationarity_topics <- unique(results_df$topic)
 stationary_topics <- setdiff(pol_issues, non_full_stationarity_topics)
 print(paste("Number of topics where time series for each group are stationary: ", length(stationary_topics)))
 cat("The topic numbers that satisfy this property:", stationary_topics, "\n")
+
+for (topic in non_full_stationarity_topics) {
+  for (v in variables) {
+    db_topic <- db[db$topic == topic, ]
+    data <- db_topic[[v]]
+    data <- as.ts(data)
+    if (sd(data) > 0) {
+      adf <- adf.test(data)
+      p_value <- adf$p.value
+      if (p_value > 0.05) {  # Vérifier si la série est non stationnaire
+        data_diff <- diff(data)
+        if (sd(data_diff) > 0) {
+          adf2 <- adf.test(data_diff)
+          p_value2 <- adf2$p.value
+          if (p_value2 > 0.05) {
+            results_list2 <- append(results_list2, list(list(topic, v, p_value2)))
+          }
+        }
+      }
+    }
+  }
+}
+
+if (length(results_list2) == 0) {
+  print("results_list2 est vide, aucun résultat à transformer en dataframe.")
+  stationary_topics2 <- non_full_stationarity_topics
+} else {
+  print("results_list2 contient des données.")
+  results_df2 <- do.call(rbind, lapply(results_list2, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
+  colnames(results_df2) <- c("topic", "variable", "p_value")
+  non_full_stationarity_topics2 <- unique(results_df2$topic)
+  stationary_topics2 <- setdiff(non_full_stationarity_topics, non_full_stationarity_topics2)
+}
+merged_statio <- c(stationary_topics, stationary_topics2)
+
+print(paste("Number of topics where time series for each group are stationary or I(1): ", length(merged_statio)))
+cat("The topic numbers that satisfy this property:", merged_statio, "\n")
 
 '''
 maindb <- db %>%
