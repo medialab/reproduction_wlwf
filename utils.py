@@ -815,12 +815,13 @@ def extract_representative_docs(docs, topics, topic_model):
 
 
 def write_representative_docs(
-    repr_docs_ids, party_day_counts, group_type, path, small, small_size
+    repr_docs_ids, party_day_counts, public, path, small, small_size
 ):
-    inverted_index = {}
+    doc_topic_pairs = []
     for topic_id, doc_ids in enumerate(repr_docs_ids):
         for doc_id in doc_ids:
-            inverted_index[doc_id] = topic_id
+            doc_topic_pairs.append((doc_id, topic_id - 1))
+    doc_topic_pairs = sorted(doc_topic_pairs)
 
     with open(
         os.path.join(
@@ -828,27 +829,44 @@ def write_representative_docs(
             "data_prod",
             "dashboard",
             "bertopic",
-            f"representative_docs_{group_type}.csv",
+            f"representative_docs_{public}.csv",
         ),
         "w",
     ) as f:
         writer = csv.writer(f)
-        writer.writerow(["id", "local_time", "text", "user_screen_name", "topic"])
+        writer.writerow(
+            [
+                "id",
+                "local_time",
+                "text",
+                "user_screen_name",
+                "topic",
+                "party",
+            ]
+        )
 
-        file_index = 0
+        doc_index = 0
+        doc_topic_pairs_index = 0
         counters = {"counter_all": 0, "counter_original": 0, "counter_threads": 0}
-        doc_count_sum, party, day = party_day_counts[file_index]
+        doc_count_sum = 0
+        for row in tqdm(party_day_counts, desc="Write representative documents"):
+            if len(row) == 3:
+                doc_count, party, day = row
+                file_path = os.path.join(
+                    path, "data_source", public, party, f"{day}.csv"
+                )
+            else:
+                party = ""
+                doc_count, day = row
+                file_path = os.path.join(path, "data_source", public, f"{day}.csv")
 
-        for doc_id, topic_id in sorted(inverted_index.items()):
-            while doc_id >= doc_count_sum:
-                file_index += 1
-                doc_count, party, day = party_day_counts[file_index]
-                doc_count_sum += doc_count
-            file_path = (
-                os.path.join(path, "data_source", group_type, party, f"{day}.csv")
-                if party
-                else os.path.join(path, "data_source", group_type, f"{day}.csv")
-            )
+            doc_count_sum += doc_count
+
+            # Skip file if no representative doc inside
+            if doc_topic_pairs[doc_topic_pairs_index][0] > doc_count_sum:
+                doc_index += doc_count
+                continue
+
             for doc in generate_threads(
                 file_path,
                 f"{day}.csv",
@@ -862,7 +880,22 @@ def write_representative_docs(
                 party_day_counts=party_day_counts,
                 metadata=True,
             ):
-                print(topic_id, doc["text"])
+                if doc_topic_pairs_index >= len(doc_topic_pairs):
+                    return
+                doc_id, topic = doc_topic_pairs[doc_topic_pairs_index]
+                if doc_index == doc_id:
+                    writer.writerow(
+                        [
+                            doc["id"],
+                            doc["local_time"],
+                            doc["text"],
+                            doc["user_screen_name"],
+                            topic,
+                            party,
+                        ]
+                    )
+                    doc_topic_pairs_index += 1
+                doc_index += 1
 
 
 def count_topics_info(topics, party_day_counts, group_type):
