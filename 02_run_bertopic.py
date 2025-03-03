@@ -8,7 +8,7 @@ from umap import UMAP
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
-# import pandas as pd (put in comment because pandas part code is currently in comments)
+
 
 from utils import (
     choices,
