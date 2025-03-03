@@ -3,8 +3,9 @@ import argparse
 from bertopic import BERTopic
 import os
 from sklearn.metrics import homogeneity_completeness_v_measure
+from sentence_transformers import SentenceTransformer
 
-from utils import existing_dir_path, SBERT_NAME
+from utils import existing_dir_path, SBERT_NAME, reduce_doc_size
 
 parser = argparse.ArgumentParser()
 
@@ -101,4 +102,18 @@ df_ground["topic_true"] = df_ground.index.to_series().apply(create_topic_true)
 ground_measure = homogeneity_completeness_v_measure(
     df_ground["topic_true"], df_ground["topic_pred"]
 )
-print(ground_measure)
+
+subset_annot = df_annot[(df_annot.coherence_doc == "bonne") & (df_annot.pertinence_doc == "oui")]
+embedding_model = SentenceTransformer(SBERT_NAME)
+docs = [reduce_doc_size(doc, length=500) for doc in subset_annot["Document"]]
+"Encode annotation"
+embeddings = embedding_model.encode(docs, show_progress_bar=True)
+topics, probs = topic_model.transform(docs, embeddings)
+
+homogeneity, completeness, v_measure = homogeneity_completeness_v_measure(
+    subset_annot["Topic_doc"], topics
+)
+
+print(f"Homogeneity: {round(homogeneity, 2)}")
+print(f"Completeness: {round(completeness, 2)}")
+print(f"V-Measure: {round(v_measure, 2)}")
