@@ -95,6 +95,8 @@ for (topic in non_full_stationarity_topics) {
   }
 }
 
+
+
 if (length(results_list2) == 0) {
   print("results_list2 est vide, aucun résultat à transformer en dataframe.")
   stationary_topics2 <- non_full_stationarity_topics
@@ -110,6 +112,56 @@ merged_statio <- c(stationary_topics, stationary_topics2)
 print(paste("Number of topics where time series for each group are stationary or I(1): ", length(merged_statio)))
 cat("The topic numbers that satisfy this property:", merged_statio, "\n")
 
+ACF_data <- data.frame(matrix(NA, nrow = length(variables), ncol = length(pol_issues)))
+PACF_data <- data.frame(matrix(NA, nrow = length(variables), ncol = length(pol_issues)))
+colnames(ACF_data) <- as.character(pol_issues) 
+rownames(ACF_data) <- variables
+colnames(PACF_data) <- as.character(pol_issues)
+rownames(PACF_data) <- variables
+
+counter_const <- 0
+for (topic in pol_issues) {
+  topic_str <- as.character(topic)
+  db_topic <- db[db$topic == topic, ]
+  for (v in variables) {
+    data <- db_topic[[v]]
+    if (sd(data) == 0) {
+      counter_const <- counter_const + 1
+    } else{
+      data_diff <- diff(data)
+      acf_values <- acf(data_diff, lag.max = 30, plot= FALSE)$acf
+      pacf_values <- pacf(data_diff, lag.max = 30, plot= FALSE)$acf
+
+      # Trouver les indices où acf_values >= 0.1 et pacf_values >= 0.1
+      above_threshold_acf <- which(abs(acf_values) >= 0.1)
+      above_threshold_pacf <- which(abs(pacf_values) >= 0.1)
+
+      # Trouver le dernier indice où acf >= 0.1
+      if (length(above_threshold_acf) == 0) {
+        number_lag_acf <- 0  # Si aucun ACF >= 0.1, on prend lag 0
+      } else {
+        number_lag_acf <- max(above_threshold_acf) - 1
+      }
+
+      #De même pour PACF
+      if (length(above_threshold_pacf) == 0) {
+        number_lag_pacf <- 0  # Si aucun ACF >= 0.1, on prend lag 1
+      } else {
+        number_lag_pacf <- max(above_threshold_pacf) 
+      }
+
+      ACF_data[v, topic_str] <- number_lag_acf
+      PACF_data[v, topic_str] <- number_lag_pacf
+    }
+  }
+}
+
+# Résumé du nombre de séries constantes
+print(paste("Nombre de séries constantes :", counter_const))
+
+# Afficher les résultats
+print(ACF_data)
+print(PACF_data)
 '''
 maindb <- db %>%
   filter(topic %in% pol_issues)
