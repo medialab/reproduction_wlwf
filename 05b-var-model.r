@@ -160,8 +160,8 @@ for (topic in pol_issues) {
 print(paste("Nombre de séries constantes :", counter_const))
 
 # Afficher les résultats
-print(ACF_data)
-print(PACF_data)
+print(summary(t(ACF_data)))
+print(summary(t(PACF_data)))
 '''
 maindb <- db %>%
   filter(topic %in% pol_issues)
