@@ -9,14 +9,31 @@ library(ggplot2)
 library(ggthemes)
 library(readr)
 library(tidyverse)
+library(argparse)
+
+parser <- ArgumentParser()
+
+parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
+
+args <- parser$parse_args()
+
+if (!(args$topic_model %in% c('bertopic', 'lda'))){
+  stop("The model name is incorrect. Choose between lda and bertopic")
+}
 
 # Chargement des données
 
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
 # load("data_prod/dashboard/qois.rdata")  # topic_scores
 # representative tweets
-load("data_prod/dashboard/congress-rs-tweets.rdata")
-load("data_prod/dashboard/media-rs-tweets.rdata")
+if (args$topic_model == 'lda') {
+  load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
+  load("data_prod/dashboard/lda/media-rs-tweets.rdata")
+} else {
+  congress_rs <- read_csv("data_prod/dashboard/bertopic/data/representative_docs_congress.csv")
+  media_rs <- read_csv("data_prod/dashboard/bertopic/data/representative_docs_media.csv")
+}
+
 # qois_long <- qois |>
 #   select(topic, starts_with("prop_")) |>
 #   pivot_longer(cols = starts_with("prop"),
@@ -25,11 +42,17 @@ load("data_prod/dashboard/media-rs-tweets.rdata")
 #                values_to = "prop")
 
 # UI
+
+if (args$topic_model == 'lda') {
+  choices_top = 1:100
+} else {
+  choices_top = 0:211
+}
 ui <- fluidPage(
   titlePanel("Annotation de Topics LDA"),
  fluidRow(
    column(2,
-      selectInput("topic", "Choisissez un topic :", choices = 1:100)
+      selectInput("topic", "Choisissez un topic :", choices = choices_top)
       )
     ),
  fluidRow(
@@ -109,9 +132,15 @@ plot_ts  <- function(df, checked_actors, selected_topic){
 }
 
 # Server
+if (args$topic_model == 'lda') {
+  source_ts <- file.path("data_prod/dashboard/lda/data/ts-", input$topic,".csv")
+} else {
+  source_ts <- file.path("data_prod/dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
+}
+
 server <- function(input, output){
   df <- reactive({
-    file_name <- paste0("data_prod/dashboard/lda/data/ts-", input$topic,".csv")
+    file_name <- source_ts
     read_csv(file_name)
   })
   selected_topic <- reactive(input$topic)
@@ -131,8 +160,13 @@ server <- function(input, output){
 # )
 
   # Image des mots spécifiques du topic
+if (args$topic_model == 'lda') {
+  source_topwords <- file.path("data_prod/dashboard/lda/img", paste0("words-plot-", input$topic, ".png"))
+} else {
+  source_topwords <- file.path("data_prod/dashboard/bertopic/img", paste0("bertopic_", input$topic, ".png"))
+}
 output$topwords_image <- renderImage({
-    list(src = file.path("data_prod/dashboard/lda/img", paste0("words-plot-", input$topic, ".png")),
+    list(source_topwords,
          contentType = 'image/png',
          alt = "Mots spécifiques",
          width = "100%",
