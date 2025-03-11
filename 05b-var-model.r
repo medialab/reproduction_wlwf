@@ -720,9 +720,7 @@ plot_db$data_type <- ifelse(
   "The effect of a one time 10 percentage point increase in day 0             ",
   "The effect of a permanent 10 percentage point increase in day 0"
 )
-write.csv(plot_db,
-            "data_prod/plot.csv",
-            row.names = FALSE)
+
 print("Generate Plot")
 # OUTPUT -- FIGURE 2
 #===============================================================================
