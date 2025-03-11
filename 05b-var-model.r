@@ -720,7 +720,9 @@ plot_db$data_type <- ifelse(
   "The effect of a one time 10 percentage point increase in day 0             ",
   "The effect of a permanent 10 percentage point increase in day 0"
 )
-
+write.csv(plot_db,
+            "data_prod/plot.csv",
+            row.names = FALSE)
 print("Generate Plot")
 # OUTPUT -- FIGURE 2
 #===============================================================================
@@ -740,7 +742,8 @@ if (args$topic_model == 'lda') {
 
 y_text <- paste("\n", args$number_irf, "-day Responses (in percentage points)")
 
-
+min_value <- min(plot_db$lwr)
+max_value <- max(plot_db$upr)
 
 ggplot(plot_db,
        aes(x = cov, y = pe, ymin = lwr, ymax = upr, col = data_type)) +
@@ -750,7 +753,7 @@ ggplot(plot_db,
   coord_flip() +
   xlab("") +
   scale_y_continuous(y_text,
-                     limits = c(-2, 10), expand = c(0,0)) +
+                     limits = c(min_value - 0.01, max_value + 0.01), expand = c(0,0)) +
   scale_color_manual("",values = c("gray60", "gray10")) +
   theme(
     panel.spacing = unit(1.05, "lines"),
