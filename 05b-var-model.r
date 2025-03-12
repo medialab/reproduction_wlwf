@@ -268,41 +268,6 @@ if (args$estimate){
 
   final_db <- bind_rows(diff_data_list)
 
-  #Correction to avoid regression between values from different topics
-  lags <- args$number_lags
-  number_dates_diff <- 267 
-
-  if (args$media) {
-      new_line <- data.frame(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    } else {
-      new_line <- data.frame(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    }
-  
-  colnames(new_line) <- colnames(final_db)
-  
-  db_empty <- bind_rows(rep(list(new_line), lags))
-
-  count_topic <- 0
-  list_new_db <- list()
-  for (i in (0:(length(unique(final_db$topic))-1))) {
-    start_value <- 1 + i*number_dates_diff
-    end_value <- (i+1)*number_dates_diff
-    db_old <- final_db[c(start_value:end_value),]
-    if (i != length(unique(final_db$topic))-1) {
-      db_empty_modified <- db_empty
-      db_empty_modified[, ncol(db_empty_modified)] <- unique(final_db$topic)[i+2] 
-      db_old <- rbind(db_old, db_empty_modified)
-    } 
-    list_new_db[[i + 1]] <- db_old 
-    count_topic <- count_topic +1
-  }
-
-  final_db <- do.call(rbind, list_new_db)
-
-  write.csv(final_db,
-          "data_prod/db_after_add_0.csv",
-          row.names = FALSE)
-
   if (args$media) {
     variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media', 'topic')
   } else {
@@ -324,6 +289,7 @@ if (args$estimate){
 
   print("VAR Estimation")
   # - estimating the model for p lags
+  lags <- args$number_lags
   var_model_merged <- VAR(y = X_endogenous, p = lags, exogen = X_exogenous)
 
   print("Cumulative IRF preparation")
