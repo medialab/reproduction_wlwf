@@ -28,7 +28,7 @@ parser$add_argument("--tests", action = "store_true",
 
 parser$add_argument("--number_lags", help="Choose a int who will represent the number of lags in VAR model", type="integer", default=10)
 
-parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=15)
+parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=21)
 
 
 args <- parser$parse_args()
@@ -273,24 +273,24 @@ if (args$estimate){
   number_dates_diff <- 267 
 
   if (args$media) {
-      new_line <- data.frame(0, "no topic here", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+      new_line <- data.frame(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     } else {
-      new_line <- data.frame(0, "no topic here", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+      new_line <- data.frame(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     }
   
-  colnames(new_line) <- colnames(db)
+  colnames(new_line) <- colnames(final_db)
   
   db_empty <- bind_rows(rep(list(new_line), lags))
 
   count_topic <- 0
   list_new_db <- list()
   for (i in (0:(length(unique(final_db$topic))-1))) {
-    start_value <- 1 + i*number_dates
-    end_value <- (i+1)*number_dates
+    start_value <- 1 + i*number_dates_diff
+    end_value <- (i+1)*number_dates_diff
     db_old <- final_db[c(start_value:end_value),]
     if (i != length(unique(final_db$topic))-1) {
       db_empty_modified <- db_empty
-      db_empty_modified[, 2] <- unique(final_db$topic)[i+2] 
+      db_empty_modified[, ncol(db_empty_modified)] <- unique(final_db$topic)[i+2] 
       db_old <- rbind(db_old, db_empty_modified)
     } 
     list_new_db[[i + 1]] <- db_old 
@@ -298,6 +298,10 @@ if (args$estimate){
   }
 
   final_db <- do.call(rbind, list_new_db)
+
+  write.csv(final_db,
+          "data_prod/db_after_add_0.csv",
+          row.names = FALSE)
 
   if (args$media) {
     variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media', 'topic')
