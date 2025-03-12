@@ -30,8 +30,8 @@ if (args$topic_model == 'lda') {
   load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
   load("data_prod/dashboard/lda/media-rs-tweets.rdata")
 } else {
-  congress_rs <- read_csv("data_prod/dashboard/bertopic/data/representative_docs_congress.csv")
-  media_rs <- read_csv("data_prod/dashboard/bertopic/data/representative_docs_media.csv")
+  congress_rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv")
+  media_rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
 }
 
 # qois_long <- qois |>
@@ -46,7 +46,7 @@ if (args$topic_model == 'lda') {
 if (args$topic_model == 'lda') {
   choices_top = 1:100
 } else {
-  choices_top = 0:211
+  choices_top = 0:92
 }
 ui <- fluidPage(
   titlePanel("Annotation de Topics LDA"),
@@ -132,17 +132,28 @@ plot_ts  <- function(df, checked_actors, selected_topic){
 }
 
 # Server
-if (args$topic_model == 'lda') {
-  source_ts <- file.path("data_prod/dashboard/lda/data/ts-", input$topic,".csv")
-} else {
-  source_ts <- file.path("data_prod/dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
-}
 
 server <- function(input, output){
   df <- reactive({
-    file_name <- source_ts
-    read_csv(file_name)
+    if (args$topic_model == 'lda') {
+      source_ts <- paste0("data_prod/dashboard/lda/data/ts-", input$topic,".csv")
+    } else {
+      source_ts <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
+    }
+
+  file_name <- source_ts
+  df_data <- read_csv(file_name)
+
+  if(args$topic_model == 'bertopic') { #Adapt bertopic to script structure
+    df_data <- df_data %>% mutate(party = recode(party, "lr" = "dep. lr", "majority" = "dep. majo.", "nupes" = "dep. nupes", "rn" = "dep. rn", "lr_supp" = "sup. lr", "majority_supp" = "sup. majo.", "nupes_supp" = "sup. nupes", "rn_supp" = "sup. rn", "attentive" = "pub. attentif", "general" = "pub. general", "media" = "medias"))
+    colnames(df) <- c("date", "actor", "topic", "prop")
+  }
+
+  df_data
   })
+
+  req(input$topic, input$acteurs)
+
   selected_topic <- reactive(input$topic)
   checked_partys <- reactive(input$acteurs)
 
