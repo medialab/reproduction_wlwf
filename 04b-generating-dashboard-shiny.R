@@ -49,7 +49,7 @@ if (args$topic_model == 'lda') {
   choices_top = 0:92
 }
 ui <- fluidPage(
-  titlePanel("Annotation de Topics LDA"),
+  titlePanel("Annotation de Topics"),
  fluidRow(
    column(2,
       selectInput("topic", "Choisissez un topic :", choices = choices_top)
@@ -151,8 +151,6 @@ server <- function(input, output){
 
   df_data
   })
-
-  req(input$topic, input$acteurs)
 
   selected_topic <- reactive(input$topic)
   checked_partys <- reactive(input$acteurs)
