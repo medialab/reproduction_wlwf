@@ -88,8 +88,6 @@ if (args$estimate){
   results_list <- list()
   results_list2 <- list()
 
-  count_msg <- 0
-
   # - logit transform all series
   for (v in variables) {
     # - pulling the series-agenda for that group
