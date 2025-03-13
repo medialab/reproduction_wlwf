@@ -23,13 +23,21 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 
 # Chargement des données
 
-# load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
-# load("data_prod/dashboard/qois.rdata")  # topic_scores
-# representative tweets
+# Take data and values
 if (args$topic_model == 'lda') {
+  choices_top = 1:100
+  titleUI <- "Annotation de Topics LDA"
+  source_ts <- paste0("data_prod/dashboard/lda/data/ts-")
+  name_img <- "words-plot-"
+  source_img <- "data_prod/dashboard/lda/img"
   load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
   load("data_prod/dashboard/lda/media-rs-tweets.rdata")
 } else {
+  choices_top = 0:92
+  titleUI <- "Annotation de Topics BERTopic" 
+  source_ts <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_")
+  name_img <- "bertopic_" 
+  source_img <- "data_prod/dashboard/bertopic/img"
   congress_rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv")
   media_rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
 }
@@ -43,13 +51,10 @@ if (args$topic_model == 'lda') {
 
 # UI
 
-if (args$topic_model == 'lda') {
-  choices_top = 1:100
-} else {
-  choices_top = 0:92
-}
+
+
 ui <- fluidPage(
-  titlePanel("Annotation de Topics"),
+  titlePanel(titleUI),
  fluidRow(
    column(2,
       selectInput("topic", "Choisissez un topic :", choices = choices_top)
@@ -96,6 +101,10 @@ ui <- fluidPage(
 
 plot_ts  <- function(df, checked_actors, selected_topic){
 
+  if(args$topic_model == 'bertopic') { #Adapt bertopic to script structure
+    df <- df %>% mutate(party = recode(party, "lr" = "dep. lr", "majority" = "dep. majo.", "nupes" = "dep. nupes", "rn" = "dep. rn", "lr_supp" = "sup. lr", "majority_supp" = "sup. majo.", "nupes_supp" = "sup. nupes", "rn_supp" = "sup. rn", "attentive" = "pub. attentif", "general" = "pub. general", "media" = "medias"))
+    colnames(df) <- c("date", "actor", "topic", "prop")
+  }
   df |>
     filter(actor %in% {{checked_actors}}) |>
     ggplot() +
@@ -135,23 +144,10 @@ plot_ts  <- function(df, checked_actors, selected_topic){
 
 server <- function(input, output){
   df <- reactive({
-    if (args$topic_model == 'lda') {
-      source_ts <- paste0("data_prod/dashboard/lda/data/ts-", input$topic,".csv")
-    } else {
-      source_ts <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
-    }
-
-  file_name <- source_ts
-  df_data <- read_csv(file_name)
-
-  if(args$topic_model == 'bertopic') { #Adapt bertopic to script structure
-    df_data <- df_data %>% mutate(party = recode(party, "lr" = "dep. lr", "majority" = "dep. majo.", "nupes" = "dep. nupes", "rn" = "dep. rn", "lr_supp" = "sup. lr", "majority_supp" = "sup. majo.", "nupes_supp" = "sup. nupes", "rn_supp" = "sup. rn", "attentive" = "pub. attentif", "general" = "pub. general", "media" = "medias"))
-    colnames(df) <- c("date", "actor", "topic", "prop")
-  }
-
-  df_data
+  file_name <- paste0(source_ts, input$topic, ".csv")
+  read_csv(file_name, show_col_types = FALSE)
   })
-
+  
   selected_topic <- reactive(input$topic)
   checked_partys <- reactive(input$acteurs)
 
@@ -169,12 +165,9 @@ server <- function(input, output){
 # )
 
   # Image des mots spécifiques du topic
-if (args$topic_model == 'lda') {
-  source_topwords <- file.path("data_prod/dashboard/lda/img", paste0("words-plot-", input$topic, ".png"))
-} else {
-  source_topwords <- file.path("data_prod/dashboard/bertopic/img", paste0("bertopic_", input$topic, ".png"))
-}
-output$topwords_image <- renderImage({
+
+  source_topwords <- file.path(source_img, paste0(name_img, input$topic, ".png"))
+  output$topwords_image <- renderImage({
     list(source_topwords,
          contentType = 'image/png',
          alt = "Mots spécifiques",
