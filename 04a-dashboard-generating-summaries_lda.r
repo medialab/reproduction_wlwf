@@ -19,7 +19,7 @@
 # pacman::p_load("topicmodels", "reshape", "ggplot2", "gtable", "gridExtra", "scales", "ggdendro", "ggthemes", "slam", "Matrix", "tm", "tidyverse", "khroma")
 
 suppressPackageStartupMessages({
-  library(tidyverse)
+library(tidyverse)
 library(topicmodels)
 library(reshape)
 library(ggplot2)
@@ -31,7 +31,6 @@ library(ggthemes)
 library(slam)
 library(Matrix)
 library(tm)
-library(argparse)
 })
 
 check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
@@ -41,15 +40,6 @@ check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
   }
 }
 
-parser <- ArgumentParser()
-
-parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
-
-args <- parser$parse_args()
-
-if (!(args$topic_model %in% c('bertopic', 'lda'))){
-  stop("The model name is incorrect. Choose between lda and bertopic")
-}
 
 # DATA
 #===============================================================================
