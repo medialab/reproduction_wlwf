@@ -31,6 +31,7 @@ library(ggthemes)
 library(slam)
 library(Matrix)
 library(tm)
+library(argparse)
 })
 
 check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
@@ -38,6 +39,16 @@ check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
     stop(sprintf("La matrice a des dimensions incorrectes : attendu %d lignes et %d colonnes, mais obtenu %d lignes et %d colonnes.",
                  expected_rows, expected_cols, nrow(mat), ncol(mat)))
   }
+}
+
+parser <- ArgumentParser()
+
+parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
+
+args <- parser$parse_args()
+
+if (!(args$topic_model %in% c('bertopic', 'lda'))){
+  stop("The model name is incorrect. Choose between lda and bertopic")
 }
 
 # DATA
@@ -308,8 +319,8 @@ general <- build_ts(
 )
 
 # créé le répertoire data si besoin
-if (!dir.exists("data_prod/dashboard/files/data")) {
-  dir.create("data_prod/dashboard/files/data",
+if (!dir.exists("data_prod/dashboard/lda/data")) {
+  dir.create("data_prod/dashboard/lda/data",
              recursive = TRUE)
 }
 
@@ -474,7 +485,7 @@ for (i in 1:nrow(rs)){
 
 }
 congress_rs <- rs
-save(congress_rs, file="data_prod/dashboard/congress-rs-tweets.rdata")
+save(congress_rs, file="data_prod/dashboard/lda/congress-rs-tweets.rdata")
 #
 #
 ### >> Medias ----
@@ -552,7 +563,7 @@ for (i in 1:nrow(rs)){
 }
 
 media_rs <- rs
-save(media_rs, file="data_prod/dashboard/media-rs-tweets.rdata")
+save(media_rs, file="data_prod/dashboard/lda/media-rs-tweets.rdata")
 #
 # file.remove("data_temp/all_media_IPG_tweets.csv",
 #             "data_temp/all_deputesXVI_tweets.csv")
