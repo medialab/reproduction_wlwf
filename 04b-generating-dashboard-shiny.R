@@ -21,9 +21,9 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
   stop("The model name is incorrect. Choose between lda and bertopic")
 }
 
-# Chargement des données
+# Charge data
 
-# Take data and values
+# Take data and values according to topic model type
 if (args$topic_model == 'lda') {
   choices_top = 1:100
   titleUI <- "Annotation de Topics LDA"
@@ -214,21 +214,21 @@ server <- function(input, output){
 #                      choices = unique(congress_tweets_data()$topic))
 #  })
   
-  # Générer les tweets HTML pour le topic sélectionné
+  # Create tweets HTML for selected topic
   output$congress_tweets <- renderUI({
     req(input$topic) # Attendre que l'utilisateur sélectionne un topic
     selected_congress_tweets <- reactive({
       congress_rs |> filter(topic == input$topic)
                                 })
     
-    # Organiser les tweets en deux colonnes
+    # Organize in two columns
     HTML(#paste(
       selected_congress_tweets()$embed#, collapse = "<br><br>")
       )
   })
   
   output$media_tweets <- renderUI({
-    req(input$topic) # Attendre que l'utilisateur sélectionne un topic
+    req(input$topic) # Wait topic selection by the user
     selected_media_tweets <- reactive({
       media_rs |> filter(topic == input$topic)
     })
