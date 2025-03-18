@@ -1,5 +1,4 @@
 #install.packages(c("rio", "vars", "tseries"))
-
 library(dplyr)
 library(tidyverse)
 library(tidyr)
@@ -11,6 +10,7 @@ library(tseries)
 library(argparse)
 library(stats)
 library(urca)
+library(plm)
 
 parser <- ArgumentParser()
 
@@ -150,7 +150,23 @@ if (args$estimate){
       }
     }
   }
-   print("Preprocessing (continued)")
+  print("Preprocessing (continued)")
+
+  pdb <- pdata.frame(db, index=c("topic", "date"))
+
+  for (v in variables){
+    data_p <- pdb[[v]]
+    levin <- purtest(data_p, test='hadri')
+    p_value <- levin$statistic$p.value[[1]]
+    if (p_value <0.05){
+      print(paste(v, "Stationary", p_value))
+    } else{
+      print(paste(v, "Non-Stationary", p_value))
+    }
+  }
+   
+
+  stop()
 
   final_db <- db 
   
