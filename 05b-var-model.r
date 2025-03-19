@@ -11,19 +11,17 @@ library(argparse)
 library(stats)
 library(urca)
 library(plm)
+library(panelvar)
 
 parser <- ArgumentParser()
 
 parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
 
 parser$add_argument("--estimate", action = "store_true",
-help = "Run the script who estimate VAR and IRF")
-
-parser$add_argument("--media", action = "store_true",
-help = "Control by media in model")
+help = "Run the script who estimate PVAR and IRF")
 
 parser$add_argument("--tests", action = "store_true",
-                    help = "Activate to do the part where we test stationnarity, stationnarity after differentiation, PACF and ACF informations")
+                    help = "Activate to test the absence of unit roots and to print the selection criteria")
 
 
 parser$add_argument("--number_lags", help="Choose a int who will represent the number of lags in VAR model", type="integer", default=10)
@@ -39,28 +37,14 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 
 if (!(args$estimate)){
   if (args$topic_model == 'lda') {
-    if(args$media) {
-      if (!file.exists("data_prod/var/lda/var_model-MAIN_with_media.Rdata") ||
-      !file.exists("data_prod/var/lda/var_irfs-MAIN_with_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
+    if (!file.exists("data_prod/var/lda/var_model-MAIN.Rdata") ||
+    !file.exists("data_prod/var/lda/var_irfs-MAIN.Rdata")) {
+      stop("No var and irf files were found. Please run the --estimate option")
       }
-    } else {
-      if (!file.exists("data_prod/var/lda/var_model-MAIN_without_media.Rdata") ||
-      !file.exists("data_prod/var/lda/var_irfs-MAIN_without_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
-      }
-    }
   } else {
-     if(args$media) {
-      if (!file.exists("data_prod/var/bertopic/var_model-MAIN_with_media.Rdata") ||
-      !file.exists("data_prod/var/bertopic/var_irfs-MAIN_with_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
-      }
-    } else {
-      if (!file.exists("data_prod/var/bertopic/var_model-MAIN_without_media.Rdata") ||
-      !file.exists("data_prod/var/bertopic/var_irfs-MAIN_without_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
-      }
+    if (!file.exists("data_prod/var/bertopic/var_model-MAIN.Rdata") ||
+    !file.exists("data_prod/var/bertopic/var_irfs-MAIN_.Rdata")) {
+      stop("No var and irf files were found. Please run the --estimate option")
     }
   }
 }
@@ -72,7 +56,6 @@ if (args$estimate){
   if (args$topic_model == 'lda') {
     db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
     pol_issues <- c(1:100)
-    print(dim(db))
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
     pol_issues <- c(0:92)
@@ -81,18 +64,8 @@ if (args$estimate){
   db <- db %>%
     filter(topic %in% pol_issues)
 
-  if (args$media) {
-    variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
-  } else {
-    variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general')
-  }
+  variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
-  if (args$tests){
-    ACF_data <- data.frame(matrix(NA, nrow = 1, ncol = length(variables)))
-    PACF_data <- data.frame(matrix(NA, nrow = 1, ncol = length(variables)))
-    colnames(ACF_data) <- variables 
-    colnames(PACF_data) <- variables
-  }
 
   # - logit transform all series
   for (v in variables) {
@@ -116,123 +89,80 @@ if (args$estimate){
     # - applying the non-linear transformation
     logit_x <- log(x / (1 - x))
     db[,v] <- logit_x
-
-    if (args$tests) {
-      if(count_msg == 0) {
-        print("Start testing process")
-        count_msg <-1
-      }
-      data <- as.ts(db[,v])
-      if (sd(data) > 0) {
-        adf <- adf.test(data)
-        p_value <- adf$p.value
-        print(paste("variable", v, p_value))
-
-        acf_values <- acf(data, lag.max = 30, plot= FALSE)$acf
-        pacf_values <- pacf(data, lag.max = 30, plot= FALSE)$acf
-        below_threshold_acf <- which(abs(acf_values) < 0.1)
-        below_threshold_pacf <- which(abs(pacf_values) < 0.1)
-
-        if (length(below_threshold_acf) > 0) {
-          number_lag_acf <- below_threshold_acf[1]  # Premier lag où ACF < 0.1
-        } else {
-          number_lag_acf <- 31  # Aucun lag trouvé, on prend 31
-          }
-
-        if (length(below_threshold_pacf) > 0) {
-          number_lag_pacf <- below_threshold_pacf[1]  # Premier lag où PACF < 0.1
-        } else {
-          number_lag_pacf <- 31  # Aucun lag trouvé, on prend 31
-        }
-
-        ACF_data[1, v] <- number_lag_acf
-        PACF_data[1, v] <- number_lag_pacf 
-      }
-    }
-  }
-  print("Preprocessing (continued)")
-
-  pdb <- pdata.frame(db, index=c("topic", "date"))
-
-  for (v in variables){
-    data_p <- pdb[[v]]
-    levin <- purtest(data_p, test='hadri')
-    p_value <- levin$statistic$p.value[[1]]
-    if (p_value <0.05){
-      print(paste(v, "Stationary", p_value))
-    } else{
-      print(paste(v, "Non-Stationary", p_value))
-    }
-  }
-   
-
-  stop()
-
-  final_db <- db 
-  
-  final_db$topic <- as.character(db$topic)
-
-  if (args$media) {
-    variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media', 'topic')
-  } else {
-    variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'topic')
-  }
-  mformula <- formula(paste0("~", 
-                            paste0(variables, collapse = " + ")))
-  model_data <- model.matrix(mformula, final_db[, variables])
-  model_data <- model_data[, 2:ncol(model_data)] # removing intercept
-
-  # - splitting the covariates of interest from the issue dummy variables
-  X_endogenous <- model_data[, which(!grepl("topic", colnames(model_data)))]
-  X_exogenous <- model_data[, which(grepl("topic", colnames(model_data)))]
-
-  if (args$tests) {
-    print("ACF Results")
-    print(ACF_data)
-    print("PACF Results")
-    print(PACF_data)
-    AIC_and_co <- VARselect(X_endogenous, lag.max = 30, season = NULL, exogen = X_exogenous)
-    print(AIC_and_co)
   }
 
   print("VAR Estimation")
   # - estimating the model for p lags
+
+  #Create aggregated df for the week 
+  
+  db$topic <- as.character(db$topic)
+  db <- db %>%
+        filter(date > as.Date("2022-06-21")) %>% #Remove the two first days to have a number of days divisible by 7. 
+        group_by(topic) %>%
+        mutate(group = ceiling(row_number() /7)) %>% 
+        group_by(group, topic) %>%
+        summarise(date = first(group), across(where(is.numeric), mean), .groups='drop') %>%
+        arrange(as.numeric(topic)) 
+  print(dim(db))
+  
+  db <- as.data.frame(db)
+  db$date <- as.factor(db$date)
+  db$topic <- as.factor(db$topic)
+
+  if (args$tests) {
+    pdb <- pdata.frame(db, index=c("topic", "date"))
+    for (v in variables){
+      data_p <- pdb[[v]]
+      hadri <- purtest(data_p, test="hadri", exo="intercept")
+      p_value <- hadri$statistic$p.value[[1]]
+      if (p_value <0.05){
+        print(paste(v, "Stationary", p_value))
+      } else{
+        print(paste(v, "Non-Stationary", p_value))
+      }
+    }
+  
+    data_test = matrix(NA, nrow=4, ncol = 5)
+    for (p in 1:nrow(data_test)){
+      model <- pvargmm(variables, lags = p, data = db, panel_identifier=c("topic", "date"), steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
+      modulus <- c(stability(model)$Modulus)
+      max_modul <- max(modulus)
+      list_crit <- Andrews_Lu_MMSC(model)
+      criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]])
+      data_test[p,] = c(p, max_modul, criteria)
+    }
+    df_test <- as.data.frame(data_test)
+    colnames(df_test) <- c("Lags", "No unit root", "BIC", "AIC", "HQIC")
+    if(args$topic_model == 'lda') {
+      write.csv(df_test,
+      "data_prod/var/lda/tests_results.csv",
+      row.names = FALSE)
+    } else {
+      write.csv(df_test,
+      "data_prod/var/bertopic/tests_results.csv",
+      row.names = FALSE)
+    }
+  }
+  stop()
   lags <- args$number_lags
-  var_model_merged <- VAR(y = X_endogenous, p = lags, exogen = X_exogenous)
+  PVAR_model<- pvargmm(variables, lags = lags, data = db, panel_identifier=c("topic", "date"), steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
 
   print("Cumulative IRF preparation")
-  var_irfs_cum_merged <- irf(var_model_merged, n.ahead = 60, cumulative = TRUE)
+  irf_NC <- bootstrap_irf(PVAR_model, typeof_irf="GIRF", n.ahead = 20, nof_Nstar_draws=500, mc.cores = 50)
 
   if (args$topic_model == 'lda') {
-    if (args$media){
-      save(var_model_merged, file = "data_prod/var/lda/var_model-MAIN_with_media.Rdata")
-      save(var_irfs_cum_merged, file = "data_prod/var/lda/var_irfs-MAIN_with_media.Rdata")
-    } else {
-      save(var_model_merged, file = "data_prod/var/lda/var_model-MAIN_without_media.Rdata")
-      save(var_irfs_cum_merged, file = "data_prod/var/lda/var_irfs-MAIN_without_media.Rdata")
-    }
+    save(PVAR_model, file = "data_prod/var/lda/Pvar_model-MAIN.Rdata")
+    save(irf_NC, file = "data_prod/var/lda/Pvar_NC_irfs-MAIN.Rdata")
   } else {
-    if (args$media) {
-      save(var_model_merged, file = "data_prod/var/bertopic/var_model-MAIN_with_media.Rdata")
-      save(var_irfs_cum_merged, file = "data_prod/var/bertopic/var_irfs-MAIN_with_media.Rdata")
-    } else {
-      save(var_model_merged, file = "data_prod/var/bertopic/var_model-MAIN_without_media.Rdata")
-      save(var_irfs_cum_merged, file = "data_prod/var/bertopic/var_irfs-MAIN_without_media.Rdata")
-    }
+    save(PVAR_model, file = "data_prod/var/bertopic/Pvar_model-MAIN.Rdata")
+    save(irf_NC, file = "data_prod/var/bertopic/Pvar_NC_irfs-MAIN.Rdata")
   }
 } else {
   if (args$topic_model == 'lda') {
-     if (args$media) {
-      load("data_prod/var/lda/var_irfs-MAIN_with_media.Rdata")
-     } else {
-      load("data_prod/var/lda/var_irfs-MAIN_without_media.Rdata")
-     }
+    load("data_prod/var/lda/Pvar_NC_irfs-MAIN.Rdata")
   } else {
-      if (args$media) {
-      load("data_prod/var/bertopic/var_irfs-MAIN_with_media.Rdata")
-     } else {
-      load("data_prod/var/bertopic/var_irfs-MAIN_without_media.Rdata")
-     }
+    load("data_prod/var/bertopic/Pvar_NC_irfs-MAIN.Rdata")
   }
 }
 var_irfs <- var_irfs_cum_merged
@@ -401,109 +331,59 @@ all_irf_data_wide <- all_irf_data %>%
 
 print("Format IRF data in a human-friendly way")
 
+# - reorder the levels of the outcome and covariate factor variables
+all_irf_data_wide$cov <- recode(all_irf_data_wide$cov,
+                          `lr` = "LR in Congress",
+                          `majority` = "Majority in Congress",
+                          `nupes` = "NUPES in Congress",
+                          `rn` = "RN in Congress",
+                          `lr_supp` = "LR Supporters",
+                          `majority_supp` = "Majority Supporters",
+                          `nupes_supp` = "NUPES Supporters",
+                          `rn_supp` = "RN Supporters",
+                          `attentive` = "Attentive Public",
+                          `general` = "General Public",
+                          `media` = "Media")
 
-if (args$media) {
-  # - reorder the levels of the outcome and covariate factor variables
-  all_irf_data_wide$cov <- recode(all_irf_data_wide$cov,
-                            `lr` = "LR in Congress",
-                            `majority` = "Majority in Congress",
-                            `nupes` = "NUPES in Congress",
-                            `rn` = "RN in Congress",
-                            `lr_supp` = "LR Supporters",
-                            `majority_supp` = "Majority Supporters",
-                            `nupes_supp` = "NUPES Supporters",
-                            `rn_supp` = "RN Supporters",
-                            `attentive` = "Attentive Public",
-                            `general` = "General Public",
-                            `media` = "Media")
+all_irf_data_wide$out <- recode(all_irf_data_wide$out,
+                          `lr` = "LR in Congress",
+                          `majority` = "Majority in Congress",
+                          `nupes` = "NUPES in Congress",
+                          `rn` = "RN in Congress",
+                          `lr_supp` = "LR Supporters",
+                          `majority_supp` = "Majority Supporters",
+                          `nupes_supp` = "NUPES Supporters",
+                          `rn_supp` = "RN Supporters",
+                          `attentive` = "Attentive Public",
+                          `general` = "General Public",
+                          `media` = "Media")
 
-  all_irf_data_wide$out <- recode(all_irf_data_wide$out,
-                            `lr` = "LR in Congress",
-                            `majority` = "Majority in Congress",
-                            `nupes` = "NUPES in Congress",
-                            `rn` = "RN in Congress",
-                            `lr_supp` = "LR Supporters",
-                            `majority_supp` = "Majority Supporters",
-                            `nupes_supp` = "NUPES Supporters",
-                            `rn_supp` = "RN Supporters",
-                            `attentive` = "Attentive Public",
-                            `general` = "General Public",
-                            `media` = "Media")
+all_irf_data_wide$out <- factor(all_irf_data_wide$out,
+                                levels = c("LR in Congress",
+                                          "Majority in Congress",
+                                          "NUPES in Congress",
+                                          "RN in Congress",
+                                          "LR Supporters",
+                                          "Majority Supporters",
+                                          "NUPES Supporters",
+                                          "RN Supporters",
+                                          "Attentive Public",
+                                          "General Public",
+                                          "Media"))
 
-  all_irf_data_wide$out <- factor(all_irf_data_wide$out,
-                                  levels = c("LR in Congress",
-                                            "Majority in Congress",
-                                            "NUPES in Congress",
-                                            "RN in Congress",
-                                            "LR Supporters",
-                                            "Majority Supporters",
-                                            "NUPES Supporters",
-                                            "RN Supporters",
-                                            "Attentive Public",
-                                            "General Public",
-                                            "Media"))
+all_irf_data_wide$cov <- factor(all_irf_data_wide$cov,
+                                levels = c("LR in Congress",
+                                          "Majority in Congress",
+                                          "NUPES in Congress",
+                                          "RN in Congress",
+                                          "LR Supporters",
+                                          "Majority Supporters",
+                                          "NUPES Supporters",
+                                          "RN Supporters",
+                                          "Attentive Public",
+                                          "General Public",
+                                          "Media"))
 
-  all_irf_data_wide$cov <- factor(all_irf_data_wide$cov,
-                                  levels = c("LR in Congress",
-                                            "Majority in Congress",
-                                            "NUPES in Congress",
-                                            "RN in Congress",
-                                            "LR Supporters",
-                                            "Majority Supporters",
-                                            "NUPES Supporters",
-                                            "RN Supporters",
-                                            "Attentive Public",
-                                            "General Public",
-                                            "Media"))
-} else {
-  all_irf_data_wide$cov <- recode(all_irf_data_wide$cov,
-                            `lr` = "LR in Congress",
-                            `majority` = "Majority in Congress",
-                            `nupes` = "NUPES in Congress",
-                            `rn` = "RN in Congress",
-                            `lr_supp` = "LR Supporters",
-                            `majority_supp` = "Majority Supporters",
-                            `nupes_supp` = "NUPES Supporters",
-                            `rn_supp` = "RN Supporters",
-                            `attentive` = "Attentive Public",
-                            `general` = "General Public")
-                            
-  all_irf_data_wide$out <- recode(all_irf_data_wide$out,
-                              `lr` = "LR in Congress",
-                              `majority` = "Majority in Congress",
-                              `nupes` = "NUPES in Congress",
-                              `rn` = "RN in Congress",
-                              `lr_supp` = "LR Supporters",
-                              `majority_supp` = "Majority Supporters",
-                              `nupes_supp` = "NUPES Supporters",
-                              `rn_supp` = "RN Supporters",
-                              `attentive` = "Attentive Public",
-                              `general` = "General Public")
-
-  all_irf_data_wide$out <- factor(all_irf_data_wide$out,
-                                  levels = c("LR in Congress",
-                                            "Majority in Congress",
-                                            "NUPES in Congress",
-                                            "RN in Congress",
-                                            "LR Supporters",
-                                            "Majority Supporters",
-                                            "NUPES Supporters",
-                                            "RN Supporters",
-                                            "Attentive Public",
-                                            "General Public"))
-
-  all_irf_data_wide$cov <- factor(all_irf_data_wide$cov,
-                                  levels = c("LR in Congress",
-                                            "Majority in Congress",
-                                            "NUPES in Congress",
-                                            "RN in Congress",
-                                            "LR Supporters",
-                                            "Majority Supporters",
-                                            "NUPES Supporters",
-                                            "RN Supporters",
-                                            "Attentive Public",
-                                            "General Public"))
-}
 
 # - better labels for the data type
 all_irf_data_wide$data_type <- recode(
@@ -513,30 +393,15 @@ all_irf_data_wide$data_type <- recode(
 
 
 if (args$topic_model == 'lda') {
-  if (args$media){
-    write.csv(all_irf_data_wide,
-            "data_prod/var/lda/onetime-structural-shock-irfs-results-media.csv",
-            row.names = FALSE)
-    final_input <- import("data_prod/var/lda/onetime-structural-shock-irfs-results-media.csv")
-  } else {
-    write.csv(all_irf_data_wide,
+  write.csv(all_irf_data_wide,
           "data_prod/var/lda/onetime-structural-shock-irfs-results.csv",
           row.names = FALSE)
   final_input <- import("data_prod/var/lda/onetime-structural-shock-irfs-results.csv")
-  }
 } else {
-  if (args$media){
-    write.csv(all_irf_data_wide,
-          "data_prod/var/bertopic/onetime-structural-shock-irfs-results-media.csv",
-          row.names = FALSE)
-    final_input <- import("data_prod/var/bertopic/onetime-structural-shock-irfs-results-media.csv")
-
-  } else {
-    write.csv(all_irf_data_wide,
-          "data_prod/var/bertopic/onetime-structural-shock-irfs-results.csv",
-          row.names = FALSE)
-    final_input <- import("data_prod/var/bertopic/onetime-structural-shock-irfs-results.csv")
-  }
+  write.csv(all_irf_data_wide,
+        "data_prod/var/bertopic/onetime-structural-shock-irfs-results.csv",
+        row.names = FALSE)
+  final_input <- import("data_prod/var/bertopic/onetime-structural-shock-irfs-results.csv")
    
 }
 print("Create plot data")
@@ -573,59 +438,33 @@ plot_db$out <- recode(plot_db$out,
                     `General Public` = "General\nPublic")
 
 # - reordering the covariate and outcome categories
-if (args$media){
-    plot_db$cov <- 
-    plot_db$cov <- factor(plot_db$cov,
-                          levels = rev(c("LR in\nCongress",
-                                          "Majority in\nCongress",
-                                          "NUPES in\nCongress",
-                                          "RN in\nCongress",
-                                          "LR\nSupporters",
-                                          "Majority\nSupporters",
-                                          "NUPES\nSupporters",
-                                          "RN\nSupporters",
-                                          "Attentive\nPublic",
-                                          "General\nPublic",
-                                          "Media")))
+plot_db$cov <- 
+plot_db$cov <- factor(plot_db$cov,
+                      levels = rev(c("LR in\nCongress",
+                                      "Majority in\nCongress",
+                                      "NUPES in\nCongress",
+                                      "RN in\nCongress",
+                                      "LR\nSupporters",
+                                      "Majority\nSupporters",
+                                      "NUPES\nSupporters",
+                                      "RN\nSupporters",
+                                      "Attentive\nPublic",
+                                      "General\nPublic",
+                                      "Media")))
 
-  plot_db$out <- factor(plot_db$out,
-                        levels = c("LR in\nCongress",
-                                    "Majority in\nCongress",
-                                    "NUPES in\nCongress",
-                                    "RN in\nCongress",
-                                    "LR\nSupporters",
-                                    "Majority\nSupporters",
-                                    "NUPES\nSupporters",
-                                    "RN\nSupporters",
-                                    "Attentive\nPublic",
-                                    "General\nPublic", 
-                                    "Media"))
-} else {
-  plot_db$cov <- 
-    plot_db$cov <- factor(plot_db$cov,
-                          levels = rev(c("LR in\nCongress",
-                                          "Majority in\nCongress",
-                                          "NUPES in\nCongress",
-                                          "RN in\nCongress",
-                                          "LR\nSupporters",
-                                          "Majority\nSupporters",
-                                          "NUPES\nSupporters",
-                                          "RN\nSupporters",
-                                          "Attentive\nPublic",
-                                          "General\nPublic")))
+plot_db$out <- factor(plot_db$out,
+                    levels = c("LR in\nCongress",
+                                "Majority in\nCongress",
+                                "NUPES in\nCongress",
+                                "RN in\nCongress",
+                                "LR\nSupporters",
+                                "Majority\nSupporters",
+                                "NUPES\nSupporters",
+                                "RN\nSupporters",
+                                "Attentive\nPublic",
+                                "General\nPublic", 
+                                "Media"))
 
-  plot_db$out <- factor(plot_db$out,
-                        levels = c("LR in\nCongress",
-                                    "Majority in\nCongress",
-                                    "NUPES in\nCongress",
-                                    "RN in\nCongress",
-                                    "LR\nSupporters",
-                                    "Majority\nSupporters",
-                                    "NUPES\nSupporters",
-                                    "RN\nSupporters",
-                                    "Attentive\nPublic",
-                                    "General\nPublic"))
-}
 # - re-phrase the shock labels
 plot_db$data_type <- ifelse(
   grepl("one time", plot_db$data_type),
@@ -637,17 +476,9 @@ print("Generate Plot")
 # OUTPUT -- FIGURE 2
 #===============================================================================
 if (args$topic_model == 'lda') {
-  if(args$media) {
-     png("data_prod/figures/lda/figure2-media.png", width = 1600, height = 700)
-  } else {
-    png("data_prod/figures/lda/figure2.png", width = 1600, height = 700)
-  }
+  png("data_prod/figures/lda/figure2.png", width = 1600, height = 700)
 } else {
-  if(args$media) {
-    png("data_prod/figures/bertopic/figure2-media.png", width = 1600, height = 700)
-  } else {
-    png("data_prod/figures/bertopic/figure2.png", width = 1600, height = 700)
-  }
+  png("data_prod/figures/bertopic/figure2.png", width = 1600, height = 700)
 }
 
 y_text <- paste("\n", args$number_irf, "-day Responses (in percentage points)")
