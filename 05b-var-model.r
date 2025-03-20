@@ -94,19 +94,15 @@ if (args$estimate){
   print("VAR Estimation")
   # - estimating the model for p lags
 
-  #Create aggregated df for the week 
-  
-  db$topic <- as.character(db$topic)
-  db <- db %>%
-        filter(date > as.Date("2022-06-21")) %>% #Remove the two first days to have a number of days divisible by 7. 
-        group_by(topic) %>%
-        mutate(group = ceiling(row_number() /7)) %>% 
-        group_by(group, topic) %>%
-        summarise(date = first(group), across(where(is.numeric), mean), .groups='drop') %>%
-        arrange(as.numeric(topic)) 
-  print(dim(db))
-  
+  db <- db %>%  #Remove the two first days to have a number of days divisible by 7. 
+  group_by(topic) %>%
+  mutate(group = ceiling(row_number() /2)) %>% 
+  group_by(group, topic) %>%
+  summarise(date = first(group), across(where(is.numeric), mean), .groups='drop') %>%
+  arrange(as.numeric(topic)) 
+
   db <- as.data.frame(db)
+  db$topic <- as.character(db$topic)
   db$date <- as.factor(db$date)
   db$topic <- as.factor(db$topic)
 
@@ -114,18 +110,21 @@ if (args$estimate){
     pdb <- pdata.frame(db, index=c("topic", "date"))
     for (v in variables){
       data_p <- pdb[[v]]
+      data_diff <- diff(pdb[[v]])
+      #na omit pour les first ROW ?? 
       hadri <- purtest(data_p, test="hadri", exo="intercept")
-      p_value <- hadri$statistic$p.value[[1]]
+      p_value <- hadri$statistic$p.value
       if (p_value <0.05){
-        print(paste(v, "Stationary", p_value))
+        print(paste(v, "Stationarity rejected", p_value))
       } else{
-        print(paste(v, "Non-Stationary", p_value))
+        print(paste(v, "Stationary not rejected", p_value))
       }
     }
   
-    data_test = matrix(NA, nrow=4, ncol = 5)
+    data_test = matrix(NA, nrow=5, ncol = 5)
     for (p in 1:nrow(data_test)){
-      model <- pvargmm(variables, lags = p, data = db, panel_identifier=c("topic", "date"), steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
+      print(p)
+      model <- pvargmm(variables, lags = p, data = db, panel_identifier=c("topic", "date"), transformation = "fod", steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
       modulus <- c(stability(model)$Modulus)
       max_modul <- max(modulus)
       list_crit <- Andrews_Lu_MMSC(model)
