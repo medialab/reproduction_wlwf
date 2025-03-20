@@ -465,7 +465,8 @@ tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
     return(txt)
 }
 
-# preparing embed
+# preparing embed ----
+# > for LDA
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
@@ -475,7 +476,22 @@ for (i in 1:nrow(rs)){
 }
 congress_rs <- rs
 save(congress_rs, file="data_prod/dashboard/congress-rs-tweets.rdata")
-#
+
+# for BERTOPIC
+rs <- read_csv("dashboard/bertopic/representative_docs_congress.csv")
+
+rs$embed <- NA
+for (i in 1:nrow(rs)){
+  
+  rs$embed[i] <- tw.embed(rs$text[i], name = rs$user_screen_name[i], screen_name = rs$user_screen_name[i], id_str = rs$id[i],
+                          dt = rs$local_time[i], "")
+  
+}
+
+rep_docs_congress <- rs
+
+save(rep_docs_congress, file="data_prod/dashboard/bertopic/representative_docs_congress.rdata")
+
 #
 ### >> Medias ----
 cat("selecting representative medias tweets for each topic\n")
@@ -541,7 +557,8 @@ tw.embed <- function(text, name,
     return(embed_html)
 }
 
-# preparing embed
+# preparing embed ----
+# > for LDA
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
@@ -553,6 +570,23 @@ for (i in 1:nrow(rs)){
 
 media_rs <- rs
 save(media_rs, file="data_prod/dashboard/media-rs-tweets.rdata")
+
+# > for BERTOPIC
+
+# for BERTOPIC
+rs <- read_csv("dashboard/bertopic/representative_docs_media.csv")
+
+rs$embed <- NA
+for (i in 1:nrow(rs)){
+  
+  rs$embed[i] <- tw.embed(rs$text[i], name = rs$user_screen_name[i], screen_name = rs$user_screen_name[i], id_str = rs$id[i],
+                          dt = rs$local_time[i], "")
+  
+}
+
+rep_docs_media <- rs
+
+save(rep_docs_media, file="data_prod/dashboard/bertopic/representative_docs_media.rdata")
 #
 # file.remove("data_temp/all_media_IPG_tweets.csv",
 #             "data_temp/all_deputesXVI_tweets.csv")
