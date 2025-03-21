@@ -15,7 +15,7 @@ library(tidyverse)
 # data path : /store/medialex/reproduction_wlwf/data_prod/dashboard/bertopic
 # img = keywords
 # data =  ts
-# tweets = reprensetative_docs_attentive.csv, etc
+# tweets = representative_docs_attentive.csv, etc
 
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
 # load("data_prod/dashboard/qois.rdata")  # topic_scores
@@ -32,7 +32,7 @@ load("data_prod/dashboard/bertopic/representative_docs_media.rdata")
 
 # UI
 ui <- fluidPage(
-  titlePanel("Annotation de Topics LDA"),
+  titlePanel("Annotation de Topics BERTOPICS"),
  fluidRow(
    column(2,
       selectInput("topic", "Choisissez un topic :", choices = -1:100)
