@@ -255,10 +255,12 @@ if group_list & set(choices):
         model_path = os.path.join(args.model_path, "_small")
     else:
         model_path = args.model_path
-    topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
-    topic_ids_list = list(topic_model.get_topic_info()["Topic"])
 
     for group in group_list:
+        # Reload model at each iteration to avoid topics contamination
+        topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
+        topic_ids_list = list(topic_model.get_topic_info()["Topic"])
+
         input_path, embeddings_path = get_paths(args.origin_path, group)
 
         party_day_counts = []
