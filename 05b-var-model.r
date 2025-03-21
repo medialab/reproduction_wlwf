@@ -164,7 +164,19 @@ if (args$estimate){
       print("Start multivariate Pedroni cointegration test")
 
       Groen_Kleibergen_Test <- function(x){
-        johanssen <- ca.jo(x, type="trace")
+        jo_mat <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
+        iter_jo <- 0
+        for(i in unique(db$topic)){
+          iter_jo <- iter_jo+1
+          data_jo <- db %>%
+                    filter(topic=i)
+          jo <- summary(ca.jo(data_jo[, variables], type="trace", spec="longrun"))@teststat
+          jo_mat[iter_jo,] <- jo 
+        }
+    
+        mean_jo <- colMeans(jo_mat, na.rm = TRUE)
+        
+
       }
 
       data_co <- array(NA, dim=c(length(unique(db$date)), length(unique(db$topic)), length(variables)))
