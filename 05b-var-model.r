@@ -1,4 +1,5 @@
 #install.packages(c("rio", "vars", "tseries"))
+#remotes::install_github(repo = "cran/pco")
 library(dplyr)
 library(tidyverse)
 library(tidyr)
@@ -12,6 +13,7 @@ library(stats)
 library(urca)
 library(plm)
 library(panelvar)
+library(pco)
 
 parser <- ArgumentParser()
 
@@ -66,7 +68,6 @@ if (args$estimate){
 
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
-
   # - logit transform all series
   for (v in variables) {
     # - pulling the series-agenda for that group
@@ -94,33 +95,112 @@ if (args$estimate){
   print("VAR Estimation")
   # - estimating the model for p lags
 
-  db <- db %>%  #Remove the two first days to have a number of days divisible by 7. 
-  group_by(topic) %>%
-  mutate(group = ceiling(row_number() /2)) %>% 
-  group_by(group, topic) %>%
-  summarise(date = first(group), across(where(is.numeric), mean), .groups='drop') %>%
-  arrange(as.numeric(topic)) 
+  #db <- db %>%  #Remove the two first days to have a number of days divisible by 7. 
+  #group_by(topic) %>%
+  #mutate(group = ceiling(row_number() /2)) %>% 
+  #group_by(group, topic) %>%
+  #summarise(date = first(group), across(where(is.numeric), mean), .groups='drop') %>%
+  #arrange(as.numeric(topic)) 
 
   db <- as.data.frame(db)
+
   db$topic <- as.character(db$topic)
   db$date <- as.factor(db$date)
   db$topic <- as.factor(db$topic)
 
+
   if (args$tests) {
+    count_stat <- 0
     pdb <- pdata.frame(db, index=c("topic", "date"))
+    print(head(index(pdb), 10))
     for (v in variables){
       data_p <- pdb[[v]]
-      data_diff <- diff(pdb[[v]])
-      #na omit pour les first ROW ?? 
       hadri <- purtest(data_p, test="hadri", exo="intercept")
       p_value <- hadri$statistic$p.value
       if (p_value <0.05){
         print(paste(v, "Stationarity rejected", p_value))
       } else{
         print(paste(v, "Stationary not rejected", p_value))
+        count_stat <- count_stat + 1
       }
     }
-  
+
+    if(count_stat != length(variables)){
+      print("At least one group is represented by a non-stationary time series. Check the stationnarity after a differentiation")
+      pdb_diff <- pdb
+      for (v in variables){
+        pdb_diff[[v]] <- diff(pdb_diff[[v]], lag=1L)
+      }
+
+      pdb_diff <- na.omit(pdb_diff)
+      pdb_diff <- pdata.frame(pdb_diff, index=c("topic", "date"))
+      pdb_diffc <- pdb_diff
+
+      for (v in variables){
+        count_stat_topic <- 0
+        for (i in unique(pdb_diff$topic)){
+          pdb_topic <- pdb_diff %>% filter(topic == i)
+          if (sd(pdb_topic[[v]]) == 0) {
+            pdb_diffc <- pdb_diffc %>% filter(topic !=i)
+            print(paste("For variable", v, "topic", i, "removed for test because constant"))
+            count_stat_topic <- 1
+          }
+        }
+
+        if(count_stat_topic==1){
+          rownames(pdb_diffc) <- NULL
+          pdb_diffc <- pdata.frame(pdb_diffc, index=c("topic", "date"))
+        }
+
+        data_p <- pdb_diffc[[v]]
+        hadri2 <- purtest(data_p, test="hadri", exo="intercept")
+        p_value2 <- hadri2$statistic$p.value
+        if (p_value2 <0.05){
+          print(paste("Diff", v, "Stationarity rejected", p_value2))
+        } else{
+          print(paste("Diff", v, "Stationary not rejected", p_value2))
+        }   
+      } 
+      print("Start multivariate Pedroni cointegration test")
+
+      Groen_Kleibergen_Test <- function(x){
+        johanssen <- ca.jo(x, type="trace")
+      }
+
+      data_co <- array(NA, dim=c(length(unique(db$date)), length(unique(db$topic)), length(variables)))
+      for (d in 1:dim(data_co)[1]){
+        for (t in 1:dim(data_co)[2]){
+          db_filt <- db %>% 
+                    filter(date == unique(db$date)[d]) %>%
+                    filter(topic == unique(db$topic)[t])
+          for (m in 1:dim(data_co)[3]){
+            m_val <- db_filt[variables[m]][[1]]
+            data_co[d, t, m] <- m_val
+         }
+        }
+      }
+      data_test_co <- matrix(NA, nrow=10, ncol=2)
+      for (k in 1:nrow(data_test_co)){
+        coint_test <- pedroni99m(data_co, type.stat = 2, ka = k)
+        data_test_co[k,] = c(k, coint_test$STATISTIC)
+      }
+      df_test_co <- as.data.frame(data_test)
+      colnames(df_test_co) <- c("Lags", "Stat")
+
+      if(args$topic_model == 'lda') {
+        write.csv(df_test_co,
+                  "data_prod/var/lda/COtests_results.csv",
+                  row.names = FALSE)
+      } else {
+        write.csv(df_test_co,
+       "data_prod/var/bertopic/COtests_results.csv",
+        row.names = FALSE)
+      }
+        
+    }
+
+    stop()
+
     data_test = matrix(NA, nrow=5, ncol = 5)
     for (p in 1:nrow(data_test)){
       print(p)
