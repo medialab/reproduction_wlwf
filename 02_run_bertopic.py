@@ -105,6 +105,8 @@ if "congress" in group_list:
 
     hdbscan_model = HDBSCAN(
         min_cluster_size=2 if args.small else 100,
+        cluster_selection_epsilon=0.2,
+        min_samples=30,
         metric="euclidean",
         cluster_selection_method="eom",
         prediction_data=True,
@@ -205,7 +207,7 @@ if "congress" in group_list:
         topics,
         probabilities=probs,  # type: ignore
         strategy="probabilities",
-        threshold=0.01,
+        threshold=0.001,
     )
     topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
 
@@ -253,10 +255,12 @@ if group_list & set(choices):
         model_path = os.path.join(args.model_path, "_small")
     else:
         model_path = args.model_path
-    topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
-    topic_ids_list = list(topic_model.get_topic_info()["Topic"])
 
     for group in group_list:
+        # Reload model at each iteration to avoid topics contamination
+        topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
+        topic_ids_list = list(topic_model.get_topic_info()["Topic"])
+
         input_path, embeddings_path = get_paths(args.origin_path, group)
 
         party_day_counts = []
