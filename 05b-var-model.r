@@ -1,5 +1,6 @@
 #install.packages(c("rio", "vars", "tseries"))
 #remotes::install_github(repo = "cran/pco")
+install.packages(resample)
 library(dplyr)
 library(tidyverse)
 library(tidyr)
@@ -13,7 +14,7 @@ library(stats)
 library(urca)
 library(plm)
 library(panelvar)
-library(pco)
+library(resample)
 
 parser <- ArgumentParser()
 
@@ -163,21 +164,53 @@ if (args$estimate){
       } 
       print("Start multivariate Pedroni cointegration test")
 
-      Groen_Kleibergen_Test <- function(x){
+      Groen_Kleibergen_Test <- function(db, n_boot=500){
         jo_mat <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
         iter_jo <- 0
+        list_subdb <- list()
         for(i in unique(db$topic)){
           iter_jo <- iter_jo+1
           data_jo <- db %>%
-                    filter(topic=i)
-          jo <- summary(ca.jo(data_jo[, variables], type="trace", spec="longrun"))@teststat
+                    filter(topic==i)
+          jo <- summary(ca.jo(data_jo[, variables], type="trace", ecdet = "const", spec="longrun"))@teststat
           jo_mat[iter_jo,] <- jo 
+          list_subdb[[iter_jo]] <- data_jo
         }
     
         mean_jo <- colMeans(jo_mat, na.rm = TRUE)
-        
 
+        bootstrap_stats <- matrix(NA, nrow=n_boot, ncol=length(variables))
+        N <- length(unique(db$topic))
+        seq <- seq(1:length(unique(db$topic)))
+        for (b in 1:n_boot){
+          boot_sample <- sample(1:N, N, replace = TRUE)
+          boot_trace_stats <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
+          iter_jo <- 0
+          for (i in boot_sample){
+            iter_jo <- iter_jo+1
+            jo_sim <- ca.jo(list_subdb[[boot_sample[i]]][, variables], type="trace", ecdet = "const", spec="longrun")@teststat
+            boot_trace_stats[iter_jo, ] <- jo_sim 
+          }
+          bootstrap_stats[b,] <- colMeans(boot_trace_stats)
+        }
+
+        Esp_jo <- colMeans(bootstrap_stats)
+        V_jo <- colVars(bootstrap_stats)
+
+        stats_GK <- (mean_jo - Esp_jo) / V_jo
+        p_value <- 2 * (1 - pnorm(abs(stats_GK)))
+        num_ranks <- rev(seq_along(stats_GK)) - 1
+        line_rank <- paste0("r<=", num_ranks)
+
+        result_table <- data.frame(
+          Rank = line_rank,
+          GK_Stat = Stats_GK,
+          P_value = p_value
+        )
+        return(result_table)
       }
+
+      Groen_Kleibergen_Test(db)
 
       data_co <- array(NA, dim=c(length(unique(db$date)), length(unique(db$topic)), length(variables)))
       for (d in 1:dim(data_co)[1]){
