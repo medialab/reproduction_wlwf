@@ -82,6 +82,8 @@ def group_by_file_and_user(root, nb_files, public, random_tweets=False):
         random_tweets_file = open(
             generate_path("{}-rs-tweet-list.csv".format(public)), "w"
         )
+        if public == "media":
+            NB_RANDOM_TWEETS = ORIGINAL_TWEET_COUNT
         random.seed(RANDOM_SEED)
         random_tweet_indices = sorted(
             random.sample(
