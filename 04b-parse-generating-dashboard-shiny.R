@@ -1,4 +1,4 @@
-### first try on dashboarding Topic Models from a Bert Topic on French MP's tweets
+### first try on dashboarding Topic Models from a LDA on French MP's tweets
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load("shiny", "topicmodels", "ggplot2", "ggthemes", "readr"
                )
@@ -9,19 +9,41 @@ library(ggplot2)
 library(ggthemes)
 library(readr)
 library(tidyverse)
+library(argparse)
 
-# Chargement des données
+parser <- ArgumentParser()
 
-# data path : /store/medialex/reproduction_wlwf/data_prod/dashboard/bertopic
-# img = keywords
-# data =  ts
-# tweets = representative_docs_attentive.csv, etc
+parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
 
-# load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
-# load("data_prod/dashboard/qois.rdata")  # topic_scores
-# representative tweets
-load("data_prod/dashboard/bertopic/representative_docs_congress.rdata")
-load("data_prod/dashboard/bertopic/representative_docs_media.rdata")
+args <- parser$parse_args()
+
+if (!(args$topic_model %in% c('bertopic', 'lda'))){
+  stop("The model name is incorrect. Choose between lda and bertopic")
+}
+
+# Charge data
+
+# Take data and values according to topic model type
+if (args$topic_model == 'lda') {
+  choices_top = 1:100
+  titleUI <- "Annotation de Topics LDA"
+  source_ts <- paste0("data_prod/dashboard/lda/data/ts-")
+  name_img <- "words-plot-"
+  source_img <- "data_prod/dashboard/lda/img"
+  load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
+  load("data_prod/dashboard/lda/media-rs-tweets.rdata")
+
+} else {
+  choices_top = 0:92
+  titleUI <- "Annotation de Topics BERTopic" 
+  source_ts <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_")
+  name_img <- "bertopic_" 
+  source_img <- "data_prod/dashboard/bertopic/img"
+  load("data_prod/dashboard/bertopic/representative_docs_congress.rdata")
+  load("data_prod/dashboard/bertopic/representative_docs_media.rdata")
+  congress_rs <- get(ls()[5]) 
+  media_rs <- get(ls()[6]) 
+}
 
 # qois_long <- qois |>
 #   select(topic, starts_with("prop_")) |>
@@ -31,11 +53,14 @@ load("data_prod/dashboard/bertopic/representative_docs_media.rdata")
 #                values_to = "prop")
 
 # UI
+
+
+
 ui <- fluidPage(
-  titlePanel("Annotation de Topics BERTOPICS"),
+  titlePanel(titleUI),
  fluidRow(
    column(2,
-      selectInput("topic", "Choisissez un topic :", choices = -1:100)
+      selectInput("topic", "Choisissez un topic :", choices = choices_top)
       )
     ),
  fluidRow(
@@ -47,11 +72,11 @@ ui <- fluidPage(
  fluidRow(
     checkboxGroupInput("acteurs", "Afficher :",
                        choices = c(
-                                   "majority", "lr", "nupes", "rn", 
-                                   "media", 
-                                   "majority_supp", "lr_supp", "nupes_supp", "rn_supp", 
-                                   "attentive", "general"), 
-                       selected = c("majority", "lr", "nupes", "rn"),
+                                   "dep. majo.", "dep. lr", "dep. nupes", "dep. rn", 
+                                   "medias", 
+                                   "sup. majo.", "sup. lr", "sup. nupes", "sup. rn", 
+                                   "pub. attentif", "pub. general"), #qois_long |> distinct(parti) |> pull(),
+                       selected = c("dep. majo.", "dep. lr", "dep. nupes", "dep. rn"), #qois_long |> distinct(parti) |> pull()
                        inline = TRUE
     )
    ),
@@ -79,10 +104,14 @@ ui <- fluidPage(
 
 plot_ts  <- function(df, checked_actors, selected_topic){
 
+  if(args$topic_model == 'bertopic') { #Adapt bertopic to script structure
+    df <- df %>% mutate(party = recode(party, "lr" = "dep. lr", "majority" = "dep. majo.", "nupes" = "dep. nupes", "rn" = "dep. rn", "lr_supp" = "sup. lr", "majority_supp" = "sup. majo.", "nupes_supp" = "sup. nupes", "rn_supp" = "sup. rn", "attentive" = "pub. attentif", "general" = "pub. general", "media" = "medias"))
+    colnames(df) <- c("date", "actor", "topic", "prop")
+  }
   df |>
-    filter(party %in% {{checked_actors}}) |>
+    filter(actor %in% {{checked_actors}}) |>
     ggplot() +
-    aes(x = date, y = prop, color = party, group = party) +
+    aes(x = date, y = prop, color = actor, group = actor) +
     geom_line() +
     scale_x_date(#date_breaks = "month",
                  breaks = c(seq(ymd("2022-06-20"), ymd("2023-03-14"), by = "1 month"), ymd("2022-06-20"), ymd("2023-03-14")),
@@ -92,17 +121,17 @@ plot_ts  <- function(df, checked_actors, selected_topic){
                 # expand = expansion(c(0,0))
                  ) +
     scale_color_manual(values = c(
-                                  "majority" = "orange",
-                                  "lr" = "blue",
-                                  "nupes" = "red",
-                                  "rn" = "purple",
-                                  "media" = "black", 
-                                  "majority_supp" = "darkorange", 
-                                  "lr_supp" = "darkblue", 
-                                  "nupes_supp" = "darkred", 
-                                  "rn_supp" = "purple4", 
-                                  "attentive" = "forestgreen", 
-                                  "general" = "lightgrey"
+                                  "dep. majo." = "orange",
+                                  "dep. lr" = "blue",
+                                  "dep. nupes" = "red",
+                                  "dep. rn" = "purple",
+                                  "medias" = "black", 
+                                  "sup. majo." = "darkorange", 
+                                  "sup. lr" = "darkblue", 
+                                  "sup. nupes" = "darkred", 
+                                  "sup. rn" = "purple4", 
+                                  "pub. attentif" = "forestgreen", 
+                                  "pub. general" = "lightgrey"
                                   )) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
     labs(color = "",
@@ -115,11 +144,13 @@ plot_ts  <- function(df, checked_actors, selected_topic){
 }
 
 # Server
+
 server <- function(input, output){
   df <- reactive({
-    file_name <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
-    read_csv(file_name)
+    file_name <- paste0(source_ts, input$topic, ".csv")
+    read_csv(file_name, show_col_types = FALSE)
   })
+  
   selected_topic <- reactive(input$topic)
   checked_partys <- reactive(input$acteurs)
 
@@ -137,8 +168,10 @@ server <- function(input, output){
 # )
 
   # Image des mots spécifiques du topic
-output$topwords_image <- renderImage({
-    list(src = file.path("data_prod/dashboard/bertopic/img", paste0("bertopic_", input$topic, ".png")),
+
+  output$topwords_image <- renderImage({
+    source_topwords <- file.path(source_img, paste0(name_img, input$topic, ".png"))
+    list(src = source_topwords,
          contentType = 'image/png',
          alt = "Mots spécifiques",
          width = "100%",
@@ -157,23 +190,23 @@ output$topwords_image <- renderImage({
 #                      choices = unique(congress_tweets_data()$topic))
 #  })
   
-  # Générer les tweets HTML pour le topic sélectionné
+  # Create tweets HTML for selected topic
   output$congress_tweets <- renderUI({
     req(input$topic) # Attendre que l'utilisateur sélectionne un topic
     selected_congress_tweets <- reactive({
-      rep_docs_congress |> filter(topic == input$topic)
+      congress_rs |> filter(topic == input$topic)
                                 })
     
-    # Organiser les tweets en deux colonnes
+    # Organize in two columns
     HTML(#paste(
       selected_congress_tweets()$embed#, collapse = "<br><br>")
       )
   })
   
   output$media_tweets <- renderUI({
-    req(input$topic) # Attendre que l'utilisateur sélectionne un topic
+    req(input$topic) # Wait topic selection by the user
     selected_media_tweets <- reactive({
-      rep_docs_media |> filter(topic == input$topic)
+      media_rs |> filter(topic == input$topic)
     })
     
     HTML(#paste(

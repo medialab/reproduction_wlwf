@@ -19,7 +19,7 @@
 # pacman::p_load("topicmodels", "reshape", "ggplot2", "gtable", "gridExtra", "scales", "ggdendro", "ggthemes", "slam", "Matrix", "tm", "tidyverse", "khroma")
 
 suppressPackageStartupMessages({
-  library(tidyverse)
+library(tidyverse)
 library(topicmodels)
 library(reshape)
 library(ggplot2)
@@ -39,6 +39,7 @@ check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
                  expected_rows, expected_cols, nrow(mat), ncol(mat)))
   }
 }
+
 
 # DATA
 #===============================================================================
@@ -308,8 +309,8 @@ general <- build_ts(
 )
 
 # créé le répertoire data si besoin
-if (!dir.exists("data_prod/dashboard/files/data")) {
-  dir.create("data_prod/dashboard/files/data",
+if (!dir.exists("data_prod/dashboard/lda/data")) {
+  dir.create("data_prod/dashboard/lda/data",
              recursive = TRUE)
 }
 
@@ -475,10 +476,10 @@ for (i in 1:nrow(rs)){
 
 }
 congress_rs <- rs
-save(congress_rs, file="data_prod/dashboard/congress-rs-tweets.rdata")
+save(congress_rs, file="data_prod/dashboard/lda/congress-rs-tweets.rdata")
 
 # for BERTOPIC
-rs <- read_csv("dashboard/bertopic/representative_docs_congress.csv")
+rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv")
 
 rs$embed <- NA
 for (i in 1:nrow(rs)){
@@ -569,12 +570,12 @@ for (i in 1:nrow(rs)){
 }
 
 media_rs <- rs
-save(media_rs, file="data_prod/dashboard/media-rs-tweets.rdata")
+save(media_rs, file="data_prod/dashboard/lda/media-rs-tweets.rdata")
 
 # > for BERTOPIC
 
 # for BERTOPIC
-rs <- read_csv("dashboard/bertopic/representative_docs_media.csv")
+rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
 
 rs$embed <- NA
 for (i in 1:nrow(rs)){
