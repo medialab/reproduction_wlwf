@@ -479,7 +479,7 @@ congress_rs <- rs
 save(congress_rs, file="data_prod/dashboard/lda/congress-rs-tweets.rdata")
 
 # for BERTOPIC
-rs <- read_csv("dashboard/bertopic/representative_docs_congress.csv")
+rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv")
 
 rs$embed <- NA
 for (i in 1:nrow(rs)){
@@ -491,7 +491,7 @@ for (i in 1:nrow(rs)){
 
 rep_docs_congress <- rs
 
-save(rep_docs_congress, file="data_prod/dashboard/bertopic/representative_docs_congress.rdata")
+save(rep_docs_congress, file="data_prod/dashboard/bertopic/congress-rs-tweets.rdata")
 
 #
 ### >> Medias ----
@@ -575,7 +575,7 @@ save(media_rs, file="data_prod/dashboard/lda/media-rs-tweets.rdata")
 # > for BERTOPIC
 
 # for BERTOPIC
-rs <- read_csv("dashboard/bertopic/representative_docs_media.csv")
+rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
 
 rs$embed <- NA
 for (i in 1:nrow(rs)){
@@ -587,7 +587,7 @@ for (i in 1:nrow(rs)){
 
 rep_docs_media <- rs
 
-save(rep_docs_media, file="data_prod/dashboard/bertopic/representative_docs_media.rdata")
+save(rep_docs_media, file="data_prod/dashboard/bertopic/media-rs-tweets.rdata")
 #
 # file.remove("data_temp/all_media_IPG_tweets.csv",
 #             "data_temp/all_deputesXVI_tweets.csv")

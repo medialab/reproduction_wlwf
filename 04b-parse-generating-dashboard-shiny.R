@@ -32,42 +32,18 @@ if (args$topic_model == 'lda') {
   source_img <- "data_prod/dashboard/lda/img"
   load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
   load("data_prod/dashboard/lda/media-rs-tweets.rdata")
+
 } else {
   choices_top = 0:92
   titleUI <- "Annotation de Topics BERTopic" 
   source_ts <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_")
   name_img <- "bertopic_" 
   source_img <- "data_prod/dashboard/bertopic/img"
-  congress_rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv", show_col_types = FALSE) |> as.data.frame()
-  media_rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv", show_col_types = FALSE) |> as.data.frame()
-
-  #Element from script 04a to adapt bertopic data for representative tweets 
-  tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
-    txt <- paste0('<blockquote class="twitter-tweet" data-cards="hidden" data-conversation="none" width="450"><p>',
-        text, '</p> ', name, " (@", screen_name,
-        ") <a href='https://twitter.com/", screen_name,
-        '/status/', id_str, "'>",
-        dt, '</a></blockquote>')
-    if (js){
-        txt <- paste0(txt,
-            ' <script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>')
-    }
-    return(txt)
-  }
-
-    congress_rs$embed <- NA 
-    for (i in 1:nrow(congress_rs)){
-      congress_rs$embed[i] <- tw.embed(congress_rs$text[i], name = congress_rs$user_screen_name[i], screen_name = congress_rs$user_screen_name[i], id_str = congress_rs$id[i],
-      dt = congress_rs$local_time[i], "")
-      }
-    media_rs$embed <- NA 
-    for (i in 1:nrow(media_rs)){
-      media_rs$embed[i] <- tw.embed(media_rs$text[i], name = media_rs$user_screen_name[i], screen_name = media_rs$user_screen_name[i], id_str = media_rs$id[i],
-      dt = media_rs$local_time[i], "")
-      }
+  load("data_prod/dashboard/bertopic/congress-rs-tweets.rdata")
+  load("data_prod/dashboard/bertopic/media-rs-tweets.rdata")
+  congress_rs <- get(ls()[5]) 
+  media_rs <- get(ls()[6]) 
 }
-
-print(colnames(congress_rs))
 
 # qois_long <- qois |>
 #   select(topic, starts_with("prop_")) |>
