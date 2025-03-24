@@ -491,7 +491,7 @@ for (i in 1:nrow(rs)){
 
 rep_docs_congress <- rs
 
-save(rep_docs_congress, file="data_prod/dashboard/bertopic/congress-rs-tweets.rdata")
+save(rep_docs_congress, file="data_prod/dashboard/bertopic/representative_docs_congress.rdata")
 
 #
 ### >> Medias ----
@@ -587,7 +587,7 @@ for (i in 1:nrow(rs)){
 
 rep_docs_media <- rs
 
-save(rep_docs_media, file="data_prod/dashboard/bertopic/media-rs-tweets.rdata")
+save(rep_docs_media, file="data_prod/dashboard/bertopic/representative_docs_media.rdata")
 #
 # file.remove("data_temp/all_media_IPG_tweets.csv",
 #             "data_temp/all_deputesXVI_tweets.csv")

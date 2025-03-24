@@ -117,7 +117,7 @@ plot_ts  <- function(df, checked_actors, selected_topic){
 # Server
 server <- function(input, output){
   df <- reactive({
-    file_name <- paste0("dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
+    file_name <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
     read_csv(file_name)
   })
   selected_topic <- reactive(input$topic)
@@ -138,7 +138,7 @@ server <- function(input, output){
 
   # Image des mots spécifiques du topic
 output$topwords_image <- renderImage({
-    list(src = file.path("dashboard/bertopic/img", paste0("bertopic_", input$topic, ".png")),
+    list(src = file.path("data_prod/dashboard/bertopic/img", paste0("bertopic_", input$topic, ".png")),
          contentType = 'image/png',
          alt = "Mots spécifiques",
          width = "100%",

@@ -39,8 +39,8 @@ if (args$topic_model == 'lda') {
   source_ts <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_")
   name_img <- "bertopic_" 
   source_img <- "data_prod/dashboard/bertopic/img"
-  load("data_prod/dashboard/bertopic/congress-rs-tweets.rdata")
-  load("data_prod/dashboard/bertopic/media-rs-tweets.rdata")
+  load("data_prod/dashboard/bertopic/representative_docs_congress.rdata")
+  load("data_prod/dashboard/bertopic/representative_docs_media.rdata")
   congress_rs <- get(ls()[5]) 
   media_rs <- get(ls()[6]) 
 }
