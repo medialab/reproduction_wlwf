@@ -13,25 +13,6 @@ library(Matrix)
 library(tm)
 })
 
-path1 <- list.files("data_source/attentive")
-path2 <- list.files("data_source/general")
-all_files <- c(path1, path2)
-i <-0
-
-for (file in all_files){
-    i <- i+1
-    if (i<269){
-        file_path <- paste0("data_source/attentive/", file)
-    } else {
-        file_path <- paste0("data_source/general/", file)
-    }
-    df <- read_csv(file_path, show_col_types=FALSE)
-    file.remove(file_path)
-    write.csv(df, file=file_path, row.names=FALSE, quote=TRUE)
-}
-
-stop()
-
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
 K <- 100
@@ -47,6 +28,9 @@ words <- apply(scores, 1, function(x)
         colnames(scores)[order(x, decreasing = TRUE)[1:num.words]])
 
 key_words <- as.vector(words)
+writeLines(key_words, "data_prod/key_words.txt")
+
+stop()
 
 #Créer matrices vides pour public random et général et remplir selon la présence de mot dans une certaine colonne
 path_attentive <- "/store/medialex/reproduction_wlwf/data_source/attentive/"
@@ -64,7 +48,7 @@ filter_folder <- function(path_folder){
                 filter(str_detect(text, paste(key_words, collapse = "|")))
         count_resting_rows <- count_resting_rows + nrow(df_red)
         export_folder <- paste0("data_source/",basename(path_folder),"/", file)
-        write.csv(df_red, file=export_folder, row.names=FALSE, quote=TRUE)
+        write.csv(df_red, file=export_folder, row.names=FALSE, quote=FALSE)
     }
     return(c(count_total_rows, count_resting_rows))
 }
