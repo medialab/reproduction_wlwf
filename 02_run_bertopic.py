@@ -8,17 +8,19 @@ from umap import UMAP
 from bertopic import BERTopic
 import bertopic._save_utils as save_utils
 import numpy as np
-# import pandas as pd (put in comment because pandas part code is currently in comments)
+
 
 from utils import (
     choices,
     count_nb_files,
+    count_topics_info,
     create_dir,
     existing_dir_path,
-    vectorizer,
+    extract_representative_docs,
     load_docs_embeddings,
-    count_topics_info,
+    vectorizer,
     write_bertopic_TS,
+    write_representative_docs,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
@@ -103,6 +105,8 @@ if "congress" in group_list:
 
     hdbscan_model = HDBSCAN(
         min_cluster_size=2 if args.small else 100,
+        cluster_selection_epsilon=0.2,
+        min_samples=30,
         metric="euclidean",
         cluster_selection_method="eom",
         prediction_data=True,
@@ -203,9 +207,21 @@ if "congress" in group_list:
         topics,
         probabilities=probs,  # type: ignore
         strategy="probabilities",
-        threshold=0.01,
+        threshold=0.001,
     )
     topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
+
+    repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
+
+    # Write representative docs for one public in one file
+    write_representative_docs(
+        repr_docs_ids,
+        party_day_counts,
+        "congress",
+        args.origin_path,
+        args.small,
+        NB_DOCS_SMALL_TRAIN,
+    )
 
     print(topic_model.get_topic_info())
     topic_ids_list = []
@@ -239,10 +255,12 @@ if group_list & set(choices):
         model_path = os.path.join(args.model_path, "_small")
     else:
         model_path = args.model_path
-    topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
-    topic_ids_list = list(topic_model.get_topic_info()["Topic"])
 
     for group in group_list:
+        # Reload model at each iteration to avoid topics contamination
+        topic_model = BERTopic.load(model_path, embedding_model=SBERT_NAME)
+        topic_ids_list = list(topic_model.get_topic_info()["Topic"])
+
         input_path, embeddings_path = get_paths(args.origin_path, group)
 
         party_day_counts = []
@@ -261,6 +279,18 @@ if group_list & set(choices):
         print(f"Predict model from {model_path}")
         topics, probs = topic_model.transform(docs, embeddings)
 
+        repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
+
+        # Write representative docs for one public in one file
+        write_representative_docs(
+            repr_docs_ids,
+            party_day_counts,
+            group,
+            args.origin_path,
+            args.small,
+            NB_DOCS_SMALL_INFER,
+        )
+
         print(topic_model.get_topic_info())
 
         # Time Series Results
@@ -272,12 +302,3 @@ if group_list & set(choices):
         write_bertopic_TS(
             topic_ids_list, topics_info, group, party_day_counts, args.origin_path
         )
-"""
-To add representative docs
-
-        # Get infos about topic, and extract documents in another way. Warning : the 4 following lines change the topic names and representations.
-        documents_df = pd.DataFrame({"Document": docs, "ID": range(len(docs)), "Topic": topics, "Image": None})
-        topic_model._extract_topics(documents_df, embeddings=embeddings, verbose=True)
-        topic_model._save_representative_docs(documents_df)
-        topic_model.get_representative_docs()
-"""

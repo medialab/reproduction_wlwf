@@ -6,6 +6,7 @@ import tarfile
 import casanova
 import csv
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
 from unidecode import unidecode
 from transformers import CamembertTokenizer
@@ -540,6 +541,109 @@ def iter_on_files(root, nb_files):
     return tar, loop, compressed
 
 
+def generate_threads(
+    file,
+    filename,
+    compressed,
+    tar,
+    empty_warn,
+    counters,
+    apply_unidecode,
+    small,
+    small_size,
+    party_day_counts,
+    metadata=False,
+):
+    thread_ids = dict()
+    threads = dict()
+
+    if compressed:
+        filestream = io.TextIOWrapper(tar.extractfile(file))
+    else:
+        filestream = open(file)
+    reader = casanova.reader(filestream)
+
+    if reader.empty:
+        empty_warn.append(filename)
+
+    text_pos = reader.headers.text
+    id_pos = reader.headers.id
+    rt_pos = reader.headers.retweeted_id
+    user_pos = reader.headers.user_id
+    to_user_pos = reader.headers.to_userid
+    to_id_pos = reader.headers.to_tweetid
+    local_time_pos = reader.headers.local_time
+    screen_name_pos = reader.headers.user_screen_name
+
+    for row in reader:
+        counters["counter_all"] += 1
+        if not row[rt_pos]:
+            counters["counter_original"] += 1
+            # if the tweet is a reply to another tweet of the same user, keep its id to form threads
+            if row[to_user_pos] == row[user_pos] and row[to_id_pos]:
+                thread_ids[row[id_pos]] = (row[to_id_pos], row[text_pos])
+                if row[to_id_pos] not in thread_ids:
+                    thread_ids[row[to_id_pos]] = None
+    if not compressed:
+        filestream.close()
+
+    for key, value in sorted(thread_ids.items()):
+        if not value:
+            threads[key] = ""
+        else:
+            origin = value[0]
+            while origin not in threads:
+                if thread_ids[origin] is not None:
+                    origin = thread_ids[origin][0]
+                else:
+                    threads[origin] = ""
+            threads[origin] += " " + value[1]
+
+    if compressed:
+        input_file = io.TextIOWrapper(tar.extractfile(file))
+    else:
+        input_file = open(file)
+
+    reader = casanova.reader(input_file)
+
+    for row in reader:
+        if not row[rt_pos]:
+            doc_id = row[id_pos]
+            if doc_id in threads:
+                doc = row[text_pos] + " " + threads[doc_id]
+
+            elif doc_id not in thread_ids:
+                doc = row[text_pos]
+
+            else:
+                continue
+
+            doc = clean_text(doc)
+
+            # Keep only documents whith more than 50 characters
+            if len(doc) > 50:
+                # A common value for BERT-based models is 512 tokens
+                doc = reduce_doc_size(doc, length=500)
+
+                if apply_unidecode:
+                    doc = unidecode(doc)
+
+                if small and counters["counter_threads"] >= small_size:
+                    break
+                counters["counter_threads"] += 1
+
+                if metadata:
+                    doc = {
+                        "id": doc_id,
+                        "local_time": row[local_time_pos],
+                        "text": doc,
+                        "user_screen_name": row[screen_name_pos],
+                    }
+                yield doc
+    if not compressed:
+        input_file.close()
+
+
 def preprocess(
     root,
     nb_files,
@@ -549,14 +653,12 @@ def preprocess(
     small=False,
     small_size=NB_DOCS_SMALL_TRAIN,
 ):
-    counter_all = 0
-    counter_original = 0
-    counter_threads = 0
+    counters = {"counter_all": 0, "counter_original": 0, "counter_threads": 0}
 
     tar, loop, compressed = iter_on_files(root, nb_files)
     empty_warn = []
     for file in loop:
-        counter_threads_file = 0
+        counter_threads_file = counters["counter_threads"]
         if compressed:
             filename = file.name
         else:
@@ -568,111 +670,43 @@ def preprocess(
 
         group_name = grep_group_name(filename)
 
-        thread_ids = dict()
-        threads = dict()
-
-        if compressed:
-            filestream = io.TextIOWrapper(tar.extractfile(file))
-        else:
-            filestream = open(file)
-        reader = casanova.reader(filestream)
-
-        if reader.empty:
-            empty_warn.append(filename)
-
-        text_pos = reader.headers.text
-        id_pos = reader.headers.id
-        rt_pos = reader.headers.retweeted_id
-        user_pos = reader.headers.user_id
-        to_user_pos = reader.headers.to_userid
-        to_id_pos = reader.headers.to_tweetid
-
-        for row in reader:
-            counter_all += 1
-            if not row[rt_pos]:
-                counter_original += 1
-                # if the tweet is a reply to another tweet of the same user, keep its id to form threads
-                if row[to_user_pos] == row[user_pos] and row[to_id_pos]:
-                    thread_ids[row[id_pos]] = (row[to_id_pos], row[text_pos])
-                    if row[to_id_pos] not in thread_ids:
-                        thread_ids[row[to_id_pos]] = None
-        if not compressed:
-            filestream.close()
-
-        for key, value in sorted(thread_ids.items()):
-            if not value:
-                threads[key] = ""
-            else:
-                origin = value[0]
-                while origin not in threads:
-                    if thread_ids[origin] is not None:
-                        origin = thread_ids[origin][0]
-                    else:
-                        threads[origin] = ""
-                threads[origin] += " " + value[1]
-
-        if compressed:
-            input_file = io.TextIOWrapper(tar.extractfile(file))
-        else:
-            input_file = open(file)
-
-        if write_files:
-            output_file = open(filename.replace(".csv", "_preprocessed.csv"), "w")
-            enricher = casanova.enricher(
-                input_file, output_file, add=["is_thread", "group"]
-            )
-        else:
-            enricher = casanova.reader(input_file)
-
-        for row in enricher:
-            if not row[rt_pos]:
-                is_thread = 0
-                if row[id_pos] in threads:
-                    is_thread = 1
-                    doc = row[text_pos] + " " + threads[row[id_pos]]
-
-                elif row[id_pos] not in thread_ids:
-                    doc = row[text_pos]
-
-                else:
-                    continue
-
-                doc = clean_text(doc)
-
-                # Keep only documents whith more than 50 characters
-                if len(doc) > 50:
-                    # A common value for BERT-based models is 512 tokens
-                    doc = reduce_doc_size(doc, length=500)
-
-                    if apply_unidecode:
-                        doc = unidecode(doc)
-                    if write_files:
-                        row[text_pos] = doc
-                        enricher.writerow(row, [is_thread, group_name])
-                    if small and counter_threads >= small_size:
-                        break
-                    counter_threads += 1
-                    counter_threads_file += 1
-                    yield doc
+        for thread in generate_threads(
+            file,
+            filename,
+            compressed,
+            tar,
+            empty_warn,
+            counters,
+            apply_unidecode,
+            small,
+            small_size,
+            party_day_counts,
+        ):
+            yield thread
         if party_day_counts is not None:
             if group_name != "":
-                party_day_counts.append((counter_threads_file, group_name, file_date))
+                party_day_counts.append(
+                    (
+                        counters["counter_threads"] - counter_threads_file,
+                        group_name,
+                        file_date,
+                    )
+                )
             else:
-                party_day_counts.append((counter_threads_file, file_date))
+                party_day_counts.append(
+                    (counters["counter_threads"] - counter_threads_file, file_date)
+                )
 
-        if write_files:
-            output_file.close()
-        if not compressed:
-            input_file.close()
-
-        if small and counter_threads >= small_size:
+        if small and counters["counter_threads"] >= small_size:
             break
 
     if compressed:
         tar.close()
     print(
         "nb of tweets: {}, nb of original tweets: {}, nb of original tweets grouped by threads: {}\n".format(
-            counter_all, counter_original, counter_threads
+            counters["counter_all"],
+            counters["counter_original"],
+            counters["counter_threads"],
         )
     )
     if empty_warn:
@@ -763,6 +797,107 @@ def load_docs_embeddings(
     return docs, max_index, embeddings
 
 
+def extract_representative_docs(docs, topics, topic_model):
+    documents_df = pd.DataFrame(
+        {"Document": docs, "ID": range(len(docs)), "Topic": topics, "Image": None}
+    )
+
+    # Extract 10 representative docs per topic
+    _, _, _, repr_docs_ids = topic_model._extract_representative_docs(
+        c_tf_idf=topic_model.c_tf_idf_,
+        documents=documents_df,
+        topics=topic_model.topic_representations_,
+        nr_samples=500,
+        nr_repr_docs=10,
+    )
+
+    return repr_docs_ids
+
+
+def write_representative_docs(
+    repr_docs_ids, party_day_counts, public, path, small, small_size
+):
+    doc_topic_pairs = []
+    for topic_id, doc_ids in enumerate(repr_docs_ids):
+        for doc_id in doc_ids:
+            doc_topic_pairs.append((doc_id, topic_id - 1))
+    doc_topic_pairs = sorted(doc_topic_pairs)
+
+    with open(
+        os.path.join(
+            path,
+            "data_prod",
+            "dashboard",
+            "bertopic",
+            f"representative_docs_{public}.csv",
+        ),
+        "w",
+    ) as f:
+        writer = csv.writer(f)
+        writer.writerow(
+            [
+                "id",
+                "local_time",
+                "text",
+                "user_screen_name",
+                "topic",
+                "party",
+            ]
+        )
+
+        doc_index = 0
+        doc_topic_pairs_index = 0
+        counters = {"counter_all": 0, "counter_original": 0, "counter_threads": 0}
+        doc_count_sum = 0
+        for row in tqdm(party_day_counts, desc="Write representative documents"):
+            if len(row) == 3:
+                doc_count, party, day = row
+                file_path = os.path.join(
+                    path, "data_source", public, party, f"{day}.csv"
+                )
+            else:
+                party = ""
+                doc_count, day = row
+                file_path = os.path.join(path, "data_source", public, f"{day}.csv")
+
+            doc_count_sum += doc_count
+
+            # Skip file if no representative doc inside
+            if doc_topic_pairs[doc_topic_pairs_index][0] > doc_count_sum:
+                doc_index += doc_count
+                continue
+
+            for doc in generate_threads(
+                file_path,
+                f"{day}.csv",
+                compressed=False,
+                tar=None,
+                empty_warn=[],
+                counters=counters,
+                apply_unidecode=False,
+                small=small,
+                small_size=small_size,
+                party_day_counts=party_day_counts,
+                metadata=True,
+            ):
+                if doc_topic_pairs_index >= len(doc_topic_pairs):
+                    return
+                doc_id, topic = doc_topic_pairs[doc_topic_pairs_index]
+                if doc_index == doc_id:
+                    writer.writerow(
+                        [
+                            doc["id"],
+                            doc["local_time"],
+                            doc["text"],
+                            doc["user_screen_name"],
+                            topic,
+                            party,
+                        ]
+                    )
+                    doc_topic_pairs_index += 1
+                doc_index += 1
+
+
 def count_topics_info(topics, party_day_counts, group_type):
     """
     party_day_count is a list with the following structure:
@@ -840,3 +975,4 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             round(topics_info[topic][day] / (doc_count), 5),
                         ]
                     )
+                    
