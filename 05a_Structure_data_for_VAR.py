@@ -84,6 +84,16 @@ with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "
             for row in rows:
                 if iter_dates==nb_dates:
                     break
+                if args.topic_model == 'lda':
+                    ind_lrs = iter_dates + index_lrsupp * nb_dates
+                    ind_majs = iter_dates + index_majsupp * nb_dates
+                    ind_nupess = iter_dates + index_nupessupp * nb_dates
+                    ind_rns = iter_dates + index_rnsupp * nb_dates
+                else:
+                    ind_lrs = iter_dates + index_lrsupp * nb_dates
+                    ind_majs = ind_lrs +1
+                    ind_nupess = ind_lrs +2
+                    ind_rns = ind_lrs +3
                 writer.writerow({
                         'date': rows[iter_dates*4]['date'],  
                         'topic': row['topic'],
@@ -91,10 +101,10 @@ with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "
                         'majority': rows[iter_dates + 1]['prop'],
                         'nupes': rows[iter_dates + 2]['prop'],
                         'rn': rows[iter_dates + 3]['prop'],
-                        'lr_supp': rows[iter_dates + index_lrsupp * nb_dates]['prop'],
-                        'majority_supp': rows[iter_dates + index_majsupp * nb_dates]['prop'],
-                        'nupes_supp': rows[iter_dates + index_nupessupp * nb_dates]['prop'],
-                        'rn_supp': rows[iter_dates + index_rnsupp * nb_dates]['prop'],
+                        'lr_supp': rows[ind_lrs]['prop'],
+                        'majority_supp': rows[ind_majs]['prop'],
+                        'nupes_supp': rows[ind_nupess]['prop'],
+                        'rn_supp': rows[ind_rns]['prop'],
                         'attentive': rows[iter_dates + index_attentive * nb_dates]['prop'],
                         'general': rows[iter_dates + index_general * nb_dates]['prop'],
                         'media': rows[iter_dates + index_media * nb_dates]['prop'],
