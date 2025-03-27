@@ -75,7 +75,7 @@ def generate_path(file):
     return os.path.join(STORE_PATH, file)
 
 
-def group_by_file_and_user(root, nb_files, public, random_tweets=False):
+def group_by_file_and_user(root, nb_files, public, random_tweets=False, lemma=False):
     # Preprocess tweets from 'one file (per party if relevant) per day' to 'one document per user per file'
     names_file = open(generate_path("{}-userday-user-list.txt".format(public)), "w")
     if random_tweets:
@@ -133,7 +133,7 @@ def group_by_file_and_user(root, nb_files, public, random_tweets=False):
                     reader.writerow(row)
                     current_index += 1
                 counter_original += 1
-                row_text = unidecode(clean_text(row[text_pos].replace("\n", "")))
+                row_text = unidecode(clean_text(row[text_pos].replace("\n", ""), lemma))
                 row_user_id = int(row[user_id_pos])
 
                 users[row_user_id]["text"] += row_text + " "
@@ -159,7 +159,7 @@ def group_by_file_and_user(root, nb_files, public, random_tweets=False):
         tar.close()
 
 
-def group_by_file(root, nb_files, write_party, public):
+def group_by_file(root, nb_files, write_party, public, lemma=True):
     global ORIGINAL_TWEET_COUNT
     # Preprocess tweets from 'one file (per party if relevant) per day' to 'one document per file'
     counter_all = 0
@@ -194,7 +194,7 @@ def group_by_file(root, nb_files, write_party, public):
             if not row[rt_pos]:
                 ORIGINAL_TWEET_COUNT += 1
                 file_text += (
-                    unidecode(clean_text(row[text_pos].replace("\n", ""))) + " "
+                    unidecode(clean_text(row[text_pos].replace("\n", ""), lemma)) + " "
                 )
 
         # yield the text of all tweets of the day, remove last character - which is a space
@@ -207,7 +207,6 @@ def group_by_file(root, nb_files, write_party, public):
 
     if write_party:
         group_names_file.close()
-
 
 def export_dfm_matrix(public, X, granularity):
     save_pattern = public + "-" + granularity

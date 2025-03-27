@@ -13,6 +13,7 @@ from transformers import CamembertTokenizer
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 from collections import defaultdict
+import spacy
 
 GROUPS = [
     "majority",
@@ -34,6 +35,7 @@ NB_DOCS_SMALL_INFER = 90000  # You need a larger one in script 03 to have variou
 TRAILING_MENTIONS_PATTERN = r"^(@\w+(?:\s+@\w+)*)"
 URLS_PATTERN = r"([\w+]+\:\/\/)?([\w+]+\:\/\/)?([\w\d-]+\.)*[\w-]+[\.\:]\w+([\/\?\=\&\#.]?[\w-]+)*\/?"
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"
+LEMMA_MODEL=spacy.load("fr_dep_news_trf") # Think to "python -m spacy download fr_dep_news_trf" on terminal if OSError: [E050] Can't find model 'fr_dep_news_trf'. It doesn't seem to be a Python package or a valid path to a data directory.
 
 
 STOP_WORDS_FR = [
@@ -419,8 +421,10 @@ STOP_WORDS_FR = [
     "assemblee",
     "vote",
     "nationale",
+    "national",
     "ministre",
     "assemblee nationale",
+    "assemblee national",
     "proposition",
     "proposition loi",
     "amendement",
@@ -436,7 +440,7 @@ STOP_WORDS_FR = [
 ]
 
 
-def clean_text(doc):
+def clean_text(doc, lemma=True):
     # Remove trailing mentions
     doc = re.sub(
         TRAILING_MENTIONS_PATTERN,
@@ -458,6 +462,14 @@ def clean_text(doc):
         doc,
         flags=re.MULTILINE | re.IGNORECASE,
     )
+    #Lemmatize
+    if lemma:
+        text = LEMMA_MODEL(doc)
+        list_lemma = []
+        for token in text:
+            list_lemma.append(token.lemma_)
+        doc = " ".join(list_lemma)
+
     return doc
 
 
@@ -572,6 +584,7 @@ def generate_threads(
     small_size,
     party_day_counts,
     metadata=False,
+    lemma=False,
 ):
     thread_ids = dict()
     threads = dict()
@@ -637,7 +650,7 @@ def generate_threads(
             else:
                 continue
 
-            doc = clean_text(doc)
+            doc = clean_text(doc, lemma)
 
             # Keep only documents whith more than 50 characters
             if len(doc) > 50:

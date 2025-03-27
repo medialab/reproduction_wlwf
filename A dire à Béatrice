@@ -1,0 +1,2 @@
+J'ai du passé en python 3.9.0 pour spacy 
+Je n'ai pas lemmatisé pour le fichier à granularité userday car ça semble davantage servir pour faire les tweets représentatifs que modéliser lda. Donc vaut mieux des tweets compréhensibles
