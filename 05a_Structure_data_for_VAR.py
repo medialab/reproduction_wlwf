@@ -9,6 +9,7 @@ import casanova
 import argparse
 from collections import defaultdict
 from datetime import datetime, timedelta
+import subprocess
 
 from utils import (
     existing_dir_path,
@@ -16,6 +17,30 @@ from utils import (
     count_nb_files, 
     iter_on_files,
 )
+
+
+def run_xan_command(topic_model):
+    command = f"xan cat rows data_prod/dashboard/{topic_model}/data/*.csv | xan groupby date,topic 'values(prop)' | xan sort -s topic,date"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result.stdout
+
+def parse_csv_data(csv_text):
+    lines = csv_text.strip().split("\n")
+    reader = csv.DictReader(lines)
+    return [row for row in reader]
+
+def split_val(data, groups):
+    for row in data:
+        values = row["values(prop)"].split("|")  # Séparation par '|'
+        
+        # Ajouter dynamiquement des colonnes group1_prop, group2_prop...
+        for i, value in enumerate(values):
+            row[f"{groups[i]}"] = value
+        
+        # Supprimer l'ancienne colonne
+        del row["values(prop)"]
+
+    return data
 
 parser = argparse.ArgumentParser()
 
@@ -35,6 +60,37 @@ args = parser.parse_args()
 
 if args.topic_model not in ['lda', 'bertopic']:
     raise ValueError("The current topic model is incorrect. Choose lda or bertopic as input for model type")
+
+if args.topic_model=='lda':
+    reader_G = casanova.reader("data_prod/dashboard/lda/data/ts-1.csv")
+    groups = list(dict.fromkeys(list(reader_G.cells('actor'))))
+    mapping_dict = {
+    "dep. lr": "lr",
+    "dep. majo.": "majority",
+    "dep. nupes": "nupes",
+    "dep. rn": "rn",
+    "sup. lr": "lr_supp",
+    "sup. majo.": "majority_supp",
+    "sup. nupes": "nupes_supp",
+    "sup. rn": "rn_supp",
+    "pub. attentif": "attentive",
+    "pub. general": "general",
+    "medias": "media"
+    }
+    
+    groups = [mapping_dict.get(actor, actor) for actor in groups] 
+else:
+    reader_G = casanova.reader("data_prod/dashboard/bertopic/data/bertopic_ts_1.csv")
+    groups = list(dict.fromkeys(list(reader_G.cells('party'))))
+
+df = split_val(parse_csv_data(run_xan_command(args.topic_model)), groups)
+output_file = f"data_prod/var/{args.topic_model}/general_TS.csv"
+with open(output_file, "w", newline="") as f:
+    writer = csv.DictWriter(f, fieldnames=df[0].keys())
+    writer.writeheader()
+    writer.writerows(df)
+
+raise(ValueError("STOP : We stop here but we want to keep previous version to avoid xan"))
 
 input_path = os.path.join(args.origin_path, "data_prod", "dashboard", str(args.topic_model), "data")
 files_TS =list(iter_on_files(input_path, count_nb_files(input_path))[1]) 
@@ -67,7 +123,8 @@ else:
     index_nupessupp = group_types.index('sup. nupes')
     index_rnsupp = group_types.index('sup. rn')
 
-
+print(group_types)
+print((index_attentive, index_general, index_lrsupp))
 
 with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "general_TS.csv"), 'w') as f: 
     fieldnames = ['date', 'topic', 'lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media']
@@ -90,7 +147,7 @@ with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "
                     ind_nupess = iter_dates + index_nupessupp * nb_dates
                     ind_rns = iter_dates + index_rnsupp * nb_dates
                 else:
-                    ind_lrs = iter_dates + index_lrsupp * nb_dates
+                    ind_lrs = 4*iter_dates + index_lrsupp * nb_dates
                     ind_majs = ind_lrs +1
                     ind_nupess = ind_lrs +2
                     ind_rns = ind_lrs +3
