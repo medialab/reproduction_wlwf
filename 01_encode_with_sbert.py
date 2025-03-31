@@ -57,7 +57,9 @@ args = parser.parse_args()
 embedding_model = SentenceTransformer(SBERT_NAME)
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-output_folder = create_dir(os.path.join(args.origin_path, "data_prod", "embeddings", f"{args.public}"))
+output_folder = create_dir(
+    os.path.join(args.origin_path, "data_prod", "embeddings", f"{args.public}")
+)
 SAVE_PATH = os.path.join(output_folder, "{}.npz".format(sbert_name_string))
 
 if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
@@ -92,7 +94,7 @@ for i in tqdm(
     range(max_index, len(docs), batch_size),
     desc="Encode sentences using {}".format(sbert_name_string),
 ):
-    if i % DEFAULT_SAVE_SIZE == 0 and i > 0:
+    if i % DEFAULT_SAVE_SIZE == 0 and i > max_index:
         np.savez_compressed(
             format_npz_output(SAVE_PATH, i),
             embeddings=embeddings,
