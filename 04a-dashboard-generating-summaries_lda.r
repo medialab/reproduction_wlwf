@@ -467,7 +467,7 @@ tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
 }
 
 # preparing embed ----
-# > for LDA
+# > for LDA ----
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
@@ -478,7 +478,7 @@ for (i in 1:nrow(rs)){
 congress_rs <- rs
 save(congress_rs, file="data_prod/dashboard/lda/congress-rs-tweets.rdata")
 
-# for BERTOPIC
+# for BERTOPIC ----
 rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv")
 
 rs$embed <- NA
@@ -559,7 +559,7 @@ tw.embed <- function(text, name,
 }
 
 # preparing embed ----
-# > for LDA
+# > for LDA ----
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
@@ -572,9 +572,8 @@ for (i in 1:nrow(rs)){
 media_rs <- rs
 save(media_rs, file="data_prod/dashboard/lda/media-rs-tweets.rdata")
 
-# > for BERTOPIC
+# > for BERTOPIC ----
 
-# for BERTOPIC
 rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
 
 rs$embed <- NA

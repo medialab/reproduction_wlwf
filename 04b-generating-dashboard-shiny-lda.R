@@ -15,8 +15,8 @@ library(tidyverse)
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
 # load("data_prod/dashboard/qois.rdata")  # topic_scores
 # representative tweets
-load("data_prod/dashboard/congress-rs-tweets.rdata")
-load("data_prod/dashboard/media-rs-tweets.rdata")
+load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
+load("data_prod/dashboard/lda/media-rs-tweets.rdata")
 # qois_long <- qois |>
 #   select(topic, starts_with("prop_")) |>
 #   pivot_longer(cols = starts_with("prop"),
