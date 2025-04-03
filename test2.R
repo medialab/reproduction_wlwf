@@ -13,6 +13,15 @@ library(Matrix)
 library(tm)
 })
 
+
+check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
+  if (nrow(mat) != expected_rows | ncol(mat) != expected_cols) {
+    stop(sprintf("La matrice a des dimensions incorrectes : attendu %d lignes et %d colonnes, mais obtenu %d lignes et %d colonnes.",
+                 expected_rows, expected_cols, nrow(mat), ncol(mat)))
+  }
+}
+
+
 K <- 100
 
 #Plots 
@@ -25,8 +34,6 @@ info.df <- data.frame(topic = n.topics, order = ranking, word = words)
 
 info.df$topic <- paste0("Topic ", info.df$topic)
 info.df$topic <- factor(info.df$topic, levels=paste0("Topic ", 1:K))
-
-print(head(info.df, 30))
 
 #topic, rank, work
 # generating figures
@@ -109,7 +116,7 @@ congress |> summarise(m = mean(prop), .by = actor)
 build_ts <- function(
                      actor_ldafile_naming,
                      actor_label, 
-                     path = "data_prod/topics/lda-output/",
+                     path = "data_prod/topics/lda-python/",
                      first_date = "2022-06-20", 
                      last_date = "2023-03-14"
                      ){
@@ -251,9 +258,8 @@ results <- results[-duplicated,]
 #
 K <- 100
 rs <- list()
-
 for (k in 1:K){
-  choices <- tail(order(results[,k]),n=10)
+  choices <- tail(order(as.numeric(pull(results, k))), n = 10)
   rs[[k]] <- tweets[choices,]
   rs[[k]]$topic <- k
 }
@@ -337,7 +343,7 @@ K <- 100
 rs <- list()
 
 for (k in 1:K){
-  choices <- tail(order(results[,k]),n=10)
+  choices <- tail(order(as.numeric(pull(results, k))), n = 10)
   rs[[k]] <- tweets[choices,]
   rs[[k]]$topic <- k
 }
