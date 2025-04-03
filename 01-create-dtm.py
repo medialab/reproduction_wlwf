@@ -33,6 +33,7 @@ import casanova
 import argparse
 from unidecode import unidecode
 from collections import defaultdict
+import pandas as pd
 
 from utils import (
     choices,
@@ -287,7 +288,6 @@ if __name__ == "__main__":
             )
         )
         export_dfm_matrix(args.public, X, "userday")
-
         print("Compute dtm matrix at tweet granularity")
         X = vectorizer.transform(
             (
@@ -298,3 +298,4 @@ if __name__ == "__main__":
             )
         )
         export_dfm_matrix(args.public, X, "rs")
+
