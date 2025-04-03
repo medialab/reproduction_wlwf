@@ -19,13 +19,14 @@ K <- 100
 topwords <-scan("data_prod/topics/lda-python/topwords.txt", what="character", sep="\n")
 words <- topwords[!seq_along(topwords) %% 16 == 1]  # On saute chaque 16ème élément
 n.topics <- rep(seq(1, K, 1), each=15)
-ranking <-  rep(seq(1, 15, 1), times = K)
+ranking <-  rep(seq(15, 1, -1), times = K)
 
 info.df <- data.frame(topic = n.topics, order = ranking, word = words)
 
-# Afficher le data.frame
+info.df$topic <- paste0("Topic ", info.df$topic)
+info.df$topic <- factor(info.df$topic, levels=paste0("Topic ", 1:K))
+
 print(head(info.df, 30))
-stop()
 
 #topic, rank, work
 # generating figures
@@ -38,13 +39,11 @@ for (k in 1:K){
 	df <- info.df[info.df$topic==paste0('Topic ', k),]
 
 	p <- ggplot(data=df,
-		aes(y=order, x=order, label=word))
-	pq <- p + geom_text(aes(size=score), hjust=1) +
+		aes(x= 1, y=order, label=word))
+	pq <- p + geom_text(hjust=1, size=4)  +
     	scale_size_continuous(range=c(3,5)) +
     	scale_y_discrete("Top 10 scoring words for each topic",
-        	expand=c(0.03, 0.1)) +
-    	scale_x_continuous("Specificity of word to each topic",
-        	limit=c(min(df$order)-.75, 1)) +
+        	limit= rev(levels(df$order))) +
     	theme_bw() +
     	theme(axis.line = element_blank(),
     	panel.grid.major = element_blank(),
@@ -56,7 +55,7 @@ for (k in 1:K){
     	axis.title.y = element_text(size = rel(.6)),
     	axis.title.x = element_text(size = rel(.6)),
     	legend.position = "none") +
-    	geom_vline(xintercept = min(df$specificity)-.75, color="grey80", linetype=7) +
+    	geom_vline(xintercept = .75, color="grey80", linetype=7) +
     	geom_hline(yintercept = 0.5, color="grey80", linetype=7)
 
 	pq
@@ -64,6 +63,48 @@ for (k in 1:K){
 	ggsave(pq, file=paste0("data_prod/dashboard/lda/img/words-plot-", k, '.png'), height=3.5, width=3, create.dir = TRUE)
 
 }
+
+#TS
+
+#getting list of dates
+fls <- scan("data_prod/dfm/congress-day-party-list.txt", what = "character", sep = "\n") # liste des partis-dates préalablement extraites des noms de fichier
+
+dates <- fls |>
+  str_extract("\\d{4}-\\d{2}-\\d{2}")
+
+# parties <- fls |>
+#   str_extract("[^/]*") |> # tout ce qui précède "/"
+#   unique()
+
+parties <- c("dep. lr", "dep. majo.", "dep. nupes", "dep. rn")
+
+# ## computing differences across parties
+congress <- read_csv("data_prod/topics/lda-python/results-congress.csv", show_col_types = FALSE)
+suppressMessages({
+congress <- congress |>  # probabilité partis / jour en ligne, topics en colonne
+  # À VERIFIER !!!!!!!!!!!!!
+  # /!\ Est-ce que l'ordre des lignes du lda.fit@gamma est bien le même que l'ordre dans fls ? /!\
+  as_tibble() |> 
+  # passage en format tidy
+  pivot_longer(everything(),
+               names_to = "topic",
+               names_pattern = "(\\d+)", # récupère les chiffres dans les noms de colonnes
+               values_to = "prop") |>  
+  mutate(date = rep(as.Date(dates), each = K),
+         actor = rep(.env$parties, each = K*length(dates)/length(.env$parties)), # /!\ Attention à la diff entre times et each /!\
+         ) |> 
+  relocate(c(topic, prop), .after = "actor") |> 
+  arrange(topic, date, actor)
+})
+# chaque jour, la somme du "score d'attention" de chaque acteur réparti entre les différents topics vaut 1
+# verif
+cat("check the coherence of congress time-series df\n")
+suppressMessages({
+congress |> summarise(s = sum(prop), .by = date) # la somme des probas chaque jour vaut 4 : 1 pour chaque parti
+congress |> summarise(s = sum(prop), .by = actor) # la somme des probas pour chaque parti vaut 268 (1 par jour)
+congress |> summarise(m = mean(prop), .by = actor)
+})
+
 
 build_ts <- function(
                      actor_ldafile_naming,
@@ -74,7 +115,7 @@ build_ts <- function(
                      ){
 
 # charge le fichier lda
-  results <- read_csv(paste0("data_prod/topics/lda-python/results-", actor_ldafile_naming, ".csv")
+  results <- read_csv(paste0("data_prod/topics/lda-python/results-", actor_ldafile_naming, ".csv"), show_col_types = FALSE)
 # vecteur des dates
   dates <- seq(as.Date(first_date), as.Date(last_date), by = "day")
 # construction du df
@@ -125,6 +166,13 @@ nupes <- build_ts(
 rn <- build_ts(
   "rn_supporters",
   "sup. rn"
+)
+
+
+# >> attentive public ----
+attentive <- build_ts(
+  "attentive",
+  "pub. attentif"
 )
 
 # >> general public ----
@@ -189,7 +237,7 @@ todelete <- which(rowSums(X)==0)
 X <- X[-todelete,]
 tweets <- tweets[-todelete,]
 #
-results <- read_csv("data_prod/topics/lda-python/results-congress_rs.csv")
+results <- read_csv("data_prod/topics/lda-python/results-congress_rs.csv", show_col_types = FALSE)
 #
 # deleting duplicated tweets
 duplicated <- which(duplicated(tweets$text))
@@ -238,7 +286,7 @@ congress_rs <- rs
 save(congress_rs, file="data_prod/dashboard/lda/congress-rs-tweets.rdata")
 
 # for BERTOPIC ----
-rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv")
+rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv", show_col_types = FALSE)
 
 rs$embed <- NA
 for (i in 1:nrow(rs)){
@@ -278,18 +326,18 @@ todelete <- which(rowSums(X)==0)
 X <- X[-todelete,]
 tweets <- tweets[-todelete,]
 #
-load('data_prod/topics/lda-output/lda-media-rs-results.Rdata')
+results <- read_csv("data_prod/topics/lda-python/results-media_rs.csv", show_col_types = FALSE)
 #
 # # deleting duplicated tweets
 duplicated <- which(duplicated(tweets$text))
 tweets <- tweets[-duplicated,]
-results$topics <- results$topics[-duplicated,]
+results <- results[-duplicated,]
 
 K <- 100
 rs <- list()
 
 for (k in 1:K){
-  choices <- tail(order(results$topics[,k]),n=10)
+  choices <- tail(order(results[,k]),n=10)
   rs[[k]] <- tweets[choices,]
   rs[[k]]$topic <- k
 }
@@ -333,7 +381,7 @@ save(media_rs, file="data_prod/dashboard/lda/media-rs-tweets.rdata")
 
 # > for BERTOPIC ----
 
-rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
+rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv", show_col_types = FALSE)
 
 rs$embed <- NA
 for (i in 1:nrow(rs)){

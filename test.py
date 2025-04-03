@@ -22,9 +22,9 @@ ORIGINAL_TWEET_COUNT = 0
 
 def create_df_sparse(public, userday=False):
     if userday:
-        indices = np.loadtxt(f"data_prod/dfm/{public}-userday-dtm-indices.txt", dtype=int)
-        indptr = np.loadtxt(f"data_prod/dfm/{public}-userday-dtm-pointers.txt", dtype=int)
-        data = np.loadtxt(f"data_prod/dfm/{public}-userday-dtm-values.txt", dtype=int)
+        indices = np.loadtxt(f"data_prod/dfm/{public}-rs-dtm-indices.txt", dtype=int)
+        indptr = np.loadtxt(f"data_prod/dfm/{public}-rs-dtm-pointers.txt", dtype=int)
+        data = np.loadtxt(f"data_prod/dfm/{public}-rs-dtm-values.txt", dtype=int)
     else:
         indices = np.loadtxt(f"data_prod/dfm/{public}-day-dtm-indices.txt", dtype=int)
         indptr = np.loadtxt(f"data_prod/dfm/{public}-day-dtm-pointers.txt", dtype=int)
