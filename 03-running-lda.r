@@ -139,8 +139,6 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 tweets <- read.csv("data_prod/dfm/media-rs-tweet-list.csv", stringsAsFactors=F, colClasses="character")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
-                  repr = "R",
-                  # prefixing dims produce a (mysterious) error. It is now directly inferred from j, p and x.
     dims=c(
       nrow(tweets),
       length(words)
