@@ -30,10 +30,7 @@ def create_df_sparse(public, userday=False):
         indptr = np.loadtxt(f"data_prod/dfm/{public}-day-dtm-pointers.txt", dtype=int)
         data = np.loadtxt(f"data_prod/dfm/{public}-day-dtm-values.txt", dtype=int)
 
-    csr_mat = csr_matrix((data, indices, indptr))
-    row_sums = np.array(csr_mat.sum(axis=1)).flatten()
-    nonzero_rows = row_sums > 0
-    csr_mat = csr_mat[nonzero_rows]
+    csr_mat = csr_matrix((data, indices, indptr)) #Check des zero potentieols
     return csr_mat
 
 def ntopwlst(model, features, ntopwords):
