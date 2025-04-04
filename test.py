@@ -31,6 +31,9 @@ def create_df_sparse(public, userday=False):
         data = np.loadtxt(f"data_prod/dfm/{public}-day-dtm-values.txt", dtype=int)
 
     csr_mat = csr_matrix((data, indices, indptr))
+    row_sums = np.array(csr_mat.sum(axis=1)).flatten()
+    nonzero_rows = row_sums > 0
+    csr_mat = csr_mat[nonzero_rows]
     return csr_mat
 
 def ntopwlst(model, features, ntopwords):
@@ -59,7 +62,7 @@ print("Dim matrice congress lda", lda_topic_doc_matrix.shape)
 lda_topic_doc_matrix.to_csv("data_prod/topics/lda-python/results-congress.csv", index=False)
 
 print("Create top words")
-ntopwords = 15 # change this to show more words for the topic selector (20)
+ntopwords = 15 
 
 topwds = ntopwlst(lda, words, ntopwords)
 with open("data_prod/topics/lda-python/topwords.txt", "w") as f:

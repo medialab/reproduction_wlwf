@@ -239,17 +239,24 @@ X |> check_matrix_dimensions(expected_rows =  nrow(tweets),
                              expected_cols = length(words)
 )
 
+print(dim(tweets))
+
 # deleting empty rows
 todelete <- which(rowSums(X)==0)
 X <- X[-todelete,]
 tweets <- tweets[-todelete,]
+print(dim(tweets))
 #
 results <- read_csv("data_prod/topics/lda-python/results-congress_rs.csv", show_col_types = FALSE)
+print(dim(results))
 #
 # deleting duplicated tweets
 duplicated <- which(duplicated(tweets$text))
 tweets <- tweets[-duplicated,]
 results <- results[-duplicated,]
+
+print(dim(tweets))
+print(dim(results))
 
 # deleting weird tweets
 #todelete <- grep('xss', tweets$text)
@@ -264,6 +271,7 @@ for (k in 1:K){
   rs[[k]]$topic <- k
 }
 rs <- do.call(rbind, rs)
+stop()
 
 # function to display embedded tweet
 tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
