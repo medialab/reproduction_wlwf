@@ -1,6 +1,6 @@
 #install.packages(c("rio", "vars", "tseries"))
 #remotes::install_github(repo = "cran/pco")
-install.packages(resample)
+install.packages("resample")
 library(dplyr)
 library(tidyverse)
 library(tidyr)
@@ -61,7 +61,7 @@ if (args$estimate){
     pol_issues <- c(1:100)
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
-    pol_issues <- c(0:92)
+    pol_issues <- c(0:91)
   }
 
   db <- db %>%
@@ -162,7 +162,7 @@ if (args$estimate){
           print(paste("Diff", v, "Stationary not rejected", p_value2))
         }   
       } 
-      print("Start multivariate Pedroni cointegration test")
+      print("Start panel cointegration test")
 
       Groen_Kleibergen_Test <- function(db, n_boot=500){
         jo_mat <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
