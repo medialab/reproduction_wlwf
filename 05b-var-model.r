@@ -129,8 +129,12 @@ if (args$estimate){
     if(count_stat != length(variables)){
       print("At least one group is represented by a non-stationary time series. Check the stationnarity after a differentiation")
       pdb_diff <- pdb
-      for (v in variables){
-        pdb_diff[[v]] <- diff(pdb_diff[[v]], lag=1L)
+      for (i in unique(pdb_diff$topic)){
+
+        pdb_topc <- pdb_diff %>% filter(topic==i)
+        for (v in variables){
+          pdb_topic[[v]] <- diff(pdb_topc[[v]], lag=1L)
+          
       }
 
       pdb_diff <- na.omit(pdb_diff)
@@ -208,43 +212,8 @@ if (args$estimate){
           P_value = p_value
         )
         return(result_table)
-      }
-
-      Groen_Kleibergen_Test(db)
-
-      data_co <- array(NA, dim=c(length(unique(db$date)), length(unique(db$topic)), length(variables)))
-      for (d in 1:dim(data_co)[1]){
-        for (t in 1:dim(data_co)[2]){
-          db_filt <- db %>% 
-                    filter(date == unique(db$date)[d]) %>%
-                    filter(topic == unique(db$topic)[t])
-          for (m in 1:dim(data_co)[3]){
-            m_val <- db_filt[variables[m]][[1]]
-            data_co[d, t, m] <- m_val
-         }
-        }
-      }
-      data_test_co <- matrix(NA, nrow=10, ncol=2)
-      for (k in 1:nrow(data_test_co)){
-        coint_test <- pedroni99m(data_co, type.stat = 2, ka = k)
-        data_test_co[k,] = c(k, coint_test$STATISTIC)
-      }
-      df_test_co <- as.data.frame(data_test)
-      colnames(df_test_co) <- c("Lags", "Stat")
-
-      if(args$topic_model == 'lda') {
-        write.csv(df_test_co,
-                  "data_prod/var/lda/COtests_results.csv",
-                  row.names = FALSE)
-      } else {
-        write.csv(df_test_co,
-       "data_prod/var/bertopic/COtests_results.csv",
-        row.names = FALSE)
-      }
-        
+      } 
     }
-
-    stop()
 
     data_test = matrix(NA, nrow=5, ncol = 5)
     for (p in 1:nrow(data_test)){
