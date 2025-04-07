@@ -46,8 +46,8 @@ mat <- as.simple_triplet_matrix(X)
 dtm <- as.DocumentTermMatrix(mat, weighting=function(x) weightTf(x))
 
 # sanity check
-rs <- apply(dtm, 2, sum)
-tail(sort(rs),n=100)
+#rs <- apply(dtm, 2, sum)
+#tail(sort(rs),n=100)
 
 # removing empty rows
 cs <- row_sums(dtm)
@@ -57,7 +57,7 @@ dtm <- dtm[cs>0,]
 # MAIN: CONGRESS
 # ===============================================================================
 # running regular LDA
-lda.fit <- LDA(dtm, k=100, method="Gibbs",
+lda.fit <- LDA(dtm, k=40, method="Gibbs",
     	control=list(verbose=50L, iter=2000))
 
 save(lda.fit, file="data_prod/topics/lda_results-twokenizer.Rdata")
@@ -139,6 +139,8 @@ words <- scan("data_prod/dfm/congress-words.txt", what="character", sep="\n")
 tweets <- read.csv("data_prod/dfm/media-rs-tweet-list.csv", stringsAsFactors=F, colClasses="character")
 
 X <- sparseMatrix(j=ind, p=pointers, x=values,
+                  repr = "R",
+                  # prefixing dims produce a (mysterious) error. It is now directly inferred from j, p and x.
     dims=c(
       nrow(tweets),
       length(words)
