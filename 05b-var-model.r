@@ -61,7 +61,10 @@ if (args$estimate){
     pol_issues <- c(1:100)
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
-    pol_issues <- c(0:91)
+    #pol_issues <- c(0:91)
+    pol_issues <- c(0, 1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 27, 28, 29, 30, 31, 32, 33, 34, 36, 
+    37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 58, 59, 62, 63, 64, 66, 67, 68, 70, 71, 
+    72, 73, 74, 75, 77, 80, 81, 82, 83, 84, 85, 86, 89, 90, 91) #14, 23, 33, 37, 41, 45, 51, 56, 61, 62, 63, 64, 79, 88
   }
 
   db <- db %>%
@@ -227,12 +230,14 @@ if (args$estimate){
     df_test <- as.data.frame(data_test)
     colnames(df_test) <- c("Lags", "No unit root", "BIC", "AIC", "HQIC")
     if(args$topic_model == 'lda') {
-      write.csv(pdb_diff, "data_prod/var/lda/general_diff.csv", row.names = FALSE)
+      write.csv(pdb, "data_prod/var/lda/general_filt_nodiff.csv", row.names = FALSE)
+      write.csv(pdb_diff, "data_prod/var/lda/general__filt_diff.csv", row.names = FALSE)
       write.csv(df_test,
       "data_prod/var/lda/tests_results.csv",
       row.names = FALSE)
     } else {
-      write.csv(pdb_diff, "data_prod/var/bertopic/general_diff.csv", row.names = FALSE)
+      write.csv(pdb, "data_prod/var/bertopic/general_filt_nodiff.csv", row.names = FALSE)
+      write.csv(pdb_diff, "data_prod/var/bertopic/general_filt_diff.csv", row.names = FALSE)
       write.csv(df_test,
       "data_prod/var/bertopic/tests_results.csv",
       row.names = FALSE)
