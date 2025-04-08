@@ -129,16 +129,11 @@ if (args$estimate){
     if(count_stat != length(variables)){
       print("At least one group is represented by a non-stationary time series. Check the stationnarity after a differentiation")
       pdb_diff <- pdb
-      for (i in unique(pdb_diff$topic)){
-
-        pdb_topc <- pdb_diff %>% filter(topic==i)
-        for (v in variables){
-          pdb_topic[[v]] <- diff(pdb_topc[[v]], lag=1L)
-          
+      for (v in variables){
+        pdb_diff[[v]] <- diff(pdb[[v]], 1L)
       }
 
       pdb_diff <- na.omit(pdb_diff)
-      pdb_diff <- pdata.frame(pdb_diff, index=c("topic", "date"))
       pdb_diffc <- pdb_diff
 
       for (v in variables){
@@ -214,24 +209,30 @@ if (args$estimate){
         return(result_table)
       } 
     }
-
+    
     data_test = matrix(NA, nrow=5, ncol = 5)
-    for (p in 1:nrow(data_test)){
-      print(p)
-      model <- pvargmm(variables, lags = p, data = db, panel_identifier=c("topic", "date"), transformation = "fod", steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
-      modulus <- c(stability(model)$Modulus)
-      max_modul <- max(modulus)
-      list_crit <- Andrews_Lu_MMSC(model)
-      criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]])
-      data_test[p,] = c(p, max_modul, criteria)
-    }
+    #for (p in 1:nrow(data_test)){
+      #print(p)
+      #model <- pvargmm(variables, lags = p, data = pdb_diff, panel_identifier=c("topic", "date"), transformation = "fod", steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
+      #modulus <- c(stability(model)$Modulus)
+      #max_modul <- max(modulus)
+      #list_crit <- Andrews_Lu_MMSC(model)
+      #criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]])
+      #data_test[p,] = c(p, max_modul, criteria)
+    #}
+
+    print(head(pdb, 5))
+    print(head(pdb_diff, 5))
+
     df_test <- as.data.frame(data_test)
     colnames(df_test) <- c("Lags", "No unit root", "BIC", "AIC", "HQIC")
     if(args$topic_model == 'lda') {
+      write.csv(pdb_diff, "data_prod/var/lda/general_diff.csv", row.names = FALSE)
       write.csv(df_test,
       "data_prod/var/lda/tests_results.csv",
       row.names = FALSE)
     } else {
+      write.csv(pdb_diff, "data_prod/var/bertopic/general_diff.csv", row.names = FALSE)
       write.csv(df_test,
       "data_prod/var/bertopic/tests_results.csv",
       row.names = FALSE)
