@@ -8,7 +8,23 @@ db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
 
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
-db <- db %>% filter(topic >= 0)
+pol_issues <- c(0, 1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 27, 28, 29, 30, 31, 32, 33, 34, 36, 
+    37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 58, 59, 62, 63, 64, 66, 67, 68, 70, 71, 
+    72, 73, 74, 75, 77, 80, 81, 82, 83, 84, 85, 86, 89, 90, 91) 
+
+db <-  db %>%
+    filter(topic %in% pol_issues)
+drop_top = c()
+for (i in unique(db$topic)){
+      pdb_top <- db %>% filter(topic==i)
+      for (v in variables){
+        if (sd(pdb_top[[v]]) == 0){
+          drop_top <- c(drop_top, i)
+        }
+      }
+    }
+
+db <- db %>% filter (!(topic %in% unique(drop_top)))
 # - logit transform all series
 for (v in variables) {
 # - pulling the series-agenda for that group
@@ -74,6 +90,8 @@ db_bis <- db %>%
     group_by(group, topic) %>%
     summarise(date = first(group), across(where(is.numeric), mean), .groups='drop') %>%
     arrange(as.numeric(topic)) 
+
+write.csv(db_bis, "data_prod/var/bertopic/nodiff_week.csv" ,row.names = FALSE)
 
 db_corr <- db_bis %>% select(variables) 
 cormat <- round(cor(db_corr),2)

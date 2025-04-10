@@ -212,17 +212,31 @@ if (args$estimate){
         return(result_table)
       } 
     }
+
+    drop_top <- c()
+
+    for (i in unique(pdb$topic)){
+      pdb_top <- pdb %>% filter(topic==i)
+      for (v in variables){
+        if (sd(pdb_top[[v]]) == 0){
+          drop_top <- c(drop_top, i)
+        }
+      }
+    }
+
+    pdb <- pdb %>% filter (!(topic %in% unique(drop_top)))
+    print(paste(length(unique(drop_top)), "topics removed"))
     
     data_test = matrix(NA, nrow=5, ncol = 5)
-    #for (p in 1:nrow(data_test)){
-      #print(p)
-      #model <- pvargmm(variables, lags = p, data = pdb_diff, panel_identifier=c("topic", "date"), transformation = "fod", steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
-      #modulus <- c(stability(model)$Modulus)
-      #max_modul <- max(modulus)
-      #list_crit <- Andrews_Lu_MMSC(model)
-      #criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]])
-      #data_test[p,] = c(p, max_modul, criteria)
-    #}
+    for (p in 1:nrow(data_test)){
+      print(p)
+      model <- pvargmm(variables, lags = p, data = pdb, panel_identifier=c("topic", "date"), transformation = "fd", steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=50)
+      modulus <- c(stability(model)$Modulus)
+      max_modul <- max(modulus)
+      list_crit <- Andrews_Lu_MMSC(model)
+      criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]])
+      data_test[p,] = c(p, max_modul, criteria)
+    }
 
     print(head(pdb, 5))
     print(head(pdb_diff, 5))
