@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def draw_topic_keywords(topic, words, x, root=os.getcwd()):
+def draw_topic_keywords(topic, words, x, root=os.getcwd(), reduced=False):
     """
     topic: the topic number
     words: a list of words
@@ -43,9 +43,15 @@ def draw_topic_keywords(topic, words, x, root=os.getcwd()):
     ax.set_yticks(np.arange(1, len(words) + 1))  # On fixe les ticks pour l'axe y
     ax.get_yaxis().set_tick_params(which="both", left=False, right=False)
 
-    fig.savefig(
-        os.path.join(root,
+    if reduced:
+        open_path = os.path.join("data_prod", "dashboard", "bertopic", "reduced", "img", "bertopic_{}.png".format(topic)
+        )
+    else:
+        open_path = os.path.join(root,
             "data_prod", "dashboard", "bertopic", "img", "bertopic_{}.png".format(topic)
         )
+
+    fig.savefig(
+        os.path.join(open_path)
     )
     plt.close()

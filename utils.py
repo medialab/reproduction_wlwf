@@ -815,7 +815,7 @@ def extract_representative_docs(docs, topics, topic_model):
 
 
 def write_representative_docs(
-    repr_docs_ids, party_day_counts, public, path, small, small_size
+    repr_docs_ids, party_day_counts, public, path, small, small_size, reduced=False
 ):
     doc_topic_pairs = []
     for topic_id, doc_ids in enumerate(repr_docs_ids):
@@ -823,14 +823,25 @@ def write_representative_docs(
             doc_topic_pairs.append((doc_id, topic_id - 1))
     doc_topic_pairs = sorted(doc_topic_pairs)
 
-    with open(
-        os.path.join(
+    if reduced:
+        open_path = os.path.join(
+            "data_prod",
+            "dashboard",
+            "bertopic",
+            "reduced",
+            f"representative_docs_{public}.csv",
+        )
+    else:
+        open_path = os.path.join(
             path,
             "data_prod",
             "dashboard",
             "bertopic",
             f"representative_docs_{public}.csv",
-        ),
+        )
+
+    with open(
+        open_path,
         "w",
     ) as f:
         writer = csv.writer(f)
@@ -939,17 +950,29 @@ def count_topics_info(topics, party_day_counts, group_type):
     return topics_info
 
 
-def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_path):
+def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_path, reduced=False):
     for topic in tqdm(topics, desc="Write time series"):
-        with open(
-            os.path.join(
+        if reduced:
+            open_path = os.path.join(
+                "data_prod",
+                "dashboard",
+                "bertopic",
+                "reduced",
+                "data",
+                f"bertopic_ts_{topic}.csv",
+            )
+        else:
+            open_path = os.path.join(
                 origin_path,
                 "data_prod",
                 "dashboard",
                 "bertopic",
                 "data",
                 f"bertopic_ts_{topic}.csv",
-            ),
+            )
+
+        with open(
+            open_path,
             "w" if group_type == "congress" else "a",
         ) as f:
             writer = csv.writer(f)

@@ -279,17 +279,18 @@ if group_list & set(choices):
         print(f"Predict model from {model_path}")
         topics, probs = topic_model.transform(docs, embeddings)
 
-        repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
-
         # Write representative docs for one public in one file
-        write_representative_docs(
-            repr_docs_ids,
-            party_day_counts,
-            group,
-            args.origin_path,
-            args.small,
-            NB_DOCS_SMALL_INFER,
-        )
+        if group=="media":
+            repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
+
+            write_representative_docs(
+                repr_docs_ids,
+                party_day_counts,
+                group,
+                args.origin_path,
+                args.small,
+                NB_DOCS_SMALL_INFER,
+            )
 
         print(topic_model.get_topic_info())
 
