@@ -8,6 +8,8 @@ library(rio)
 library(tseries)
 library(argparse)
 library(stats)
+library(stringr)
+library(data.table)
 library(urca)
 
 parser <- ArgumentParser()
@@ -71,7 +73,7 @@ if (args$estimate){
     pol_issues <- c(1:100)
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
-    pol_issues <- c(0:92)
+    pol_issues <- c(0:91)
   }
 
   db <- db %>%
@@ -87,6 +89,10 @@ if (args$estimate){
     count_msg <- 0
     results_list <- list()
     results_list2 <- list()
+
+    concat_statio <- as.data.frame(matrix(NA, nrow = length(variables), ncol=1))
+    colnames(concat_statio) <- c("p-value")
+    rownames(concat_statio) <- variables
   }
 
   # - logit transform all series
@@ -113,10 +119,15 @@ if (args$estimate){
     db[,v] <- logit_x
 
     if (args$tests) {
+      data <- as.ts(db[[v]])
+      adf <- adf.test(data)
+      p_value <- adf$p.value
+      concat_statio[v,1] <- p_value
       if (count_msg == 0) {
          print("Start testing process")
          count_msg <- 1
       }
+
       no_stationarity_TS_data <- data.frame()
       for (topic_n in pol_issues) { 
         # Augmented Dickey-Fuller (ADF) test for stationarity
@@ -127,8 +138,7 @@ if (args$estimate){
           adf <- adf.test(data)
           p_value <- adf$p.value
           if (is.nan(p_value)) { #ADF ne gère pas certains cas. On va donc vérifier manuellement par ACF et PACF si les données sont stationnaires
-            print(paste("P-value not calculated for topic:", topic_n, "and variable:", v, 
-                  "because of data structure and weak variance of the time series. The variance is:", var(data), "A special treatment was done to determine stationnarity using ACF and PACF functions"))
+            cat("P-value not calculated for topic:", topic_n, "and variable:", v, "because of data structure and weak variance of the time series. The variance is:", var(data), "A special treatment was done to determine stationnarity using ACF and PACF functions")
             acf_values <- acf(data, plot = FALSE, lag.max = 6)
             pacf_values <- pacf(data, plot = FALSE, lag.max = 6)
 
@@ -144,28 +154,64 @@ if (args$estimate){
   }
 
   if (args$tests) {
+    cat("Résultats de stationnarité sur les séries concaténées \n")
+    print(concat_statio)
     results_df <- do.call(rbind, lapply(results_list, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
     colnames(results_df) <- c("topic", "variable", "p_value")
     non_full_stationarity_topics <- unique(results_df$topic)
 
+    list_full_top <- list()
     count_full_top <- 0
     for (topic_n in non_full_stationarity_topics){
         db_top <- results_df %>% filter(topic == topic_n)
-        print(db_top)
         if (nrow(db_top) == length(variables)){
             count_full_top <- count_full_top + 1
+            list_full_top <- append(list_full_top, topic_n) 
         }
     count_partial_topic <- length(non_full_stationarity_topics) - count_full_top
     }
     stationary_topics <- setdiff(pol_issues, non_full_stationarity_topics)
-    print(paste("Number of topics where time series for each group are stationary: ", length(stationary_topics)))
+    cat("Number of topics where time series for each group are stationary: ", length(stationary_topics), "\n")
     cat("The topic numbers that satisfy this property:", stationary_topics, "\n")
-    print(paste("Number of topics where time series for each group are not stationary: ", count_full_top))
-    print(paste("Number of topics where time series are I(0) or I(1) according to group: ", count_partial_topic))
+    cat("Number of topics where time series for each group are not stationary: ", count_full_top, "\n")
+    cat("These topics are : ", paste(list_full_top, collapse= " "), "\n")
+    cat("Number of topics where time series are I(0) or I(1) according to group: ", count_partial_topic, "\n")
+
+    count_coint <- 0
+    count_ignor_coint <- 0
+    list_coint <- list()
+    rank_coint <- data.frame(matrix(NA, nrow=length(non_full_stationarity_topics), ncol=2))
+    colnames(rank_coint) <- c("topic", "rank")
+    ind_top <- 0
 
     for (topic in non_full_stationarity_topics) {
+      ind_top <- ind_top + 1
+      db_topic <- db[db$topic == topic, ]
+      if (args$topic_model =='lda'){
+        sumjo <- summary(ca.jo(db_topic[, variables],type="trace", ecdet = "const", spec="longrun"))
+        jo_stat <- sumjo@teststat[length(variables)]
+        jo_seuil5 <- sumjo@cval[length(variables), 2]
+        if(jo_seuil5<jo_stat){
+          count_coint <- count_coint + 1
+          list_coint <- append(list_coint, topic)
+        }
+        rank_coint[ind_top, "topic"] <- topic
+        stats <- sumjo@teststat
+        seuils <- sumjo@cval[,2]
+        rank_val <- 0
+        for (i in length(variables):1){
+          if(stats[i] < seuils[i]){
+            rank_coint[ind_top, "rank"] <- rank_val
+            break
+          }else{
+            rank_val <- rank_val + 1
+            if (rank_val==11){
+              rank_coint[ind_top, "rank"] <- rank_val
+            }
+          }
+        }
+      }
       for (v in variables) {
-        db_topic <- db[db$topic == topic, ]
         data <- db_topic[[v]]
         data <- as.ts(data)
         if (sd(data) > 0) {
@@ -177,7 +223,7 @@ if (args$estimate){
               adf2 <- adf.test(data_diff)
               p_value2 <- adf2$p.value
               if (is.nan(p_value2)) { #ADF ne gère pas certains cas. On va donc vérifier manuellement par ACF et PACF si les données sont stationnaires
-                print(paste("P-value not calculated for topic:", topic_n, "and variable:", v, "because of data structure and weak variance of the differentiated time series. The variance is:", var(data_diff), "A special treatment was done to determine stationnarity using ACF and PACF functions"))
+                cat("P-value not calculated for topic:", topic_n, "and variable:", v, "because of data structure and weak variance of the differentiated time series. The variance is:", var(data_diff), "A special treatment was done to determine stationnarity using ACF and PACF functions")
               acf_values <- acf(data, plot = FALSE, lag.max = 6)
               pacf_values <- pacf(data, plot = FALSE, lag.max = 6)
 
@@ -197,10 +243,10 @@ if (args$estimate){
 
 
     if (length(results_list2) == 0) {
-      print("results_list2 est vide, aucun résultat à transformer en dataframe.")
+      cat("results_list2 est vide, aucun résultat à transformer en dataframe.")
       stationary_topics2 <- non_full_stationarity_topics
     } else {
-      print("results_list2 contient des données.")
+      cat("results_list2 contient des données.")
       results_df2 <- do.call(rbind, lapply(results_list2, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
       colnames(results_df2) <- c("topic", "variable", "p_value")
       non_full_stationarity_topics2 <- unique(results_df2$topic)
@@ -208,15 +254,35 @@ if (args$estimate){
     }
     merged_statio <- c(stationary_topics, stationary_topics2)
 
-    print(paste("Number of topics where time series for each group are stationary or I(1): ", length(merged_statio)))
+    cat("Number of topics where time series for each group are stationary or I(1): ", length(merged_statio), "\n")
     cat("The topic numbers that satisfy this property:", merged_statio, "\n")
+    if (args$topic_model == 'lda'){
+      cat("Number of topics I(1) which have cointegration relations", count_coint, "\n")
+      cat("The topic I(1) which satisfy cointegration relations:", paste(list_coint, collapse = " "), " and have following cointegration ranks \n")
+      print(summary(rank_coint$rank))
+      print(table(rank_coint$rank))
+      # Créer une liste vide pour stocker les résultats
+      rank_topic_list <- list()
 
-    ACF_data <- data.frame(matrix(NA, nrow = length(variables), ncol = length(pol_issues)))
-    PACF_data <- data.frame(matrix(NA, nrow = length(variables), ncol = length(pol_issues)))
+      # Parcourir chaque valeur unique de rank_coint$rank
+      for (value in unique(rank_coint$rank)) {
+        topics <- rank_coint$topic[rank_coint$rank == value]
+        rank_topic_list[[as.character(value)]] <- topics
+      }
+
+      cat("Ranks values per topics")
+      print(rank_topic_list)
+      } else {
+        cat("No cointegration tests performed for BERTopic, problem with data structure")
+      }
+
+
+    ACF_data <- data.frame(matrix(NA, nrow = length(variables)*2, ncol = length(pol_issues)))
+    PACF_data <- data.frame(matrix(NA, nrow = length(variables)*2, ncol = length(pol_issues)))
     colnames(ACF_data) <- as.character(pol_issues) 
-    rownames(ACF_data) <- variables
     colnames(PACF_data) <- as.character(pol_issues)
-    rownames(PACF_data) <- variables
+    rownames(ACF_data) <- c(variables, paste0(variables, "_diff"))
+    rownames(PACF_data) <- c(variables, paste0(variables, "_diff"))
 
     counter_const <- 0
     for (topic in pol_issues) {
@@ -224,40 +290,90 @@ if (args$estimate){
       db_topic <- db[db$topic == topic, ]
       for (v in variables) {
         data <- db_topic[[v]]
+        data <- as.ts(data)
         if (sd(data) == 0) {
           counter_const <- counter_const + 1
         } else{
-          data_diff <- diff(data)
-          acf_values <- acf(data_diff, lag.max = 30, plot= FALSE)$acf
-          pacf_values <- pacf(data_diff, lag.max = 30, plot= FALSE)$acf
+          data_differ <- diff(data)
 
-          below_threshold_acf <- which(abs(acf_values) < 0.1)
-          below_threshold_pacf <- which(abs(pacf_values) < 0.1)
+          acf_values <- acf(data, lag.max = 30, plot = FALSE)$acf
+          pacf_values <- pacf(data, lag.max = 30, plot = FALSE)$acf
+          acf_values_diff <- acf(data_differ, lag.max = 30, plot = FALSE)$acf
+          pacf_values_diff <- pacf(data_differ, lag.max = 30, plot = FALSE)$acf
+        
+        # Trouve les premiers lags où ACF et PACF < 0.1
+        below_threshold_acf <- which(abs(acf_values) < 0.1)
+        below_threshold_pacf <- which(abs(pacf_values) < 0.1)
+        below_threshold_acf_diff <- which(abs(acf_values_diff) < 0.1)
+        below_threshold_pacf_diff <- which(abs(pacf_values_diff) < 0.1)
+        
+        # ACF
+        if (length(below_threshold_acf) > 0) {
+          number_lag_acf <- below_threshold_acf[1]
+        } else {
+          number_lag_acf <- 31
+        }
 
-          if (length(below_threshold_acf) > 0) {
-            number_lag_acf <- below_threshold_acf[1]  # Premier lag où ACF < 0.1
-          } else {
-            number_lag_acf <- 31  # Aucun lag trouvé, on prend 31
-          }
-
-          if (length(below_threshold_pacf) > 0) {
-            number_lag_pacf <- below_threshold_pacf[1]  # Premier lag où PACF < 0.1
-          } else {
-            number_lag_pacf <- 31  # Aucun lag trouvé, on prend 31
-          }
-
-          ACF_data[v, topic_str] <- number_lag_acf
-          PACF_data[v, topic_str] <- number_lag_pacf
+        if (length(below_threshold_acf_diff) > 0) {
+          number_lag_acf_diff <- below_threshold_acf_diff[1]
+        } else {
+          number_lag_acf_diff <- 31
+        }
+        
+        # PACF
+        if (length(below_threshold_pacf) > 0) {
+          number_lag_pacf <- below_threshold_pacf[1]
+        } else {
+          number_lag_pacf <- 31
+        }    
+        
+        if (length(below_threshold_pacf_diff) > 0) {
+          number_lag_pacf_diff <- below_threshold_pacf_diff[1]
+        } else {
+          number_lag_pacf_diff <- 31
+        }
+        ACF_data[v, topic_str] <- number_lag_acf
+        PACF_data[v, topic_str] <- number_lag_pacf
+        ACF_data[paste0(v, "_diff"), topic_str] <- number_lag_acf_diff
+        PACF_data[paste0(v, "_diff"), topic_str] <- number_lag_pacf_diff
         }
       }
     }
 
     # Résumé du nombre de séries constantes
-    print(paste("Nombre de séries constantes :", counter_const))
+    cat("Nombre de séries constantes :", counter_const, "\n")
 
-    # Afficher les résultats
-    print(summary(t(ACF_data)))
-    print(summary(t(PACF_data)))
+    transfo_acf <- function(data){
+      dfexp <- as.data.frame(matrix(NA, nrow=6, ncol=length(variables)*2))
+      colnames(dfexp) <- c(variables, paste0(variables, "_diff"))
+      rownames(dfexp) <- c("Min", "Q1", "Median", "Mean", "Q3", "Max")
+      df <- as.data.frame(data)
+      df$value <- sapply(strsplit(as.character(df$Freq), ":"), function(x) x[2])
+      k <- 0
+      for (i in 1:ncol(dfexp)){
+        for (j in 1:6){
+          dfexp[j,i] <- str_trim(df[j + k*6, "value"])
+        }
+        k <- k+1
+      }
+      return(dfexp)
+    }
+
+    acf_sum <- summary(t(ACF_data))
+    pacf_sum <- summary(t(PACF_data))
+
+    acf_exp <- transfo_acf(acf_sum)
+    pacf_exp <- transfo_acf(pacf_sum)
+
+    #Afficher et enregistrer les résultats
+    write.csv(acf_exp, file=paste0("data_prod/var/", args$topic_model, "/ACF_results.csv"))
+    write.csv(pacf_exp, file=paste0("data_prod/var/", args$topic_model, "/PACF_results.csv"))
+
+    print(acf_sum)
+    print(pacf_sum)
+
+
+    
   }
 
   print("Preprocessing (continued)")
@@ -288,15 +404,26 @@ if (args$estimate){
                             paste0(variables, collapse = " + ")))
   model_data <- model.matrix(mformula, final_db[, variables])
   model_data <- model_data[, 2:ncol(model_data)] # removing intercept
-
+  model_data2 <- model.matrix(mformula, db[, variables])
+  model_data2 <- model_data2[, 2:ncol(model_data2)] # removing intercept
   # - splitting the covariates of interest from the issue dummy variables
+
   X_endogenous <- model_data[, which(!grepl("topic", colnames(model_data)))]
   X_exogenous <- model_data[, which(grepl("topic", colnames(model_data)))]
 
+    
+  X_endogenous2 <- model_data2[, which(!grepl("topic", colnames(model_data2)))]
+  X_exogenous2 <- model_data2[, which(grepl("topic", colnames(model_data2)))]
   if (args$tests) {
     AIC_and_co <- VARselect(X_endogenous, lag.max = 30, season = NULL, exogen = X_exogenous)
-    print(AIC_and_co)
+    AIC_and_co2 <- VARselect(X_endogenous2, lag.max = 30, season = NULL, exogen = X_exogenous2)
+    print("For not diff data AIC/HQ etc. criteria")
+    print(AIC_and_co2$selection)
+    print("For diff data AIC/HQ etc. criteria")
+    print(AIC_and_co$selection)
   }
+
+  stop()
 
   print("VAR Estimation")
   # - estimating the model for p lags
