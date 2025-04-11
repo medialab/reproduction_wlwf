@@ -4,6 +4,55 @@ library(tidyr)
 library(ggplot2)
 library(reshape2)
 
+barbera <- read_csv("data_prod/figures/corrbarbera.csv", show_col_types=FALSE)
+ldanf <- read_csv("data_prod/figures/corrlda.csv", show_col_types=FALSE)
+ldaf <- read_csv("data_prod/figures/corrldafilter.csv", show_col_types=FALSE)
+
+names = c("barbera", "ldanf", "ldaf")
+i <-0
+
+for (mat in list(barbera, ldanf, ldaf)){
+    cormat <- as.matrix(mat[,-1])
+    cormat <- round(cormat,3)  
+    rownames(cormat) <- mat[[1]]
+    
+    # Melt pour ggplot
+    melted_cormat <- melt(cormat)
+    melted_cormat$Var1 <- factor(melted_cormat$Var1, levels = rev(rownames(cormat)))
+    melted_cormat$Var2 <- factor(melted_cormat$Var2, levels = colnames(cormat))
+    i <- i+1
+    
+    png(paste0("data_prod/figures/corrmat_",names[i],".png"),  width = 800, height = 800)
+    ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
+    geom_tile(color = "white")+
+    scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+    midpoint = 0, limit = c(-1,1), space = "Lab",
+    name="Pearson\nCorrelation") +
+    theme_minimal()+ # minimal theme
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+        size = 12, hjust = 1))+
+    coord_fixed() 
+
+    ggfinal <- ggheatmap + 
+    geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) +
+    theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks = element_blank(),
+    legend.justification = c(1, 0),
+    legend.position.inside = c(0.6, 0.7),
+    legend.direction = "horizontal")+
+    guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+                    title.position = "top", title.hjust = 0.5))
+    print(ggfinal)
+    dev.off()
+}
+
+stop()
+<-
 db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
 
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
