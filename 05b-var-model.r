@@ -26,10 +26,7 @@ help = "Run the script who estimate PVAR and IRF")
 parser$add_argument("--tests", action = "store_true",
                     help = "Activate to test the absence of unit roots and to print the selection criteria")
 
-
-parser$add_argument("--number_lags", help="Choose a int who will represent the number of lags in VAR model", type="integer", default=10)
-
-parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=21)
+parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=15)
 
 
 args <- parser$parse_args()
@@ -224,25 +221,42 @@ if (args$estimate){
       }
     }
 
-    pdb <- pdb %>% filter (!(topic %in% unique(drop_top)))
-    print(paste(length(unique(drop_top)), "topics removed"))
+    #pdb <- pdb %>% filter (!(topic %in% unique(drop_top)))
+    #print(paste(length(unique(drop_top)), "topics removed"))
+
+    PVAR_post <- function(model){
+      residuals <- model$residuals
+      lags <- model$lags
+      n_obs <- nrow(residuals)
+      k <- ncol(residuals)^2*lags
+      sum_errors <- 0
+      Sigma <- cov(residuals)
+      Sigma_inv <- solve(Sigma)
+      for (i in 1:n_obs){
+        to_add <- residuals[i,]
+        value <- t(to_add) %*% Sigma_inv %*% to_add
+        sum_errors <- sum_errors + value
+      }
+      log_LH <- -n_obs*k*log(2*pi)/2 - n_obs*log(det(Sigma))/2 - sum_errors/2
+      AIC <- -2 * log_LH + 2 * k
+      BIC <- -2 * log_LH + k * log(n_obs)
+      HQ <- -2 * log_LH + 2 * k * log(log(n_obs))
+      return(c(AIC = AIC, BIC = BIC, HQ = HQ))
+    }
     
-    data_test = matrix(NA, nrow=5, ncol = 5)
+    data_test = matrix(NA, nrow=10, ncol = 5)
     for (p in 1:nrow(data_test)){
       print(p)
-      model <- pvargmm(variables, lags = p, data = pdb, panel_identifier=c("topic", "date"), transformation = "fd", steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=50)
-      modulus <- c(stability(model)$Modulus)
+      model <- pvarfeols(variables, lags = p, data = db, panel_identifier=c("topic", "date"))
+      modulus <- panelvar::stability(model)$Modulus
       max_modul <- max(modulus)
-      list_crit <- Andrews_Lu_MMSC(model)
+      list_crit <- PVAR_post(model)
       criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]])
       data_test[p,] = c(p, max_modul, criteria)
     }
 
-    print(head(pdb, 5))
-    print(head(pdb_diff, 5))
-
     df_test <- as.data.frame(data_test)
-    colnames(df_test) <- c("Lags", "No unit root", "BIC", "AIC", "HQIC")
+    colnames(df_test) <- c("Lags", "No unit root", "AIC", "BIC", "HQ")
     if(args$topic_model == 'lda') {
       write.csv(pdb, "data_prod/var/lda/general_filt_nodiff.csv", row.names = FALSE)
       write.csv(pdb_diff, "data_prod/var/lda/general__filt_diff.csv", row.names = FALSE)
@@ -257,28 +271,59 @@ if (args$estimate){
       row.names = FALSE)
     }
   }
-  stop()
-  lags <- args$number_lags
-  PVAR_model<- pvargmm(variables, lags = lags, data = db, panel_identifier=c("topic", "date"), steps="twostep", pca_instruments = TRUE, pca_eigenvalue = 1, max_instr_dependent_vars=99)
+  if (args$topic_model == "lda"){
+    lags <- 2
+  } else {
+    lags <- 3
+  }
 
-  print("Cumulative IRF preparation")
-  irf_NC <- bootstrap_irf(PVAR_model, typeof_irf="GIRF", n.ahead = 20, nof_Nstar_draws=500, mc.cores = 50)
+  PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
+  print("Non-Cumulative IRF preparation")
+  irf_NC <- panelvar::oirf(PVAR_model, n.ahead = 60)
+  irf_NC_BS <- panelvar::bootstrap_irf(PVAR_model, typeof_irf="OIRF", n.ahead = 60, nof_Nstar_draws=500, mc.cores = 50)
+
+  print("Create data according to vars package (including cumulation)")
+  for (v in variables){
+    irf_NC[[v]] <- apply(irf_NC[[v]], 2, cumsum)
+    irf_NC_BS$Lower[[v]] <- apply(irf_NC_BS$Lower[[v]], 2, cumsum)
+    irf_NC_BS$Upper[[v]] <- apply(irf_NC_BS$Upper[[v]], 2, cumsum)
+  }
+
+  var_irfs <- list(
+    irf        = irf_NC,
+    Lower      = irf_NC_BS$Lower,
+    Upper      = irf_NC_BS$Upper,
+    response   = variables,
+    impulse    = variables,
+    ortho      = TRUE,         
+    cumulative = TRUE,           
+    runs       = 500,
+    ci         = 0.95,
+    boot       = TRUE,
+    model      = "pvarfeols"           
+  )
+
+  class(var_irfs) <- "varirf"
 
   if (args$topic_model == 'lda') {
     save(PVAR_model, file = "data_prod/var/lda/Pvar_model-MAIN.Rdata")
-    save(irf_NC, file = "data_prod/var/lda/Pvar_NC_irfs-MAIN.Rdata")
+    save(var_irfs, file = "data_prod/var/lda/Pvar_irfs-MAIN.Rdata")
   } else {
     save(PVAR_model, file = "data_prod/var/bertopic/Pvar_model-MAIN.Rdata")
-    save(irf_NC, file = "data_prod/var/bertopic/Pvar_NC_irfs-MAIN.Rdata")
+    save(var_irfs, file = "data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")
   }
 } else {
+  variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
   if (args$topic_model == 'lda') {
-    load("data_prod/var/lda/Pvar_NC_irfs-MAIN.Rdata")
+    load("data_prod/var/lda/Pvar_irfs-MAIN.Rdata")
   } else {
-    load("data_prod/var/bertopic/Pvar_NC_irfs-MAIN.Rdata")
+    load("data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")
   }
 }
-var_irfs <- var_irfs_cum_merged
+
+stop()
+
+var_irfs <- var_irfs
 variables <- names(var_irfs$irf)
 elements_to_pull <- c("irf", "Upper", "Lower")
 
