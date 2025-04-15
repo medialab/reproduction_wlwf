@@ -113,21 +113,23 @@ if (args$estimate){
   if (args$tests) {
     count_stat <- 0
     pdb <- pdata.frame(db, index=c("topic", "date"))
-    print(head(index(pdb), 10))
+    cat("Hadri Test (H0 : All panels don't contain unit root) \n")
     for (v in variables){
       data_p <- pdb[[v]]
       hadri <- purtest(data_p, test="hadri", exo="intercept")
       p_value <- hadri$statistic$p.value
       if (p_value <0.05){
-        print(paste(v, "Stationarity rejected", p_value))
+        print(paste(v, "H0 rejected", p_value, "At least one panel is not stationary"))
       } else{
-        print(paste(v, "Stationary not rejected", p_value))
+        print(paste(v, "H0 not rejected", p_value, "All panels are stationary"))
         count_stat <- count_stat + 1
       }
     }
+    
 
     if(count_stat != length(variables)){
-      print("At least one group is represented by a non-stationary time series. Check the stationnarity after a differentiation")
+      print("At least one group is represented by a non-stationary time series in one panel. Check the stationnarity after a differentiation")
+      cat("Hadri Test (H0 : All panels don't contain unit root) \n")
       pdb_diff <- pdb
       for (v in variables){
         pdb_diff[[v]] <- diff(pdb[[v]], 1L)
@@ -136,13 +138,16 @@ if (args$estimate){
       pdb_diff <- na.omit(pdb_diff)
       pdb_diffc <- pdb_diff
 
+      list_const_top <- list()
+
       for (v in variables){
         count_stat_topic <- 0
         for (i in unique(pdb_diff$topic)){
           pdb_topic <- pdb_diff %>% filter(topic == i)
           if (sd(pdb_topic[[v]]) == 0) {
+            list_const_top <- append(list_const_top, i)
             pdb_diffc <- pdb_diffc %>% filter(topic !=i)
-            print(paste("For variable", v, "topic", i, "removed for test because constant"))
+            print(paste("For variable", v, "topic", i, "removed for Hadri Test in diff data because constant"))
             count_stat_topic <- 1
           }
         }
@@ -156,107 +161,125 @@ if (args$estimate){
         hadri2 <- purtest(data_p, test="hadri", exo="intercept")
         p_value2 <- hadri2$statistic$p.value
         if (p_value2 <0.05){
-          print(paste("Diff", v, "Stationarity rejected", p_value2))
+          print(paste("Diff", v, "H0 rejected", p_value2, "At least one panel is not stationary"))
         } else{
-          print(paste("Diff", v, "Stationary not rejected", p_value2))
-        }   
-      } 
-      print("Start panel cointegration test")
-
-      Groen_Kleibergen_Test <- function(db, n_boot=500){
-        jo_mat <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
-        iter_jo <- 0
-        list_subdb <- list()
-        for(i in unique(db$topic)){
-          iter_jo <- iter_jo+1
-          data_jo <- db %>%
-                    filter(topic==i)
-          jo <- summary(ca.jo(data_jo[, variables], type="trace", ecdet = "const", spec="longrun"))@teststat
-          jo_mat[iter_jo,] <- jo 
-          list_subdb[[iter_jo]] <- data_jo
+          print(paste("Diff", v, "H0 not rejected", p_value2, "All panels are stationary"))
         }
-    
-        mean_jo <- colMeans(jo_mat, na.rm = TRUE)
+      }
 
-        bootstrap_stats <- matrix(NA, nrow=n_boot, ncol=length(variables))
-        N <- length(unique(db$topic))
-        seq <- seq(1:length(unique(db$topic)))
-        for (b in 1:n_boot){
-          boot_sample <- sample(1:N, N, replace = TRUE)
-          boot_trace_stats <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
-          iter_jo <- 0
-          for (i in boot_sample){
-            iter_jo <- iter_jo+1
-            jo_sim <- ca.jo(list_subdb[[boot_sample[i]]][, variables], type="trace", ecdet = "const", spec="longrun")@teststat
-            boot_trace_stats[iter_jo, ] <- jo_sim 
+      if(args$topic_model == 'lda'){
+        topic_ips <- setdiff(pol_issues, unlist(unique(list_const_top)))
+
+        cat("Topics", unlist(unique(list_const_top)), "will be remove for following tests to avoid constants or quasi-constants \n")
+        cat("Test IPS test (H0 : All panels contain unit root) \n")
+        pdb_ips <- pdb %>% filter(topic %in% topic_ips)
+        cat("Dimensions de pdb_ips :", dim(pdb_ips), "\n")
+        if (!is.pbalanced(pdb_ips)){
+          stop("Unbalanced panel data in ips test")
+        }
+        for (v in variables){
+          ips <- purtest(data_p, test="ips", exo="intercept", lags="AIC", pmax=10)
+          p_val <- ips$statistic$p.value
+          if(p_val < 0.05){
+            print(paste(v, "H0 rejected", p_val, "At least one panel is stationary"))
+          } else {
+            print(paste(v, "H0 not rejected", p_val, "All panels are not stationary"))
+            count_stat_top_ips <- count_stat_top_ips + 1
           }
-          bootstrap_stats[b,] <- colMeans(boot_trace_stats)
-        }
+        } 
 
-        Esp_jo <- colMeans(bootstrap_stats)
-        V_jo <- colVars(bootstrap_stats)
+        Groen_Kleibergen_Test <- function(db, n_boot=500){
+          print("Start panel cointegration test")
+          jo_mat <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
+          iter_jo <- 0
+          list_subdb <- list()
+          for(i in unique(db$topic)){
+            iter_jo <- iter_jo+1
+            data_jo <- db %>%
+                      filter(topic==i)
+            jo <- summary(ca.jo(data_jo[, variables], type="trace", ecdet = "const", spec="longrun"))@teststat
+            jo_mat[iter_jo,] <- jo 
+            list_subdb[[iter_jo]] <- data_jo
+          }
+      
+          mean_jo <- colMeans(jo_mat, na.rm = TRUE)
 
-        stats_GK <- (mean_jo - Esp_jo) / V_jo
-        p_value <- 2 * (1 - pnorm(abs(stats_GK)))
-        num_ranks <- rev(seq_along(stats_GK)) - 1
-        line_rank <- paste0("r<=", num_ranks)
+          bootstrap_stats <- matrix(NA, nrow=n_boot, ncol=length(variables))
+          N <- length(unique(db$topic))
+          seq <- seq(1:length(unique(db$topic)))
+          for (b in 1:n_boot){
+            boot_sample <- sample(1:N, N, replace = TRUE)
+            boot_trace_stats <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
+            iter_jo <- 0
+            for (i in boot_sample){
+              iter_jo <- iter_jo+1
+              jo_sim <- ca.jo(list_subdb[[boot_sample[i]]][, variables], type="trace", ecdet = "const", spec="longrun")@teststat
+              boot_trace_stats[iter_jo, ] <- jo_sim 
+            }
+            bootstrap_stats[b,] <- colMeans(boot_trace_stats)
+          }
 
-        result_table <- data.frame(
-          Rank = line_rank,
-          GK_Stat = Stats_GK,
-          P_value = p_value
-        )
-        return(result_table)
-      } 
-    }
+          Esp_jo <- colMeans(bootstrap_stats)
+          V_jo <- colVars(bootstrap_stats)
 
-    drop_top <- c()
+          stats_GK <- (mean_jo - Esp_jo) / V_jo
+          p_value <- 2 * (1 - pnorm(abs(stats_GK)))
+          num_ranks <- rev(seq_along(stats_GK)) - 1
+          line_rank <- paste0("r<=", num_ranks)
 
-    for (i in unique(pdb$topic)){
-      pdb_top <- pdb %>% filter(topic==i)
-      for (v in variables){
-        if (sd(pdb_top[[v]]) == 0){
-          drop_top <- c(drop_top, i)
-        }
+          result_table <- data.frame(
+            Rank = line_rank,
+            GK_Stat = stats_GK,
+            P_value = p_value
+          )
+          return(result_table)
+        } 
+        db_ips <- db %>% filter(topic %in% topic_ips)
+        GK_res <- Groen_Kleibergen_Test(db_ips)
+        print(GK_res)
+      } else {
+        cat("No further stationarity or cointegration tests can be performed for BERTopic because of data structure \n")
+        #Refer to a do file with these tests 
       }
     }
 
-    #pdb <- pdb %>% filter (!(topic %in% unique(drop_top)))
-    #print(paste(length(unique(drop_top)), "topics removed"))
 
     PVAR_post <- function(model){
       residuals <- model$residuals
       lags <- model$lags
       n_obs <- nrow(residuals)
-      k <- ncol(residuals)^2*lags
-      sum_errors <- 0
+      k <- ncol(residuals)
       Sigma <- cov(residuals)
-      Sigma_inv <- solve(Sigma)
-      for (i in 1:n_obs){
-        to_add <- residuals[i,]
-        value <- t(to_add) %*% Sigma_inv %*% to_add
-        sum_errors <- sum_errors + value
-      }
-      log_LH <- -n_obs*k*log(2*pi)/2 - n_obs*log(det(Sigma))/2 - sum_errors/2
-      AIC <- -2 * log_LH + 2 * k
-      BIC <- -2 * log_LH + k * log(n_obs)
-      HQ <- -2 * log_LH + 2 * k * log(log(n_obs))
-      return(c(AIC = AIC, BIC = BIC, HQ = HQ))
+      n_star <- k*lags
+      AIC <- log(det(Sigma)) + 2*k^2*lags/n_obs
+      SC <- log(det(Sigma)) + log(n_obs)*k^2*lags/n_obs
+      HQ <- log(det(Sigma)) + log(log(n_obs))*lags*k^2/n_obs
+      FPE <- det(Sigma)*((n_obs + n_star)/(n_obs - n_star))^k
+      return(c(AIC = AIC, SC = SC, HQ = HQ, FPE=FPE))
     }
     
-    data_test = matrix(NA, nrow=10, ncol = 5)
+    data_test = matrix(NA, nrow=30, ncol = 6)
     for (p in 1:nrow(data_test)){
       print(p)
       model <- pvarfeols(variables, lags = p, data = db, panel_identifier=c("topic", "date"))
       modulus <- panelvar::stability(model)$Modulus
       max_modul <- max(modulus)
       list_crit <- PVAR_post(model)
-      criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]])
+      criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]], list_crit[[4]])
       data_test[p,] = c(p, max_modul, criteria)
     }
 
     df_test <- as.data.frame(data_test)
-    colnames(df_test) <- c("Lags", "No unit root", "AIC", "BIC", "HQ")
+    colnames(df_test) <- c("Lags", "Max eigenvalue process", "AIC", "SC", "HQ", "FPE")
+
+    max_AIC <- df_test$Lags[which.min(df_test$AIC)]
+    max_SC <- df_test$Lags[which.min(df_test$SC)]
+    max_HQ <- df_test$Lags[which.min(df_test$HQ)]
+    max_FPE <- df_test$Lags[which.min(df_test$FPE)]
+
+    cat("Selection criteria suggests to choose the following number(s) of lags: \n")
+    cat("AIC", max_AIC, "\n", "SC", max_SC, "\n", "HQ", max_HQ, "\n", "FPE", max_FPE, "\n")
+    
     if(args$topic_model == 'lda') {
       write.csv(pdb, "data_prod/var/lda/general_filt_nodiff.csv", row.names = FALSE)
       write.csv(pdb_diff, "data_prod/var/lda/general__filt_diff.csv", row.names = FALSE)
@@ -274,7 +297,7 @@ if (args$estimate){
   if (args$topic_model == "lda"){
     lags <- 2
   } else {
-    lags <- 3
+    lags <- 4
   }
 
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
