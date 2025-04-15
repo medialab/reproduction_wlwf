@@ -85,7 +85,7 @@ if (args$estimate){
     colnames(concat_statio) <- c("p-value")
     rownames(concat_statio) <- variables
 
-    infos_topic <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=9)) #Seuil ACF, seuil PACF, Stationnarité, Max Modul VAR, VAR select (4), rank 
+    infos_topic <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=8)) #Seuil ACF, seuil PACF, Stationnarité, Max Modul VAR, VAR select (4), rank 
     colnames(infos_topic) <- c("Topic", "Statio_type", "Max Modul", "AIC", "HQ", "SC", "FPE", "Rank")
   }
 
@@ -149,7 +149,6 @@ if (args$estimate){
 
   if (args$tests) {
     cat("Résultats de stationnarité sur les séries concaténées \n")
-    print(concat_statio)
     results_df <- do.call(rbind, lapply(results_list, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
     colnames(results_df) <- c("topic", "variable", "p_value")
     non_full_stationarity_topics <- unique(results_df$topic)
@@ -288,11 +287,11 @@ if (args$estimate){
           infos_topic[iter_info, "Statio_type"] <- "Mixed"
         }
         if(args$topic_model == 'lda'){
-          if (topic %in% list_coint){ rank_coint
+          if (topic %in% list_coint){ 
             row_index = which(rank_coint$topic == topic)
-            infos_topic[iter_info, "Statio_type"] <- rank_coint[row_index, "rank"]
+            infos_topic[iter_info, "Rank"] <- rank_coint[row_index, "rank"]
           } else {
-            infos_topic[iter_info, "Statio_type"] <- "No Coint"
+            infos_topic[iter_info, "Rank"] <- "No Coint"
           }
         } 
       } else {
@@ -388,20 +387,19 @@ if (args$estimate){
   }
 
   print("Preprocessing (continued)")
-
-  
   db$topic <- as.character(db$topic)
 
   #Model by topic
   lags <- 7
-  for (topic in db$topic){
+  for (topic in unique(db$topic)){
+    print(paste("Start VAR", topic))
     db_topic <- db %>% filter(topic == topic)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
-    var_irfs_cum <- irf(var_model, n.ahead = 60, cumulative = TRUE)
-    save(var_irfs_cum, file = paste0("var/issue-level/var_irfs_topic_", topic, "_logit-UPD.Rdata"))
+    #var_irfs_cum <- irf(var_model, n.ahead = 60, cumulative = TRUE)
+    #save(var_irfs_cum, file = paste0("var/issue-level/var_irfs_topic_", topic, "_logit-UPD.Rdata"))
     if (args$tests){
       print(paste("Currently testing topic", topic))
-      AIC_and_co <- VARselect(db_topic[, variables], lag.max = 30, season = NULL)
+      AIC_and_co <- VARselect(db_topic[, variables], lag.max = 15, season = NULL)
       row_index <- which(infos_topic$Topic == topic)
       infos_topic[row_index, "Max Modul"] <- max(roots(var_model))
       infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
@@ -412,7 +410,12 @@ if (args$estimate){
   }
 
   if (args$tests){
-    write.csv(infos_topic, file=paste("data_prod/var/", args$topic_model, "/issue-level/infos_topics.csv"))
+    if (args$topic_model == 'lda'){
+      path_info <- "data_prod/var/lda/issue-level/infos_topics.csv"
+    } else {
+      path_info <- "data_prod/var/bertopic/issue-level/infos_topics.csv"
+    }
+    write.csv(infos_topic, file=path_info, row.names = FALSE)
   }
 
   stop()
