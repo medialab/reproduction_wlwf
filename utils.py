@@ -730,7 +730,6 @@ def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False
         return None, np.load(file)["embeddings"][:nb_docs]
 
     for file in glob.glob(path.replace(".npz", "_*")):
-        print(file)
         index = int(file[len(path) - 3 : -len(".npz")])
         if index > max_index:
             max_index = index

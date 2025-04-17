@@ -26,7 +26,7 @@ from utils import (
     NB_DOCS_SMALL_TRAIN,
     NB_DOCS_SMALL_INFER,
 )
-#os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 sbert_name_string = SBERT_NAME.replace("/", "_")
 n_tweets = 10
 def write_sample_BERTOPIC(group, topics, docs, reduced=False):
@@ -114,7 +114,7 @@ try:
         embeddings.append(embeddings_temp)
 
     docs = [doc for sublist in docs for doc in sublist]
-    embeddings = [embed for sublist in embeddings for embed in sublist]
+    embeddings = np.vstack(embeddings)
 
     print("Make topics prediction")
 
