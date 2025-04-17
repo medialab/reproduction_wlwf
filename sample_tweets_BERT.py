@@ -26,7 +26,7 @@ from utils import (
     NB_DOCS_SMALL_TRAIN,
     NB_DOCS_SMALL_INFER,
 )
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 sbert_name_string = SBERT_NAME.replace("/", "_")
 n_tweets = 10
 def write_sample_BERTOPIC(group, topics, docs, reduced=False):
@@ -74,17 +74,17 @@ try:
 
     print("Create tweets sample for congress")
     input_path = f"/store/medialex/reproduction_wlwf/data_source/congress"
-    docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
+    #docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
 
-    topic_pred = topic_model.topics_
-    topic_pred_r = topic_model_r.topics_
+    #topic_pred = topic_model.topics_
+    #topic_pred_r = topic_model_r.topics_
 
     #Random sample for congress
-    write_sample_BERTOPIC("congress", topic_pred, docs, reduced=False)
-    write_sample_BERTOPIC("congress", topic_pred_r, docs, reduced=True)
+    #write_sample_BERTOPIC("congress", topic_pred, docs, reduced=False)
+    #write_sample_BERTOPIC("congress", topic_pred_r, docs, reduced=True)
 
     #Create random sample for predict
-    Print("Loading predict info")
+    print("Loading predict info")
 
     docs = []
     embeddings = []
@@ -116,7 +116,7 @@ try:
     docs = [doc for sublist in docs for doc in sublist]
     embeddings = [embed for sublist in embeddings for embed in sublist]
 
-    Print("Make topics prediction")
+    print("Make topics prediction")
 
     topic_pred, probs = topic_model.transform(docs, embeddings)
     topic_pred_r, probs = topic_model_r.transform(docs, embeddings)
