@@ -42,22 +42,30 @@ for (topic_num in unique(db$topic)){
     outlier_counter <- 0
     db_topic <- db %>%
                 filter(topic == topic_num)
-    print(dim(db_topic))
     count_var_init <- 0
     for (v in variables){
+        print(v)
         line_topic <- 0
+        count_day <- 1
         data <- db_topic[[v]]
         QMAX <- quantile(data, 0.95)
         outlier_idx <- which(data > QMAX)
         date_indexes <- db_topic$date_index[outlier_idx]
         if(!(length(outlier_idx) ==0)){
+            topic_str <- as.character(topic_num)
+            outliers_count[topic_str, v] <- length(outlier_idx)
             if (v=='lr'){
-                topic_str <- as.character(topic_num)
-                outliers_count[topic_str, v] <- length(outlier_idx)
                 for (day in date_indexes){
+                    if (count_day > 1){
+                        ecart_last_value <- day - date_indexes[count_day-1]
+                        if (ecart_last_value <10){
+                            next
+                        }
+                    }
                     line_topic <- line_topic +1
                     outliers_mat[line + line_topic, v] <- day
                     outliers_mat[line + line_topic, "topic"] <- topic_num
+                    count_day <- count_day + 1
                 }
                 outlier_counter <- line_topic
             } else {
@@ -66,16 +74,27 @@ for (topic_num in unique(db$topic)){
                     outlier_counter <- length(outlier_idx)
                 }
                 for (day in date_indexes){
+                    if (count_day > 1){
+                        ecart_last_value <- day - date_indexes[count_day-1]
+                        if (ecart_last_value <10){
+                            next
+                        }
+                    }
                     min_ecart <- list()
                     for (k in 1:outlier_counter){
                         for (out in variables[1:count_var_init]){
-                            value <- outliers_mat[line + k, out] - day
+                            if (!is.na(outliers_mat[line + k, out])){
+                                value <- outliers_mat[line + k, out] - day
+                            } else {
+                                value <- 269
+                            }
                             min_ecart <- append(min_ecart,value)
                         }
                     }
+                    count_day <- count_day + 1
                     min_ecart <- Filter(function(x) !is.na(x), min_ecart)
                     min_ecart <- unlist(min_ecart)
-                    min_ecart <- as.numeric(min_ecart)
+                    min_ecart <- abs(as.numeric(min_ecart))
                     if (min(min_ecart) > 15){ #More than 15 days appart other group is considered as another "pic"
                         outlier_counter <- outlier_counter + 1
                          outliers_mat[line + outlier_counter, v] <- day
@@ -85,10 +104,9 @@ for (topic_num in unique(db$topic)){
                         nb_out_vars <- length(variables[1:count_var_init])
                         line_selected <- ((index_min - 1) %/% nb_out_vars) + 1
                         outliers_mat[line + line_selected, v] <- day
-                         outliers_mat[line + line_selected, "topic"] <- topic_num
+                        outliers_mat[line + line_selected, "topic"] <- topic_num
                     }
                 }
-
             }
         }
     }
@@ -99,16 +117,16 @@ for (topic_num in unique(db$topic)){
 row_indices <- apply(outliers_mat[, colnames(outliers_mat)], 1, function(x) !all(is.na(x)))
 outliers_mat <- outliers_mat[row_indices, ]
 outliers_mat[is.na(outliers_mat)] <- 0
-print(head(outliers_mat,20))
-stop()
+print(paste("Number of rows for regression", nrow(outliers_mat)))
 
 #Convert topic as dummy
 maindb <- outliers_mat
 maindb$topic <- as.character(outliers_mat$topic)
-dummies <- model.matrix(~ topic - 1, data = maindb)
-colnames(dummies) <- gsub("^topic", "topic_", colnames(dummies))
-maindb <- cbind(maindb, dummies)
-  
+maindb <- maindb[, !colnames(maindb) %in% "topic"]
+#dummies <- model.matrix(~ topic - 1, data = maindb)
+#colnames(dummies) <- gsub("^topic", "topic_", colnames(dummies))
+#maindb <- cbind(maindb, dummies)
+
 results_list <- list()
 for (v in variables){
     reg_formula <- as.formula(paste(v,"~ ."))
@@ -117,3 +135,5 @@ for (v in variables){
 }
 
 print(results_list)
+
+save(results_list, file="data_prod/var/bertopic/resultREGOUTLIERS.RData")
