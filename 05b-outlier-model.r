@@ -43,6 +43,7 @@ for (topic_num in unique(db$topic)){
     db_topic <- db %>%
                 filter(topic == topic_num)
     print(dim(db_topic))
+    count_var_init <- 0
     for (v in variables){
         line_topic <- 0
         data <- db_topic[[v]]
@@ -50,15 +51,44 @@ for (topic_num in unique(db$topic)){
         outlier_idx <- which(data > QMAX)
         date_indexes <- db_topic$date_index[outlier_idx]
         if(!(length(outlier_idx) ==0)){
-            topic_str <- as.character(topic_num)
-            outliers_count[topic_str, v] <- length(outlier_idx)
-            for (day in date_indexes){
-                line_topic <- line_topic +1
-                if (line_topic > outlier_counter){
-                    outlier_counter <- line_topic
+            if (v=='lr'){
+                topic_str <- as.character(topic_num)
+                outliers_count[topic_str, v] <- length(outlier_idx)
+                for (day in date_indexes){
+                    line_topic <- line_topic +1
+                    outliers_mat[line + line_topic, v] <- day
+                    outliers_mat[line + line_topic, "topic"] <- topic_num
                 }
-                outliers_mat[line + line_topic, v] <- day
-                outliers_mat[line + line_topic, "topic"] <- topic_num
+                outlier_counter <- line_topic
+            } else {
+                count_var_init <- count_var_init+1
+                if (length(outlier_idx) > outlier_counter){
+                    outlier_counter <- length(outlier_idx)
+                }
+                for (day in date_indexes){
+                    min_ecart <- list()
+                    for (k in 1:outlier_counter){
+                        for (out in variables[1:count_var_init]){
+                            value <- outliers_mat[line + k, out] - day
+                            min_ecart <- append(min_ecart,value)
+                        }
+                    }
+                    min_ecart <- Filter(function(x) !is.na(x), min_ecart)
+                    min_ecart <- unlist(min_ecart)
+                    min_ecart <- as.numeric(min_ecart)
+                    if (min(min_ecart) > 15){ #More than 15 days appart other group is considered as another "pic"
+                        outlier_counter <- outlier_counter + 1
+                         outliers_mat[line + outlier_counter, v] <- day
+                        outliers_mat[line + outlier_counter, "topic"] <- topic_num
+                    } else {
+                        index_min <- which.min(min_ecart)
+                        nb_out_vars <- length(variables[1:count_var_init])
+                        line_selected <- ((index_min - 1) %/% nb_out_vars) + 1
+                        outliers_mat[line + line_selected, v] <- day
+                         outliers_mat[line + line_selected, "topic"] <- topic_num
+                    }
+                }
+
             }
         }
     }
@@ -69,6 +99,8 @@ for (topic_num in unique(db$topic)){
 row_indices <- apply(outliers_mat[, colnames(outliers_mat)], 1, function(x) !all(is.na(x)))
 outliers_mat <- outliers_mat[row_indices, ]
 outliers_mat[is.na(outliers_mat)] <- 0
+print(head(outliers_mat,20))
+stop()
 
 #Convert topic as dummy
 maindb <- outliers_mat
