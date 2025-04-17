@@ -28,8 +28,9 @@ from utils import (
 )
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 sbert_name_string = SBERT_NAME.replace("/", "_")
-n_tweets = 10
-def write_sample_BERTOPIC(group, topics, docs, reduced=False):
+n_tweets_congress = 10
+n_tweets_per_pred = 5
+def write_sample_BERTOPIC(group, topics, docs, n_tweets,reduced=False):
     if reduced:
         open_path = f"data_prod/topics/bert-sample/reduced/sample_{group}.csv"
     else:
@@ -73,21 +74,18 @@ try:
     topic_model_r = BERTopic.load(model_path_reduced, embedding_model=SBERT_NAME)
 
     print("Create tweets sample for congress")
-    input_path = f"/store/medialex/reproduction_wlwf/data_source/congress"
+    #input_path = f"/store/medialex/reproduction_wlwf/data_source/congress"
     #docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
 
     #topic_pred = topic_model.topics_
     #topic_pred_r = topic_model_r.topics_
 
     #Random sample for congress
-    #write_sample_BERTOPIC("congress", topic_pred, docs, reduced=False)
-    #write_sample_BERTOPIC("congress", topic_pred_r, docs, reduced=True)
+    #write_sample_BERTOPIC("congress", topic_pred, docs, n_tweets_congress, reduced=False)
+    #write_sample_BERTOPIC("congress", topic_pred_r, docs, n_tweets_congress, reduced=True)
 
     #Create random sample for predict
     print("Loading predict info")
-
-    docs = []
-    embeddings = []
 
     for group in ["media", "attentive", "supporter", "general"]:
         print(group)
@@ -99,7 +97,7 @@ try:
         group,
         "{}.npz".format(sbert_name_string),
         )
-        docs_temp, max_index, embeddings_temp = load_docs_embeddings(
+        docs, max_index, embeddings = load_docs_embeddings(
             input_path,
             count_nb_files(input_path),
             embeddings_path,
@@ -110,21 +108,15 @@ try:
             small_size=NB_DOCS_SMALL_INFER,
         )
 
-        docs.append(docs_temp)
-        embeddings.append(embeddings_temp)
+        print("Make topics prediction")
 
-    docs = [doc for sublist in docs for doc in sublist]
-    embeddings = np.vstack(embeddings)
+        topic_pred, probs = topic_model.transform(docs, embeddings)
+        topic_pred_r, probs = topic_model_r.transform(docs, embeddings)
 
-    print("Make topics prediction")
+        print("Writing")
 
-    topic_pred, probs = topic_model.transform(docs, embeddings)
-    topic_pred_r, probs = topic_model_r.transform(docs, embeddings)
-
-    print("Writing")
-
-    write_sample_BERTOPIC("predict", topic_pred, docs, reduced=False)
-    write_sample_BERTOPIC("predict", topic_pred_r, docs, reduced=True)
+        write_sample_BERTOPIC(group, topic_pred, docs, n_tweets_per_pred, reduced=False)
+        write_sample_BERTOPIC(group, topic_pred_r, docs, n_tweets_per_pred, reduced=True)
 
 finally:
     print("in")
