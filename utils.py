@@ -939,6 +939,66 @@ def count_topics_info(topics, party_day_counts, group_type):
     return topics_info
 
 
+def make_average_probs(party_day_counts, topics, probs):
+    multiplier_matrix = np.zeros((len(party_day_counts), len(topics)))
+    last_index = 0
+    for idx in range(len(party_day_counts)):
+        doc_count = party_day_counts[idx][0]
+        multiplier_matrix[idx, last_index : last_index + doc_count] = 1.0 / doc_count
+        last_index += doc_count
+    probs_average = multiplier_matrix @ probs
+    return probs_average
+
+
+def write_average_probs_time_series(
+    average_probs, party_day_counts, origin_path, group_type
+):
+    """For each topic (average_prob has one column per topic and one row per day and per group),
+    write a file with the corresponding time series
+    """
+    transposed = average_probs.T
+    for topic in tqdm(
+        range(transposed.shape[0]), desc="Write average probs time series"
+    ):
+        ts = transposed[topic]
+        with open(
+            os.path.join(
+                origin_path,
+                "data_prod",
+                "dashboard",
+                "bertopic",
+                "data",
+                f"bertopic_average_ts_{topic}.csv",
+            ),
+            "w" if group_type == "congress" else "a",
+        ) as f:
+            writer = csv.writer(f)
+            if group_type == "congress":
+                writer.writerow(["date", "party", "topic", "prop"])
+            if group_type == "supporter" or group_type == "congress":
+                for proba, party_day_count in zip(ts, party_day_counts):
+                    count, party, day = party_day_count
+                    writer.writerow(
+                        [
+                            day,
+                            f"{party}_supp" if group_type == "supporter" else party,
+                            topic,
+                            proba,
+                        ]
+                    )
+            else:
+                for proba, party_day_count in zip(ts, party_day_counts):
+                    count, day = party_day_count
+                    writer.writerow(
+                        [
+                            day,
+                            group_type,
+                            topic,
+                            proba,
+                        ]
+                    )
+
+
 def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_path):
     for topic in tqdm(topics, desc="Write time series"):
         with open(

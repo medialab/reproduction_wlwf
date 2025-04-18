@@ -21,6 +21,8 @@ from utils import (
     vectorizer,
     write_bertopic_TS,
     write_representative_docs,
+    make_average_probs,
+    write_average_probs_time_series,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
@@ -235,12 +237,18 @@ if "congress" in group_list:
     # Create tables in a format adapted to Time Series
     topics_info = count_topics_info(topics, party_day_counts, "congress")
 
+    average_probs = make_average_probs(party_day_counts, topics, probs)
+
     # Sort by day so that all resulting files have the same order
-    party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
+    # party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
 
     # Open one CSV file per topic for congress
     write_bertopic_TS(
         topic_ids_list, topics_info, "congress", party_day_counts, args.origin_path
+    )
+
+    write_average_probs_time_series(
+        average_probs, party_day_counts, args.origin_path, "congress"
     )
 
     choices.remove("congress")
@@ -295,10 +303,17 @@ if group_list & set(choices):
 
         # Time Series Results
         topics_info = count_topics_info(topics, party_day_counts, group)
-        # Sort by day so that all resulting files have the same order
-        party_day_counts = sorted(party_day_counts, key=lambda x: x[-1])
+
+        average_probs = make_average_probs(party_day_counts, topics, probs)
+
+        # # Sort by day so that all resulting files have the same order
+        # party_day_counts = sorted(party_day_counts, key=lambda x: x[-1])
 
         # Complete TS data base with the new counts :
         write_bertopic_TS(
             topic_ids_list, topics_info, group, party_day_counts, args.origin_path
+        )
+
+        write_average_probs_time_series(
+            average_probs, party_day_counts, args.origin_path, "congress"
         )
