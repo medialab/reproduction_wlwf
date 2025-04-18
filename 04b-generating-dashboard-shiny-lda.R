@@ -15,8 +15,8 @@ library(tidyverse)
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
 # load("data_prod/dashboard/qois.rdata")  # topic_scores
 # representative tweets
-load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
-load("data_prod/dashboard/lda/media-rs-tweets.rdata")
+load("data_prod/dashboard/lda40/congress-rs-tweets.rdata")
+load("data_prod/dashboard/lda40/media-rs-tweets.rdata")
 # qois_long <- qois |>
 #   select(topic, starts_with("prop_")) |>
 #   pivot_longer(cols = starts_with("prop"),
@@ -111,7 +111,7 @@ plot_ts  <- function(df, checked_actors, selected_topic){
 # Server
 server <- function(input, output){
   df <- reactive({
-    file_name <- paste0("data_prod/dashboard/lda/data/ts-", input$topic,".csv")
+    file_name <- paste0("data_prod/dashboard/lda40/data/ts-", input$topic,".csv")
     read_csv(file_name)
   })
   selected_topic <- reactive(input$topic)
@@ -132,7 +132,7 @@ server <- function(input, output){
 
   # Image des mots spécifiques du topic
 output$topwords_image <- renderImage({
-    list(src = file.path("data_prod/dashboard/lda/img", paste0("words-plot-", input$topic, ".png")),
+    list(src = file.path("data_prod/dashboard/lda40/img", paste0("words-plot-", input$topic, ".png")),
          contentType = 'image/png',
          alt = "Mots spécifiques",
          width = "100%",
