@@ -1,4 +1,4 @@
-### first try on dashboarding Topic Models from a LDA on French MP's tweets
+### first try on dashboarding Topic Models from a Bert Topic on French MP's tweets
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load("shiny", "topicmodels", "ggplot2", "ggthemes", "readr"
                )
@@ -12,11 +12,19 @@ library(tidyverse)
 
 # Chargement des données
 
+# data path : /store/medialex/reproduction_wlwf/data_prod/dashboard/bertopic
+# img = keywords
+# data =  ts
+# tweets = representative_docs_attentive.csv, etc
+
 # load("data_prod/topics/lda_results-twokenizer.Rdata")  # results lda
 # load("data_prod/dashboard/qois.rdata")  # topic_scores
 # representative tweets
-load("data_prod/dashboard/lda/congress-rs-tweets.rdata")
-load("data_prod/dashboard/lda/media-rs-tweets.rdata")
+load("data_prod/dashboard/bertopic/representative_docs_congress.rdata")
+load("data_prod/dashboard/bertopic/representative_docs_media.rdata")
+load("data_prod/dashboard/bertopic/congress-rs-sample-tweets.rdata")
+load("data_prod/dashboard/bertopic/predict-rs-sample-tweets.rdata")
+
 # qois_long <- qois |>
 #   select(topic, starts_with("prop_")) |>
 #   pivot_longer(cols = starts_with("prop"),
@@ -26,10 +34,10 @@ load("data_prod/dashboard/lda/media-rs-tweets.rdata")
 
 # UI
 ui <- fluidPage(
-  titlePanel("Annotation de Topics LDA"),
+  titlePanel("Annotation de Topics BERTOPICS"),
  fluidRow(
    column(2,
-      selectInput("topic", "Choisissez un topic :", choices = 1:40)
+      selectInput("topic", "Choisissez un topic :", choices = -1:91)
       )
     ),
  fluidRow(
@@ -41,11 +49,11 @@ ui <- fluidPage(
  fluidRow(
     checkboxGroupInput("acteurs", "Afficher :",
                        choices = c(
-                                   "dep. majo.", "dep. lr", "dep. nupes", "dep. rn", 
-                                   "medias", 
-                                   "sup. majo.", "sup. lr", "sup. nupes", "sup. rn", 
-                                   "pub. attentif", "pub. general"), #qois_long |> distinct(parti) |> pull(),
-                       selected = c("dep. majo.", "dep. lr", "dep. nupes", "dep. rn"), #qois_long |> distinct(parti) |> pull()
+                                   "majority", "lr", "nupes", "rn", 
+                                   "media", 
+                                   "majority_supp", "lr_supp", "nupes_supp", "rn_supp", 
+                                   "attentive", "general"), 
+                       selected = c("majority", "lr", "nupes", "rn"),
                        inline = TRUE
     )
    ),
@@ -59,14 +67,19 @@ ui <- fluidPage(
    titlePanel("Tweets représentatifs de député⋅es (à gauche) et de médias (à droite)"),
    #uiOutput("congress_tweets")
    column(6, htmlOutput("congress_tweets")),
-   column(6, htmlOutput("media_tweets")
+   column(6, htmlOutput("media_tweets"),
           #tags$head(
           #  tags$script(src = "https://platform.twitter.com/widgets.js")
           #),
           #titlePanel("Test d'intégration de tweet"),
           #uiOutput("tweets_test")
           )
-   )#,
+   ),
+   fluidRow(
+    titlePanel("Tweets aléatoires des députés (à gauche) et des divers publics prédits (à droite, médias inclus)"),
+    column(6, htmlOutput("congress_tweets_sample")),
+    column(6, htmlOutput("publics_tweets_sample"))
+   )
 )
 
 # time serie des topics
@@ -74,9 +87,9 @@ ui <- fluidPage(
 plot_ts  <- function(df, checked_actors, selected_topic){
 
   df |>
-    filter(actor %in% {{checked_actors}}) |>
+    filter(party %in% {{checked_actors}}) |>
     ggplot() +
-    aes(x = date, y = prop, color = actor, group = actor) +
+    aes(x = date, y = prop, color = party, group = party) +
     geom_line() +
     scale_x_date(#date_breaks = "month",
                  breaks = c(seq(ymd("2022-06-20"), ymd("2023-03-14"), by = "1 month"), ymd("2022-06-20"), ymd("2023-03-14")),
@@ -86,17 +99,17 @@ plot_ts  <- function(df, checked_actors, selected_topic){
                 # expand = expansion(c(0,0))
                  ) +
     scale_color_manual(values = c(
-                                  "dep. majo." = "orange",
-                                  "dep. lr" = "blue",
-                                  "dep. nupes" = "red",
-                                  "dep. rn" = "purple",
-                                  "medias" = "black", 
-                                  "sup. majo." = "darkorange", 
-                                  "sup. lr" = "darkblue", 
-                                  "sup. nupes" = "darkred", 
-                                  "sup. rn" = "purple4", 
-                                  "pub. attentif" = "forestgreen", 
-                                  "pub. general" = "lightgrey"
+                                  "majority" = "orange",
+                                  "lr" = "blue",
+                                  "nupes" = "red",
+                                  "rn" = "purple",
+                                  "media" = "black", 
+                                  "majority_supp" = "darkorange", 
+                                  "lr_supp" = "darkblue", 
+                                  "nupes_supp" = "darkred", 
+                                  "rn_supp" = "purple4", 
+                                  "attentive" = "forestgreen", 
+                                  "general" = "lightgrey"
                                   )) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
     labs(color = "",
@@ -111,7 +124,7 @@ plot_ts  <- function(df, checked_actors, selected_topic){
 # Server
 server <- function(input, output){
   df <- reactive({
-    file_name <- paste0("data_prod/dashboard/lda/data/ts-", input$topic,".csv")
+    file_name <- paste0("data_prod/dashboard/bertopic/data/bertopic_ts_", input$topic,".csv")
     read_csv(file_name)
   })
   selected_topic <- reactive(input$topic)
@@ -132,7 +145,7 @@ server <- function(input, output){
 
   # Image des mots spécifiques du topic
 output$topwords_image <- renderImage({
-    list(src = file.path("data_prod/dashboard/lda/img", paste0("words-plot-", input$topic, ".png")),
+    list(src = file.path("data_prod/dashboard/bertopic/img", paste0("bertopic_", input$topic, ".png")),
          contentType = 'image/png',
          alt = "Mots spécifiques",
          width = "100%",
@@ -155,7 +168,7 @@ output$topwords_image <- renderImage({
   output$congress_tweets <- renderUI({
     req(input$topic) # Attendre que l'utilisateur sélectionne un topic
     selected_congress_tweets <- reactive({
-      congress_rs |> filter(topic == input$topic)
+      rep_docs_congress |> filter(topic == input$topic)
                                 })
     
     # Organiser les tweets en deux colonnes
@@ -167,12 +180,36 @@ output$topwords_image <- renderImage({
   output$media_tweets <- renderUI({
     req(input$topic) # Attendre que l'utilisateur sélectionne un topic
     selected_media_tweets <- reactive({
-      media_rs |> filter(topic == input$topic)
+      rep_docs_media |> filter(topic == input$topic)
     })
     
     HTML(#paste(
       selected_media_tweets()$embed#, collapse = "<br><br>")
     )
+  })
+
+  output$congress_tweets_sample <- renderUI({
+  req(input$topic) # Attendre que l'utilisateur sélectionne un topic
+  selected_congress_tweets <- reactive({
+    congress_rs_sample|> filter(topic == input$topic)
+                              })
+    
+    # Organiser les tweets en deux colonnes
+    HTML(#paste(
+      selected_congress_tweets()$embed#, collapse = "<br><br>")
+      )
+  })
+
+  output$publics_tweets_sample <- renderUI({
+  req(input$topic) # Attendre que l'utilisateur sélectionne un topic
+  selected_predict_tweets <- reactive({
+    predict_rs_sample|> filter(topic == input$topic)
+                              })
+    
+    # Organiser les tweets en deux colonnes
+    HTML(#paste(
+      selected_predict_tweets()$embed#, collapse = "<br><br>")
+      )
   })
   #output$tweets_test <- renderUI({
   #  HTML('<blockquote class="twitter-tweet" data-theme="light">
