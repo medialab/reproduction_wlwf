@@ -51,18 +51,83 @@ for (mat in list(barbera, ldanf, ldaf)){
     dev.off()
 }
 
-stop()
-<-
+
 db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
 
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
-pol_issues <- c(0, 1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 27, 28, 29, 30, 31, 32, 33, 34, 36, 
-    37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 58, 59, 62, 63, 64, 66, 67, 68, 70, 71, 
-    72, 73, 74, 75, 77, 80, 81, 82, 83, 84, 85, 86, 89, 90, 91) 
+#pol_issues <- c(0, 1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 27, 28, 29, 30, 31, 32, 33, 34, 36, 
+    #37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 58, 59, 62, 63, 64, 66, 67, 68, 70, 71, 
+    #72, 73, 74, 75, 77, 80, 81, 82, 83, 84, 85, 86, 89, 90, 91) 
+
+pol_issues <- c(0:91)
 
 db <-  db %>%
     filter(topic %in% pol_issues)
+
+db_binary <- db
+db_binary[,variables] <- sapply(db_binary[, variables], function(x) ifelse(x > 0, 1, 0))
+print(sample_n(db_binary, 30))
+
+get_pairwise_identical_proportions <- function(data, variables) {
+  # Initialiser une matrice vide pour les résultats
+  proportions <- matrix(NA, nrow = length(variables), ncol = length(variables))
+  rownames(proportions) <- variables
+  colnames(proportions) <- variables
+  
+  # Boucle pour comparer chaque couple de variables
+  for (i in 1:(length(variables) - 1)) {
+    for (j in (i + 1):length(variables)) {
+      # Extraire les valeurs des deux variables
+      var1 <- data[[variables[i]]]
+      var2 <- data[[variables[j]]]
+      
+      # Comparer les valeurs de var1 et var2 pour trouver les valeurs identiques
+      match_identical <- sum(var1 == var2) 
+      total <- length(var1)               
+      proportions[i, j] <- round(match_identical / total,2) 
+      proportions[j, i] <- round(match_identical / total,2)
+      proportions[i, i] <- 1
+      proportions[j, j] <- 1
+    }
+  }
+  
+  # Retourner la matrice des proportions
+  return(proportions)
+}
+
+proportion_table <- get_pairwise_identical_proportions(db_binary, variables)
+melted_proportions <- melt(proportion_table)
+melted_proportions$value <- as.numeric(melted_proportions$value)
+print(melted_proportions)
+png("data_prod/var/bertopic/corrmat_logit.png",  width = 800, height = 800)
+ggheatmap <- ggplot(melted_proportions, aes(Var2, Var1, fill = value)) +
+    geom_tile(color = "white")+
+ scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(0,1), space = "Lab",
+   name="Proportion of identical logit variable between groups") +
+  theme_minimal()+ # minimal theme
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()  + 
+geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) +
+theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.border = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  legend.justification = c(1, 0),
+  legend.position.inside = c(0.6, 0.7),
+  legend.direction = "horizontal")+
+  guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+                title.position = "top", title.hjust = 0.5))
+print(ggheatmap)
+dev.off()
+
+
+
 drop_top = c()
 for (i in unique(db$topic)){
       pdb_top <- db %>% filter(topic==i)
@@ -74,6 +139,8 @@ for (i in unique(db$topic)){
     }
 
 db <- db %>% filter (!(topic %in% unique(drop_top)))
+
+
 # - logit transform all series
 for (v in variables) {
 # - pulling the series-agenda for that group

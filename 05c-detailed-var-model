@@ -63,7 +63,7 @@ if (args$estimate){
   #Put our main databse generated thanks to script 05a 
   print("Files recuperation and preprocessing")
   if (args$topic_model == 'lda') {
-    db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
+    db <- read_csv("data_prod/var/lda/general_TS_100.csv", show_col_types = FALSE)
     pol_issues <- c(1:100)
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
@@ -277,6 +277,8 @@ if (args$estimate){
     rownames(PACF_data) <- c(variables, paste0(variables, "_diff"))
     counter_const <- 0
     iter_info <-0
+    print("Nombre de topic")
+    print(length(pol_issues))
     for (topic in pol_issues) {
       iter_info <- iter_info + 1
       infos_topic[iter_info, "Topic"] <- as.character(topic)
@@ -355,15 +357,25 @@ if (args$estimate){
     cat("Nombre de séries constantes :", counter_const, "\n")
 
     transfo_acf <- function(data){
-      dfexp <- as.data.frame(matrix(NA, nrow=6, ncol=length(variables)*2))
-      colnames(dfexp) <- c(variables, paste0(variables, "_diff"))
-      rownames(dfexp) <- c("Min", "Q1", "Median", "Mean", "Q3", "Max")
       df <- as.data.frame(data)
       df$value <- sapply(strsplit(as.character(df$Freq), ":"), function(x) x[2])
+      if (any(grepl("NA's\\s*", df$Freq, ignore.case = TRUE))) {
+        print("NA detected")
+        nrow_exp <- 7
+        rows_exp <- c("Min", "Q1", "Median", "Mean", "Q3", "Max", "Missing")
+      } else {
+        print("NA Undetected")
+        nrow_exp <- 6
+        rows_exp <- c("Min", "Q1", "Median", "Mean", "Q3", "Max")
+      }
+      dfexp <- as.data.frame(matrix(NA, nrow=nrow_exp, ncol=length(variables)*2))
+      colnames(dfexp) <- c(variables, paste0(variables, "_diff"))
+      rownames(dfexp) <- rows_exp
       k <- 0
       for (i in 1:ncol(dfexp)){
-        for (j in 1:6){
-          dfexp[j,i] <- str_trim(df[j + k*6, "value"])
+        print(i)
+        for (j in 1:nrow_exp){
+          dfexp[j,i] <- str_trim(df[j + k*nrow_exp, "value"])
         }
         k <- k+1
       }
@@ -384,6 +396,47 @@ if (args$estimate){
 
     print(acf_sum)
     print(pacf_sum)
+
+    #Create ACF and PACF plots
+    plot_PACFS <- function(data, type){
+      if (!(type %in% c("ACF", "PACF"))){
+        stop("Choose ACF or PACF type for schem")
+      }
+      path_ACF <- paste0("data_prod/var/", args$topic_model, "/issue-level/", type, "_plot.png")
+      png(file=path_ACF, width = 1800, height = 1200)
+      db_plot <- as.data.frame(t(data))
+      db_plot <- db_plot[, variables]
+      db_plot$stationarity <- ifelse(rownames(db_plot) %in% as.character(stationary_topics), TRUE, FALSE)
+      db_plot$topic <- rownames(db_plot)
+      db_plot_long <-  db_plot %>% gather(key="groups", value = "value", variables)
+      max_y <- max(db_plot_long$value)
+      p <- ggplot(data = db_plot_long, aes(x = as.integer(topic), y = value, color=groups, shape = as.factor(stationarity), xmin = 0, xmax = 101, ymin=0, ymax= max_y + 1)) +
+          geom_jitter(width = 0.3, size = 5) +  
+          scale_shape_manual(values = c("TRUE" = 18, "FALSE" = 16), labels = c("TRUE" = "Stationnaire", "FALSE" = "Mixte"), name = "Stationnarité") +
+          scale_color_manual(values = c(
+                                  "lr" = "blue",
+                                  "majority" = "orange",
+                                  "nupes" = "red",
+                                  "rn" = "purple",
+                                  "media" = "black", 
+                                  "majority_supp" = "darkorange", 
+                                  "lr_supp" = "darkblue", 
+                                  "nupes_supp" = "darkred", 
+                                  "rn_supp" = "purple4", 
+                                  "attentive" = "forestgreen", 
+                                  "general" = "lightgrey"
+                                  )) +
+         labs(
+          title = paste(type, "day where value was < 0.1 for model", args$topic_model),
+          x = "Topics",
+          y = "Number of days")
+      print(p)
+      dev.off()
+    }
+    plot_PACFS(ACF_data, "ACF")
+    plot_PACFS(PACF_data, "PACF")
+
+
   }
 
   print("Preprocessing (continued)")
@@ -391,16 +444,17 @@ if (args$estimate){
 
   #Model by topic
   lags <- 7
-  for (topic in unique(db$topic)){
+  for (topic in unique(as.character(db$topic))){
     print(paste("Start VAR", topic))
-    db_topic <- db %>% filter(topic == topic)
+    db_topic <- db %>% filter(as.character(topic) == topic)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
     #var_irfs_cum <- irf(var_model, n.ahead = 60, cumulative = TRUE)
     #save(var_irfs_cum, file = paste0("var/issue-level/var_irfs_topic_", topic, "_logit-UPD.Rdata"))
     if (args$tests){
+      topic <- as.character(topic)
       print(paste("Currently testing topic", topic))
       AIC_and_co <- VARselect(db_topic[, variables], lag.max = 15, season = NULL)
-      row_index <- which(infos_topic$Topic == topic)
+      row_index <- which(as.character(infos_topic$Topic) == topic)
       infos_topic[row_index, "Max Modul"] <- max(roots(var_model))
       infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
       infos_topic[row_index, "HQ"] <- AIC_and_co$selection[[2]]
