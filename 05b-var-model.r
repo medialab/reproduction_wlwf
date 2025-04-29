@@ -26,7 +26,7 @@ help = "Run the script who estimate PVAR and IRF")
 parser$add_argument("--tests", action = "store_true",
                     help = "Activate to test the absence of unit roots and to print the selection criteria")
 
-parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=15)
+parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=21)
 
 
 args <- parser$parse_args()
@@ -37,13 +37,13 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 
 if (!(args$estimate)){
   if (args$topic_model == 'lda') {
-    if (!file.exists("data_prod/var/lda/var_model-MAIN.Rdata") ||
-    !file.exists("data_prod/var/lda/var_irfs-MAIN.Rdata")) {
+    if (!file.exists("data_prod/var/lda/Pvar_model-MAIN.Rdata") ||
+    !file.exists("data_prod/var/lda/Pvar_irfs-MAIN.Rdata")) {
       stop("No var and irf files were found. Please run the --estimate option")
       }
   } else {
-    if (!file.exists("data_prod/var/bertopic/var_model-MAIN.Rdata") ||
-    !file.exists("data_prod/var/bertopic/var_irfs-MAIN_.Rdata")) {
+    if (!file.exists("data_prod/var/bertopic/Pvar_model-MAIN.Rdata") ||
+    !file.exists("data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")) {
       stop("No var and irf files were found. Please run the --estimate option")
     }
   }
@@ -51,6 +51,7 @@ if (!(args$estimate)){
 
 if (args$estimate){
   count_msg <- 0
+  variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
   #Put our main databse generated thanks to script 05a 
   print("Files recuperation and preprocessing")
   if (args$topic_model == 'lda') {
@@ -62,12 +63,26 @@ if (args$estimate){
     #pol_issues <- c(0, 1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 27, 28, 29, 30, 31, 32, 33, 34, 36, 
     #37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 58, 59, 62, 63, 64, 66, 67, 68, 70, 71, 
     #72, 73, 74, 75, 77, 80, 81, 82, 83, 84, 85, 86, 89, 90, 91) #14, 23, 33, 37, 41, 45, 51, 56, 61, 62, 63, 64, 79, 88
+    #pol_issues <- c(2, 6, 9, 11, 12, 13, 16, 17, 20, 22, 27, 30, 31, 32, 33, 34, 36, 37, 39, 40, 41, 43, 44, 45, 46, 47, 48, 50, 52, 53, 55, 57, 58, 59, 60, 64, 66, 67, 68, 72, 73, 74, 76, 77, 78, 79, 81, 82, 83, 84, 86, 87, 88, 90) #Stationary list
   }
-
+  if (args$tests){
+    proportion_remove <- c()
+    db <- db %>% filter(topic >=0)
+    db_filt <- db %>% filter(topic %in% pol_issues)
+    for (v in variables){
+      sum_attention <- sum(db[[v]], na.rm = TRUE)
+      sum_attention_filter <- sum(db_filt[[v]], na.rm = TRUE)
+      prop_remove <- sum_attention_filter/sum_attention
+      proportion_remove <- append(proportion_remove, prop_remove)
+    }
+    summary_table <- data.frame(
+    variable = variables,
+    proportion_removed = 1 - proportion_remove
+  )
+    print(summary_table)
+  }
   db <- db %>%
     filter(topic %in% pol_issues)
-
-  variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
   # - logit transform all series
   for (v in variables) {
@@ -296,8 +311,10 @@ if (args$estimate){
   }
   if (args$topic_model == "lda"){
     lags <- 2
+    lags_filter <- NA
   } else {
-    lags <- 4
+    lags <- 8
+    lags_filter <- 8  
   }
 
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
@@ -344,15 +361,13 @@ if (args$estimate){
   }
 }
 
-stop()
-
 var_irfs <- var_irfs
 variables <- names(var_irfs$irf)
 elements_to_pull <- c("irf", "Upper", "Lower")
 
-print("Creation one-timpe shock IRF data")
+print("Creation one-time shock IRF data")
 irf_data <- NULL
-DAYS <- 60
+DAYS <- 59
 for (el in elements_to_pull) {
   new_irf_info <- var_irfs[el][[1]]
   for (out in variables) {
@@ -382,6 +397,8 @@ new_irf_data <- NULL
 
 # - a vector with the name of the variables
 variables <- unique(irf_data$cov)
+
+DAYS <- 59
 
 # - deciding the number of days to simulate
 print("Creation structural shock IRF data")
