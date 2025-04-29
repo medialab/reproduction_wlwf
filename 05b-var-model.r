@@ -56,7 +56,7 @@ if (args$estimate){
   print("Files recuperation and preprocessing")
   if (args$topic_model == 'lda') {
     db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-    pol_issues <- c(1:100)
+    pol_issues <- c(1:70)
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
     pol_issues <- c(0:91)
@@ -310,7 +310,7 @@ if (args$estimate){
     }
   }
   if (args$topic_model == "lda"){
-    lags <- 2
+    lags <- 15
     lags_filter <- NA
   } else {
     lags <- 8
