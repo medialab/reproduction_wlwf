@@ -29,7 +29,7 @@ ui <- fluidPage(
   titlePanel("Annotation de Topics LDA"),
  fluidRow(
    column(2,
-      selectInput("topic", "Choisissez un topic :", choices = 1:100)
+      selectInput("topic", "Choisissez un topic :", choices = 1:70)
       )
     ),
  fluidRow(
