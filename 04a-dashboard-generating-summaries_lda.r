@@ -141,7 +141,7 @@ for (k in 1:K){
 		aes(y=order, x=specificity, label=word))
 	pq <- p + geom_text(aes(size=score), hjust=1) +
     	scale_size_continuous(range=c(3,5)) +
-    	scale_y_discrete("Top 10 scoring words for each topic",
+    	scale_y_discrete("Top 15 scoring words for each topic",
         	expand=c(0.03, 0.1)) +
     	scale_x_continuous("Specificity of word to each topic",
         	limit=c(min(df$specificity)-.75, 1)) +
