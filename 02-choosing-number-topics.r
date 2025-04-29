@@ -72,15 +72,15 @@ cvLDA <- function(Ntopics,dtm,K=5) {
 K <- c(40, 50, 60, 70, 80, 90, 100, 110, 120)
 results <- list()
 i = 1
-#for (k in K){
-    #cat("\n\n\n##########\n\n\n ", k, "topics", "\n\n\n")
-    #res <- cvLDA(k, dtm)
-    #results[[i]] <- res
-    #save(results, file=sprintf("data_prod/topics/\"%s\"_topics_results_cv.Rdata", k))
-    #i = i + 1
-#}
+for (k in K){
+    cat("\n\n\n##########\n\n\n ", k, "topics", "\n\n\n")
+    res <- cvLDA(k, dtm)
+    results[[i]] <- res
+    save(results, file=sprintf("data_prod/topics/\"%s\"_topics_results_cv.Rdata", k))
+    i = i + 1
+}
 
-#save(results, file="data_prod/topics/k_topics_results_cv.Rdata")
+save(results, file="data_prod/topics/k_topics_results_cv.Rdata")
 
 
 # PLOT
