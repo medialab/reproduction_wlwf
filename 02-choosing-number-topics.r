@@ -69,22 +69,24 @@ cvLDA <- function(Ntopics,dtm,K=5) {
 #===============================================================================
 
 ## running LDA with different number of topics
-K <- c(40, 60, 80, 100, 120, 140)
+K <- c(40, 50, 60, 70, 80, 90, 100, 110, 120)
 results <- list()
 i = 1
-for (k in K){
-    cat("\n\n\n##########\n\n\n ", k, "topics", "\n\n\n")
-    res <- cvLDA(k, dtm)
-    results[[i]] <- res
-    save(results, file=sprintf("data_prod/topics/\"%s\"_topics_results_cv.Rdata", k))
-    i = i + 1
-}
+#for (k in K){
+    #cat("\n\n\n##########\n\n\n ", k, "topics", "\n\n\n")
+    #res <- cvLDA(k, dtm)
+    #results[[i]] <- res
+    #save(results, file=sprintf("data_prod/topics/\"%s\"_topics_results_cv.Rdata", k))
+    #i = i + 1
+#}
 
-save(results, file="data_prod/topics/k_topics_results_cv.Rdata")
+#save(results, file="data_prod/topics/k_topics_results_cv.Rdata")
 
 
 # PLOT
 #===============================================================================
+load("data_prod/topics/k_topics_results_cv.Rdata")
+print("Plot 1")
 df <- data.frame(
     k = rep(K, each=10),
     perp =  unlist(lapply(results, '[[', 'perplexity')),
@@ -130,9 +132,44 @@ pq
 
 ggsave("plots/appendix-choosing-k.pdf", pq, height=4, width=6)
 
+#Création d'un plot plus lisible, qui enlève LL
+print("Plot 2")
+df <- data.frame(
+    k = rep(K, each=10),
+    perp =  unlist(lapply(results, '[[', 'perplexity')),
+    stringsAsFactors=F)
 
+df <- data.frame(cbind(
+    aggregate(df$perp, by=list(df$k), FUN=mean),
+    aggregate(df$perp, by=list(df$k), FUN=sd)$x,
+    stringsAsFactors=F))
+names(df) <- c("k", "mean_perp", "sd_perp")
 
+pd <- melt(df[,c("k","mean_perp")], id.vars="k")
+pd2 <- melt(df[,c("k","sd_perp")], id.vars="k")
+pd$sd <- pd2$value
 
+pd$meansmin <- pd$value - pd$sd
+pd$meansdmax <- pd$value + pd$sd
 
+limits_y_scale <- c(min(pd$meansmin) - 100,  max(pd$meansdmax) + 100)
 
+p <- ggplot(pd, aes(x=k, y=value))
+pq <- p + geom_line(color="red") + geom_point(
+        fill="white", shape=21, size=1.40) +
+    geom_errorbar(aes(ymax=value+sd, ymin=value-sd), width=4) +
+    scale_y_continuous("Perplexity score (5-fold cross-validation)", limits = limits_y_scale) +
+    scale_x_continuous("Number of topics",
+        breaks=c(40, 50, 60, 70, 80, 90, 100, 110, 120)) +
+    theme_bw() +
+        theme(axis.line = element_line(colour = "black"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    legend.key.size=unit(0.5, "cm"), legend.position.inside=c(0.70,.90),
+    legend.box.just = "left", legend.direction="horizontal",
+    legend.title=element_blank()) 
+pq
 
+ggsave("plots/appendix-choosing-k-perplexity.png", pq, height=4, width=6)
