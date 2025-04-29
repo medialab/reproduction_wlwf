@@ -45,7 +45,7 @@ check_matrix_dimensions <- function(mat, expected_rows, expected_cols) {
 #===============================================================================
 load("data_prod/topics/lda_results-twokenizer.Rdata")
 
-K <- 100
+K <- 70
 
 ###############################################################################
 ### A) Computing top 10 words for each topic
@@ -442,7 +442,7 @@ results$topics <- results$topics[-duplicated,]
 #tweets <- tweets[-todelete,]
 #results$topics <- results$topics[-todelete,]
 #
-K <- 100
+K <- 70
 rs <- list()
 
 for (k in 1:K){
@@ -526,7 +526,7 @@ duplicated <- which(duplicated(tweets$text))
 tweets <- tweets[-duplicated,]
 results$topics <- results$topics[-duplicated,]
 
-K <- 100
+K <- 70
 rs <- list()
 
 for (k in 1:K){
