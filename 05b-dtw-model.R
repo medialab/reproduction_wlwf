@@ -2,7 +2,6 @@
 # author: Carlo Santagiustina
 # data: 6 May 2025
  # Should print 20 100 10
-install.packages("mFLICA")
 library(mFLICA)
 library(dplyr)
 library(tidyverse)
@@ -28,21 +27,21 @@ for(topic_num in pol_issues){
     matrix_dtw[,,topic_num + 1] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
 }
 
-write.csv(matrix_dtw[2,,], file='test.csv')
-
 # Check structure
 
-timeWindow=  30
-lagWindow= 6
-timeShift= 1
+timeWindow <- 30
+lagWindow <- 6
+timeShift <- 1
 
 mFLICA=mFLICA(
-  TS,
-  timeWindow=  30,
-  lagWindow= 6,
-  timeShift= 1,
+  matrix_dtw,
+  timeWindow=  timeWindow,
+  lagWindow= lagWindow,
+  timeShift= timeShift,
   sigma = 0.5,
   silentFlag = FALSE
 )
-
+#Commandes intéressantes :
+#plotMultipleTimeSeries(TS=model_dtw$dyNetOut$dyNetBinDensityVec) #Mesure de la coordination (de 0 à 1) 
+saveRDS(mFLICA, file="data_prod/dtw/bertopic/model_dtw.RDS")
 
