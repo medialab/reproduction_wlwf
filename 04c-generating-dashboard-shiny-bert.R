@@ -35,7 +35,7 @@ ui <- fluidPage(
   titlePanel("Annotation de Topics BERTOPICS"),
  fluidRow(
    column(2,
-      selectInput("topic", "Choisissez un topic :", choices = -1:100)
+      selectInput("topic", "Choisissez un topic :", choices = -1:91)
       )
     ),
  fluidRow(
