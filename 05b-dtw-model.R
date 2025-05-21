@@ -29,16 +29,11 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 }
 
 if (args$topic_model=='lda'){
-    db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-    db <-  db %>% mutate(topic = ifelse(topic == 55, 16, topic)) %>% 
-                mutate(topic = ifelse(topic == 60, 51, topic)) %>%
-                mutate(topic = ifelse(topic %in% c(65, 40, 50, 59, 70), 27, topic)) %>%
-                group_by(date, topic) %>%                                  
-                summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")       
-    pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 12, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66)
+    db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)    
+    pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66, 55, 60, 65, 40, 50, 59, 70)
 } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
-    throw_topic <- c(87, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
+    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
     pol_issues <- setdiff(c(0:91), throw_topic)
 }
 
@@ -64,28 +59,6 @@ if (args$topic_model == 'lda'){
     path_test1 <- "data_prod/dtw/bertopic/relations_lags_followscore.csv"
     path_mat_adj <- "data_prod/dtw/bertopic/adj_mat.png"
     path_MultipleTimeSeries_faction <- "data_prod/dtw/bertopic/factions_evol.png"
-}
-
-if (args$tests){
-    cat("Number of lines we are waiting for \n")
-    print(length(pol_issues)*268)
-    cat("Current number of lines and columns \n")
-    print(dim(db))
-    lost_att_info <- db %>% 
-        select(-topic) %>%
-        group_by(date) %>%
-        summarise(across(everything(), \(x) sum(x, na.rm = TRUE)))
-    lost_prop <- lost_att_info %>% 
-        mutate(across(-date, \(x) 1 - x)) %>% 
-        select(-date) %>%
-        summarise(across(everything(), \(x) mean(x, na.rm=TRUE)))
-    cat("mean of the attention lost per day after political filter \n")
-    k <- 1
-    for (elem in lost_prop){
-        print(variables[k])
-        print(elem)
-        k <- k+1
-    }
 }
 
 db <- db %>% select(-date)

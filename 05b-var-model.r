@@ -54,33 +54,25 @@ if (args$estimate){
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
   #Put our main databse generated thanks to script 05a 
   print("Files recuperation and preprocessing")
-  if (args$topic_model == 'lda') {
-    db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-    pol_issues <- c(1:70)
+  if (args$topic_model=='lda'){
+  db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
+  db <-  db %>% mutate(topic = ifelse(topic == 55, 16, topic)) %>% 
+              mutate(topic = ifelse(topic == 60, 51, topic)) %>%
+              mutate(topic = ifelse(topic %in% c(65, 40, 50, 59, 70), 27, topic)) %>%
+              group_by(date, topic) %>%                                  
+              summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")       
+  pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66)
   } else {
-    db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE) 
-    pol_issues <- c(0:91)
-    #pol_issues <- c(0, 1, 2, 4, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 22, 27, 28, 29, 30, 31, 32, 33, 34, 36, 
-    #37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 58, 59, 62, 63, 64, 66, 67, 68, 70, 71, 
-    #72, 73, 74, 75, 77, 80, 81, 82, 83, 84, 85, 86, 89, 90, 91) #14, 23, 33, 37, 41, 45, 51, 56, 61, 62, 63, 64, 79, 88
-    #pol_issues <- c(2, 6, 9, 11, 12, 13, 16, 17, 20, 22, 27, 30, 31, 32, 33, 34, 36, 37, 39, 40, 41, 43, 44, 45, 46, 47, 48, 50, 52, 53, 55, 57, 58, 59, 60, 64, 66, 67, 68, 72, 73, 74, 76, 77, 78, 79, 81, 82, 83, 84, 86, 87, 88, 90) #Stationary list
+    db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
+    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
+    pol_issues_temp <- setdiff(c(0:91), throw_topic)
+    db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
+          mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>%
+          group_by(date, topic) %>%                                  
+          summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
+    pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))  
   }
-  if (args$tests){
-    proportion_remove <- c()
-    db <- db %>% filter(topic >=0)
-    db_filt <- db %>% filter(topic %in% pol_issues)
-    for (v in variables){
-      sum_attention <- sum(db[[v]], na.rm = TRUE)
-      sum_attention_filter <- sum(db_filt[[v]], na.rm = TRUE)
-      prop_remove <- sum_attention_filter/sum_attention
-      proportion_remove <- append(proportion_remove, prop_remove)
-    }
-    summary_table <- data.frame(
-    variable = variables,
-    proportion_removed = 1 - proportion_remove
-  )
-    print(summary_table)
-  }
+  
   db <- db %>%
     filter(topic %in% pol_issues)
 

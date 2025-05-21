@@ -23,6 +23,7 @@ num_timepoints <- 268  # Number of time steps
 if (!(args$topic_model %in% c('bertopic', 'lda'))){
   stop("The model name is incorrect. Choose between lda and bertopic")
 }
+cat("Choose saving paths according to topic model \n")
 if (args$topic_model == 'lda'){
     init_path <- "data_prod/dtw/lda/tests/"
     path_test_density_sigma <- "data_prod/dtw/lda/test_sigma.png"
@@ -35,25 +36,71 @@ if (args$topic_model == 'lda'){
     path_test_density_LW <- "data_prod/dtw/bertopic/test_LW.png"
 }
 if(args$calculate){
+    cat("Start calculus \n")
     if (args$topic_model=='lda'){
-        db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-        db <-  db %>% mutate(topic = ifelse(topic == 55, 16, topic)) %>% 
-                    mutate(topic = ifelse(topic == 60, 51, topic)) %>%
-                    mutate(topic = ifelse(topic %in% c(65, 40, 50, 59, 70), 27, topic)) %>%
-                    group_by(date, topic) %>%                                  
-                    summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")       
-        pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 12, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66)
+        db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)    
+        pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66, 55, 60, 65, 40, 50, 59, 70)
+        pol_issues_BQ <- c(12,8,20, 11, 4, 6, 18, 22, 31,35, 38, 39, 41, 47, 49, 54, 62, 67, 68, 14, 43, 69)
     } else {
         db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
-        throw_topic <- c(87, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
+        throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
         pol_issues <- setdiff(c(0:91), throw_topic)
+        pol_issues_BQ <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45)
     }
-
-    db <- db %>% filter(topic %in% pol_issues) %>% select(-date)
+    cat("Dimensions check \n")
+    topic_all <- c(pol_issues, pol_issues_BQ)
+    db_BQ <-  db %>% filter(topic %in% topic_all) 
+    db <- db %>% filter(topic %in% pol_issues) 
     variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
     num_topics <- length(pol_issues)   # Number of dimensions (features)
-    cat("Choose saving paths according to topic model \n")
- 
+
+    cat("Number of lines we are waiting for \n")
+    print(length(pol_issues)*268)
+    cat("Current number of lines and columns \n")
+    print(dim(db))
+    cat("Plot attention histograms linked to filter \n")
+    df_plot_loss <- data.frame(
+        Variable = variables,
+        Proportion_Attention_Politique = NA,
+        Proportion_Attention_Politique_Valide = NA
+        )
+
+    lost_att_info_PV <- db %>% 
+        select(-topic) %>%
+        group_by(date) %>%
+        summarise(across(everything(), \(x) sum(x, na.rm = TRUE)), .groups = "drop")
+    
+    lost_att_infoP <- db_BQ %>% 
+        select(-topic) %>%
+        group_by(date) %>%
+        summarise(across(everything(), \(x) sum(x, na.rm = TRUE)), .groups = "drop")
+    
+
+    for (i in 1:length(variables)) {
+        # Moyenne de la proportion (par date) pour les deux dataframes
+        mean_prop_P <- mean(lost_att_infoP[[variables[i]]], na.rm = TRUE)
+        mean_prop_PV <- mean(lost_att_info_PV[[variables[i]]], na.rm = TRUE)
+
+        # Remplissage dans df_plot_loss
+        df_plot_loss$Proportion_Attention_Politique[i] <- mean_prop_P
+        df_plot_loss$Proportion_Attention_Politique_Valide[i] <- mean_prop_PV
+    }
+
+    df_long <- df_plot_loss %>%
+        pivot_longer(cols = -Variable, names_to = "Type", values_to = "Proportion")
+
+    # Création de l'histogramme
+    png(filename=paste0("data_prod/figures/", args$topic_model, "/prop_att_filter.png"), width = 600, height = 600)
+    p <- ggplot(df_long, aes(x = Variable, y = Proportion, fill = Type)) +
+    geom_col(position = "dodge") +
+    theme_minimal() +
+    labs(title = paste0("Proportions moyennes d'attention par variable (",args$topic_model, ")") ,
+        x = "Variable", y = "Proportion") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    print(p)
+    dev.off()
+
+    db <- db %>% select(-date)
     matrix_dtw <- array(NA, c(num_groups, num_timepoints, num_topics))
 
     i <- 1
@@ -65,20 +112,25 @@ if(args$calculate){
     timeWindow <- 30
     lagWindow <- 6/30
     timeShift <- 1
-    cat("Start test for sigma \n")
-    sigma_seuils <- c(0.1, 0.3, 0.5, 0.7, 0.9)
-    for (seuil in sigma_seuils){
-        print(paste("seuil", seuil))
-            model_output = paste0(init_path, "sigmatest_", sub("^[^.]*\\.", "", as.character(seuil)), ".RDS")
-            model_dtw=mFLICA(
-            matrix_dtw,
-            timeWindow=  timeWindow,
-            lagWindow= lagWindow,
-            timeShift= timeShift,
-            sigma = seuil,
-            silentFlag = FALSE
-            )
-        saveRDS(model_dtw, file=model_output)
+
+    DO <- FALSE
+
+    if(DO){
+        cat("Start test for sigma \n")
+        sigma_seuils <- c(0.1, 0.3, 0.5, 0.7, 0.9)
+        for (seuil in sigma_seuils){
+            print(paste("seuil", seuil))
+                model_output = paste0(init_path, "sigmatest_", sub("^[^.]*\\.", "", as.character(seuil)), ".RDS")
+                model_dtw=mFLICA(
+                matrix_dtw,
+                timeWindow=  timeWindow,
+                lagWindow= lagWindow,
+                timeShift= timeShift,
+                sigma = seuil,
+                silentFlag = FALSE
+                )
+            saveRDS(model_dtw, file=model_output)
+        }
     }
     cat("Start test for time Window")
     TW_tests <- c(15,30,45,60)
@@ -88,7 +140,7 @@ if(args$calculate){
             model_dtw=mFLICA(
             matrix_dtw,
             timeWindow=  time_window,
-            lagWindow= 6/time_window,
+            lagWindow= 6/30,
             timeShift= timeShift,
             sigma = 0.5,
             silentFlag = FALSE
@@ -96,7 +148,7 @@ if(args$calculate){
         saveRDS(model_dtw, file=model_output)
     }
     cat("Start test for lag Window")
-    LW_tests <- c(2, 4, 6, 8, 10)
+    LW_tests <- c(2, 6, 10, 14, 18, 22, 26, 30)
     for (number_lag in LW_tests){
         print(paste("LW", number_lag))
         model_output = paste0(init_path, "lagtest_", number_lag, ".RDS")
@@ -120,10 +172,13 @@ if (args$topic_model=='lda'){
     model4 <- readRDS("data_prod/dtw/lda/tests/sigmatest_7.RDS")
     model5 <- readRDS("data_prod/dtw/lda/tests/sigmatest_9.RDS")
     model6 <- readRDS("data_prod/dtw/lda/tests/lagtest_2.RDS")
-    model7 <- readRDS("data_prod/dtw/lda/tests/lagtest_4.RDS")
-    model8 <- readRDS("data_prod/dtw/lda/tests/lagtest_6.RDS")
-    model9 <- readRDS("data_prod/dtw/lda/tests/lagtest_8.RDS")
-    model10 <- readRDS("data_prod/dtw/lda/tests/lagtest_10.RDS")
+    model7 <- readRDS("data_prod/dtw/lda/tests/lagtest_6.RDS")
+    model8 <- readRDS("data_prod/dtw/lda/tests/lagtest_10.RDS")
+    model9 <- readRDS("data_prod/dtw/lda/tests/lagtest_14.RDS")
+    model10 <- readRDS("data_prod/dtw/lda/tests/lagtest_18.RDS")
+    model15 <- readRDS("data_prod/dtw/lda/tests/lagtest_22.RDS")
+    model16 <- readRDS("data_prod/dtw/lda/tests/lagtest_30.RDS")
+    model17 <- readRDS("data_prod/dtw/lda/tests/lagtest_18.RDS")
     model11 <- readRDS("data_prod/dtw/lda/tests/windowtest_15.RDS")
     model12 <- readRDS("data_prod/dtw/lda/tests/windowtest_30.RDS")
     model13 <- readRDS("data_prod/dtw/lda/tests/windowtest_45.RDS")
@@ -135,10 +190,13 @@ if (args$topic_model=='lda'){
     model4 <- readRDS("data_prod/dtw/bertopic/tests/sigmatest_7.RDS")
     model5 <- readRDS("data_prod/dtw/bertopic/tests/sigmatest_9.RDS")
     model6 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_2.RDS")
-    model7 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_4.RDS")
-    model8 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_6.RDS")
-    model9 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_8.RDS")
-    model10 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_10.RDS")
+    model7 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_6.RDS")
+    model8 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_10.RDS")
+    model9 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_14.RDS")
+    model10 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_18.RDS")
+    model15 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_22.RDS")
+    model16 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_30.RDS")
+    model17 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_18.RDS")
     model11 <- readRDS("data_prod/dtw/bertopic/tests/windowtest_15.RDS")
     model12 <- readRDS("data_prod/dtw/bertopic/tests/windowtest_30.RDS")
     model13 <- readRDS("data_prod/dtw/bertopic/tests/windowtest_45.RDS")
@@ -175,11 +233,14 @@ param2 <- model7$dyNetOut$dyNetBinDensityVec
 param3 <- model8$dyNetOut$dyNetBinDensityVec
 param4 <- model9$dyNetOut$dyNetBinDensityVec
 param5 <- model10$dyNetOut$dyNetBinDensityVec
+param6 <- model15$dyNetOut$dyNetBinDensityVec
+param7 <- model16$dyNetOut$dyNetBinDensityVec
+param8 <- model17$dyNetOut$dyNetBinDensityVec
 
 df <- data.frame(
-date = rep(dates, 5),
-value = c(param1, param2, param3, param4, param5),
-param = factor(rep(c("lag=1/15", "lag=2/15", "lag=3/15", "lag=4/15", "lag=5/15"), each = num_timepoints))
+date = rep(dates, 8),
+value = c(param1, param2, param3, param4, param5, param6, param7, param8),
+param = factor(rep(c("lag=2/30 jours", "lag=6/30 jours", "lag=10/30 jours", "lag=14/30 jours", "lag=18/30 jours", "lag=22/30 jours", "lag=26/30 jours", "lag=30/30 jours"), each = num_timepoints))
 )
 png(filename = path_test_density_LW, width = 800, height = 600)
 p <- ggplot(df, aes(x = date, y = value, color = param)) +
