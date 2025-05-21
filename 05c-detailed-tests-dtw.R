@@ -113,24 +113,20 @@ if(args$calculate){
     lagWindow <- 6/30
     timeShift <- 1
 
-    DO <- FALSE
-
-    if(DO){
-        cat("Start test for sigma \n")
-        sigma_seuils <- c(0.1, 0.3, 0.5, 0.7, 0.9)
-        for (seuil in sigma_seuils){
-            print(paste("seuil", seuil))
-                model_output = paste0(init_path, "sigmatest_", sub("^[^.]*\\.", "", as.character(seuil)), ".RDS")
-                model_dtw=mFLICA(
-                matrix_dtw,
-                timeWindow=  timeWindow,
-                lagWindow= lagWindow,
-                timeShift= timeShift,
-                sigma = seuil,
-                silentFlag = FALSE
-                )
-            saveRDS(model_dtw, file=model_output)
-        }
+    cat("Start test for sigma \n")
+    sigma_seuils <- c(0.1, 0.3, 0.5, 0.7, 0.9)
+    for (seuil in sigma_seuils){
+        print(paste("seuil", seuil))
+            model_output = paste0(init_path, "sigmatest_", sub("^[^.]*\\.", "", as.character(seuil)), ".RDS")
+            model_dtw=mFLICA(
+            matrix_dtw,
+            timeWindow=  timeWindow,
+            lagWindow= lagWindow,
+            timeShift= timeShift,
+            sigma = seuil,
+            silentFlag = FALSE
+            )
+        saveRDS(model_dtw, file=model_output)
     }
     cat("Start test for time Window")
     TW_tests <- c(15,30,45,60)
@@ -177,8 +173,8 @@ if (args$topic_model=='lda'){
     model9 <- readRDS("data_prod/dtw/lda/tests/lagtest_14.RDS")
     model10 <- readRDS("data_prod/dtw/lda/tests/lagtest_18.RDS")
     model15 <- readRDS("data_prod/dtw/lda/tests/lagtest_22.RDS")
-    model16 <- readRDS("data_prod/dtw/lda/tests/lagtest_30.RDS")
-    model17 <- readRDS("data_prod/dtw/lda/tests/lagtest_18.RDS")
+    model16 <- readRDS("data_prod/dtw/lda/tests/lagtest_26.RDS")
+    model17 <- readRDS("data_prod/dtw/lda/tests/lagtest_30.RDS")
     model11 <- readRDS("data_prod/dtw/lda/tests/windowtest_15.RDS")
     model12 <- readRDS("data_prod/dtw/lda/tests/windowtest_30.RDS")
     model13 <- readRDS("data_prod/dtw/lda/tests/windowtest_45.RDS")
@@ -195,8 +191,8 @@ if (args$topic_model=='lda'){
     model9 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_14.RDS")
     model10 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_18.RDS")
     model15 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_22.RDS")
-    model16 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_30.RDS")
-    model17 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_18.RDS")
+    model16 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_26.RDS")
+    model17 <- readRDS("data_prod/dtw/bertopic/tests/lagtest_30.RDS")
     model11 <- readRDS("data_prod/dtw/bertopic/tests/windowtest_15.RDS")
     model12 <- readRDS("data_prod/dtw/bertopic/tests/windowtest_30.RDS")
     model13 <- readRDS("data_prod/dtw/bertopic/tests/windowtest_45.RDS")
@@ -242,6 +238,7 @@ date = rep(dates, 8),
 value = c(param1, param2, param3, param4, param5, param6, param7, param8),
 param = factor(rep(c("lag=2/30 jours", "lag=6/30 jours", "lag=10/30 jours", "lag=14/30 jours", "lag=18/30 jours", "lag=22/30 jours", "lag=26/30 jours", "lag=30/30 jours"), each = num_timepoints))
 )
+
 png(filename = path_test_density_LW, width = 800, height = 600)
 p <- ggplot(df, aes(x = date, y = value, color = param)) +
 geom_line(linewidth = 1) +

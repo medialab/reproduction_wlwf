@@ -15,8 +15,11 @@ parser <- ArgumentParser()
 parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
 
 
-parser$add_argument("--estimate", action = "store_true",
-help = "Estimate model")
+parser$add_argument("--estimate_AT", action = "store_true",
+help = "Estimate model for time series with all topics")
+
+parser$add_argument("--estimate_UT", action = "store_true",
+help = "Estimate model for time series with one at one time serie")
 
 parser$add_argument("--tests", action = "store_true",
 help = "Do some tests")
@@ -50,6 +53,7 @@ if (args$topic_model == 'lda'){
     path_test1 <- "data_prod/dtw/lda/relations_lags_followscore.csv"
     path_mat_adj <- "data_prod/dtw/lda/adj_mat.png"
     path_MultipleTimeSeries_faction <- "data_prod/dtw/lda/factions_evol.png"
+    init_unique <- "data_prod/dtw/lda/unique/"
 } else{
     path_densitycorr <- "data_prod/dtw/bertopic/densitycorrelation.png"
     path_inst_corr <- "data_prod/dtw/bertopic/cormat_dtw_inst.png"
@@ -59,14 +63,18 @@ if (args$topic_model == 'lda'){
     path_test1 <- "data_prod/dtw/bertopic/relations_lags_followscore.csv"
     path_mat_adj <- "data_prod/dtw/bertopic/adj_mat.png"
     path_MultipleTimeSeries_faction <- "data_prod/dtw/bertopic/factions_evol.png"
+    init_unique <- "data_prod/dtw/bertopic/unique/"
 }
 
+db_date <- db
 db <- db %>% select(-date)
 num_groups <- length(variables)      # Number of time series
 num_timepoints <- 268  # Number of time steps
 num_topics <- length(pol_issues)   # Number of dimensions (features)
-
-if (args$estimate){
+timeWindow <- 15
+lagWindow <- 4/15 
+timeShift <- 1
+if (args$estimate_AT){
     matrix_dtw <- array(NA, c(num_groups, num_timepoints, num_topics))
 
     i <- 1
@@ -75,9 +83,6 @@ if (args$estimate){
         matrix_dtw[,,i] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
         i <- i+1
     }
-    timeWindow <- 30
-    lagWindow <- 6
-    timeShift <- 1
 
     if(args$tests){
         matrix_test <- array(NA, c(55,3))
@@ -133,14 +138,102 @@ if (args$estimate){
     }
     model_dtw <- readRDS(model_output)
 }
-biv_plot_TS <- function(data1, data2, leader, follower, title, path){
+
+top_topic_change <- function(group1, group2, seuil_delta){
+    #Idée pour faire différemment : calculer les lags, couper les données en 7, prendre le max et le min d'écart de chaque sous groupe, bind les db_topics, et choisir le max et le min de chaque période pour chaque acteur. Ensuite, virer les maxs et les mins osef selon seuil delta
+    lag_events1 <- data.frame(
+        topic = character(),
+        lag_value = numeric(),
+        stringsAsFactors = FALSE
+    )
+    lag_events2 <- data.frame(
+        topic = character(),
+        lag_value = numeric(),
+        stringsAsFactors = FALSE
+    )
+    for (topic_num in pol_issues){
+        db_topic <- db_date %>% filter (topic == topic_num)
+        db_topic$week_lags1 <- db_topic[[group1]] - dplyr::lag(db_topic[[group1]], 7)
+        db_topic$week_lags2 <- db_topic[[group2]] - dplyr::lag(db_topic[[group2]], 7)
+
+        to_add1 <- db_topic %>%
+                filter(!is.na(week_lags1) & abs(week_lags1) > seuil_delta) %>%
+                transmute(topic = topic_num, date = as.Date(date), lag_value = week_lags1)
+        
+        to_add1 <- to_add1 %>%
+            group_by(topic, date) %>%
+            filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
+            ungroup() %>%
+            arrange(topic,date) %>%
+            group_by(topic) %>%
+            mutate(ecart_date = as.numeric(date - lag(date, 1)), ecart_date = ifelse(is.na(ecart_date), 10, ecart_date)) %>%
+            ungroup() 
+        
+        to_add2 <- db_topic %>%
+                filter(!is.na(week_lags2) & abs(week_lags2) > seuil_delta) %>%
+                transmute(topic = topic_num, date = as.Date(date), lag_value = week_lags2)
+        
+        to_add2 <- to_add2 %>%
+            group_by(topic, date) %>%
+            filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
+            ungroup() %>%
+            arrange(topic,date) %>%
+            group_by(topic) %>%
+            mutate(ecart_date = as.numeric(date - lag(date, 1)), ecart_date = ifelse(is.na(ecart_date), 10, ecart_date)) %>%
+            ungroup() 
+        
+        lag_events1 <- rbind(lag_events1, to_add1)
+        lag_events2 <- rbind(lag_events2, to_add2)
+    }
+    return(list(group1_lags = lag_events1, group2_lags = lag_events2))
+}
+
+if(args$estimate_UT){
+    matrix_dtw_top <- array(NA, c(num_groups, num_timepoints, 1))
+    for(topic_num in pol_issues){
+        mat <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
+        print(dim(mat))
+        print(dim(matrix_dtw_top))
+        matrix_dtw_top[,,1] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
+        print(dim(matrix_dtw_top))
+        model_output_unique <- paste0(init_unique, "model_topic", topic_num, ".RDS")
+        model_dtw=mFLICA(
+        matrix_dtw_top,
+        timeWindow=  timeWindow,
+        lagWindow= lagWindow,
+        timeShift= timeShift,
+        sigma = 0.5,
+        silentFlag = FALSE
+        )
+    saveRDS(model_dtw, file=model_output_unique)
+    }
+}
+
+biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta=0.4){
+    res <- top_topic_change(leader, follower, seuil_delta)
+    topic_info_leader <- res$group1_lags
+    topic_info_follower <- res$group2_lags
     TS_plot <- c()
-    dates <- seq.Date(from = as.Date("2022-06-20"), to = as.Date("2023-04-14"), length.out = num_timepoints)
+    dates <- seq.Date(from = as.Date("2022-06-20"), to = as.Date("2023-03-14"), length.out = num_timepoints)
     for (k in 1:num_timepoints){
         score_ij <- data1[k] - data2[k]
         TS_plot <- c(TS_plot, score_ij)
     }
     df <- data.frame(date = dates, score = TS_plot)
+    annots <- bind_rows(
+        topic_info_leader %>% mutate(group = leader, topic = as.character(topic)),
+        topic_info_follower %>% mutate(group = follower, topic = as.character(topic))
+        ) %>%
+        mutate(
+        couleur = ifelse(lag_value > 0, "green", "purple"),
+        y_pos = case_when(
+            couleur == "green" & group == follower   ~ 1.15,
+            couleur == "green" & group == leader ~ -1.2,
+            couleur == "purple" & group == follower   ~ 1.1,
+            couleur == "purple" & group == leader ~ -1.25
+        ),
+        label = topic)
+
     png(path,  width = 1000, height = 600)
     p <- ggplot(df, aes(x = date, y = score)) +
         geom_rect(aes(xmin = min(date), xmax = max(date), ymin = 0, ymax = 1), fill = "red", alpha = 0.3) +
@@ -154,14 +247,23 @@ biv_plot_TS <- function(data1, data2, leader, follower, title, path){
              label = paste(leader, "lead", follower),
              color = "blue4", fontface = "bold", size = 4) +
         labs(x = "Date", y = "Lead/Follow relation Index", title = title) +
+        coord_cartesian(ylim = c(-1, 1), clip = "off") +
         theme(
         plot.title = element_text(hjust = 0.5, face = "bold"),
         axis.text.x = element_text(angle = 45, hjust = 1),
         panel.grid.major = element_blank(),   
         panel.grid.minor = element_blank(),   
         panel.background = element_rect(fill = "white", color = NA),  
-        plot.background = element_rect(fill = "white", color = NA)   
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.margin = margin(5, 5, 30, 5),  # marge en bas (top, right, bottom, left)
+        plot.clip = "off"                   # autorise le dépassement hors panel
         )
+
+    if(nrow(annots) > 0){
+        p <- p + geom_text(data = annots, aes(x = date, y = y_pos, label = label, color = couleur),
+                    size = 3, fontface = "bold", vjust = -0.5, show.legend = FALSE)
+    }
+
     print(p)
     dev.off()
 }
