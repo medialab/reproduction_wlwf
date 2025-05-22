@@ -45,7 +45,7 @@ if(args$calculate){
         db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
         throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
         pol_issues <- setdiff(c(0:91), throw_topic)
-        pol_issues_BQ <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45)
+        pol_issues_BQ <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 25, 41, 45)
     }
     cat("Dimensions check \n")
     topic_all <- c(pol_issues, pol_issues_BQ)

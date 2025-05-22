@@ -54,6 +54,8 @@ if (args$topic_model == 'lda'){
     path_mat_adj <- "data_prod/dtw/lda/adj_mat.png"
     path_MultipleTimeSeries_faction <- "data_prod/dtw/lda/factions_evol.png"
     init_unique <- "data_prod/dtw/lda/unique/"
+    path_evolv_leader <- "data_prod/dtw/lda/leaders_switch.png"
+    path_factions_heatmap <- "data_prod/dtw/lda/factions_heatmap.png"
 } else{
     path_densitycorr <- "data_prod/dtw/bertopic/densitycorrelation.png"
     path_inst_corr <- "data_prod/dtw/bertopic/cormat_dtw_inst.png"
@@ -64,6 +66,8 @@ if (args$topic_model == 'lda'){
     path_mat_adj <- "data_prod/dtw/bertopic/adj_mat.png"
     path_MultipleTimeSeries_faction <- "data_prod/dtw/bertopic/factions_evol.png"
     init_unique <- "data_prod/dtw/bertopic/unique/"
+    path_evolv_leader <- "data_prod/dtw/bertopic/leaders_switch.png"
+    path_factions_heatmap <- "data_prod/dtw/bertopic/factions_heatmap.png"
 }
 
 db_date <- db
@@ -218,8 +222,6 @@ top_topic_change <- function(group1, group2, seuil_delta){
     return(list(group1_lags = lag_events1, group2_lags = lag_events2))
 }
 
-
-
 biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta=0.1){
     res <- top_topic_change(leader, follower, seuil_delta)
     topic_info_leader <- res$group1_lags
@@ -259,11 +261,11 @@ biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta
              color = "blue4", fontface = "bold", size = 4) +
         labs(x = "Date", y = "Lead/Follow relation Index", title = title) +
         annotate("text", x = min(df$date) - 14, y = 1.2,
-            label = "Leader\nTop Δ topic",
+            label = "Follower\nTop Δ topic",
             color = "black", fontface = "bold", size = 3, angle = 90, hjust = 0.5) +
 
         annotate("text", x = min(df$date) - 14, y = -1.2,
-                label = "Follower\nTop Δ topic",
+                label = "Leader\nTop Δ topic",
                 color = "black", fontface = "bold", size = 3, angle = 90, hjust = 0.5) +
         scale_y_continuous(limits = c(-1.4, 1.4), breaks = seq(-1, 1, by = 0.5)) + 
         scale_x_date(limits = c(as.Date("2022-06-05"), as.Date("2023-03-14")),  breaks = seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "3 weeks"), date_labels = "%b %d") +
@@ -394,6 +396,187 @@ p <- ggplot(mat_mean_dtw_long, aes(Var2, Var1, fill = value))+
                     title.position = "top", title.hjust = 0.5))
     print(ggfinal)
     dev.off()
+
+dates <- seq.Date(from = as.Date("2022-06-20"), to = as.Date("2023-03-14"), length.out = num_timepoints)
+df_evol_leader <- data.frame(
+    date = as.Date(character()),
+    is_leader = numeric(),
+    number_group = numeric()
+)
+
+all_nums <- 1:11
+
+for (i in 1:num_timepoints){
+    nums <- model_dtw$leadersTimeSeries[[i]]
+    presence <- as.integer(all_nums %in% nums)
+    add_df <- data.frame(
+    date = rep(dates[i], length(all_nums)),
+    is_leader = presence,
+    number_group = all_nums
+    )
+    df_evol_leader <- rbind(df_evol_leader, add_df)
+}
+
+df_evol_leader <- df_evol_leader %>%
+    mutate(group = variables[number_group]) %>%
+    mutate(y_pos = is_leader + number_group*1/12)
+
+colors_dict <- c(
+  "lr" = "blue4",
+  "lr_supp" = "cyan3",
+  "majority" = "orange",
+  "majority_supp" = "darkorange1",
+  "nupes" = "chartreuse4",
+  "nupes_supp" = "seagreen1",
+  "rn" = "lightsalmon3",
+  "rn_supp" = "brown4",
+  "attentive" = "red",
+  "general" = "darkgrey",
+  "media" = "darkorchid3"
+)
+
+
+#Création d'un graphique changement leader/follower
+png(path_evolv_leader, width = 800, height = 800)
+p <- ggplot(df_evol_leader, aes(x = date, y = y_pos, group = group, color=group)) +
+    geom_point() +        
+    geom_hline(yintercept = 1, color = "black") +
+    labs(x = "Date", y = "", title = "Évolution des positions de leader dans le temps") +
+    scale_x_date(breaks = seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "3 weeks"), date_labels = "%b %d") +
+    scale_colour_manual(values = colors_dict) +
+    scale_y_continuous(
+        limits = c(0, 2),
+        breaks = c(0.5, 1.5),
+        labels = c("Follower", "Leader")
+        ) + 
+    theme_minimal()
+
+    print(p)
+    dev.off()
+
+#Afficher les appartenance de factions de manière plus précise
+#Créer une matrice d'appartenance
+factions_ts <- model_dtw$factionMembersTimeSeries
+
+print("Create evolution faction representation")
+#Exclure les cas où un groupe appartient à plusieurs factions en le forçant à appartenir à celle où le follow est le plus fort
+for (i in seq_along(factions_ts)){
+    factions_i <-  factions_ts[[i]]
+    list_index_leaders <- c()
+    list_index_followers <- c()
+    leader_indices <- c()
+    for (j in seq_along(factions_i)){
+        elem <- factions_i[[j]]
+        if(length(elem)>1){ #Si le leader est seul dans le groupe, on a pas besoin de vérifier qu'un groupe de follower apparait dedans
+            for (k in 2:length(elem)){
+                list_index_leaders <- c(list_index_leaders, elem[1])
+                list_index_followers <- c(list_index_followers, elem[k])
+                leader_indices <- c(leader_indices, j)
+            }
+        }
+    }
+    if (any(duplicated(list_index_followers))){
+        duplicated_elements <- as.integer(names(which(table(unlist(list_index_followers)) > 1)))
+        for (dup in duplicated_elements){
+            indexs_dup <- which(list_index_followers == dup)
+            values_follow <- numeric(length(indexs_dup))
+            for (l in seq_along(indexs_dup)) {
+                val_follow <- model_dtw$dyNetOut$dyNetWeightedMat[dup, list_index_leaders[indexs_dup[l]], i]
+                values_follow[l] <- val_follow
+            }
+
+            max_idx <- which.max(values_follow)
+            indexs_dup <- indexs_dup[-max_idx]
+            
+            for (rmv_idx in indexs_dup){
+                j_faction <- leader_indices[rmv_idx] 
+                factions_i[[j_faction]] <- factions_i[[j_faction]][factions_i[[j_faction]] != dup]
+            }
+        }
+    }
+}
+
+#Investiguer : pourquoi même faction alors que des 0 apparaissent ? 
+heatmap_matrix <- matrix(0, nrow = num_groups, ncol = num_timepoints)
+leader_data <- matrix(0, nrow=num_groups, ncol=num_timepoints)
+
+for (t in seq_len(num_timepoints)) {
+    factions_t <- factions_ts[[t]]
+    for (i in seq_along(factions_t)){
+        faction <-factions_t[[i]]
+        leader <- faction[1]
+        leader_data[leader, t] <- 1
+        for (member in faction){
+            heatmap_matrix[member, t] <- leader
+        }
+    }
+}
+
+df_heatmap <- as.data.frame(heatmap_matrix)
+df_heatmap$group <- 1:11
+df_leader <- as.data.frame(leader_data)
+df_leader$group <- 1:11
+
+df_long <- df_heatmap %>%
+  pivot_longer(
+    cols = -group,
+    names_to = "time",
+    values_to = "leader_id"
+  ) %>%
+  mutate(
+    time = as.integer(gsub("[^0-9]", "", time)),  # Nettoie noms de colonnes (ex: V1 → 1)
+    group = as.factor(group),
+    leader_id = as.factor(leader_id)
+  )
+
+df_leader_long <- df_leader %>%
+  pivot_longer(
+    cols = -group,
+    names_to = "time",
+    values_to = "is_leader"
+  ) %>%
+  mutate(
+    time = as.integer(gsub("[^0-9]", "", time)),
+    group = as.factor(group),
+    is_leader = as.integer(is_leader)
+  )
+
+# Fusionne les deux
+# Ajout des noms et dates AVANT le plot
+df_final <- left_join(df_long, df_leader_long, by = c("group", "time"))
+leader_dict <- setNames(variables, as.character(1:11))
+group_names <- variables
+df_final$leader_name <- leader_dict[as.character(df_final$leader_id)]
+df_final$group_name <- factor(df_final$group, levels = 1:11, labels = group_names)
+df_final$date <- dates[df_final$time]
+colors_dict["Hors Faction"] <- "white" #Améliorer affichage
+
+# Plot
+png(path_factions_heatmap, width=1400, height=400)
+p <- ggplot(df_final, aes(x = date, y = group_name, fill = leader_name)) +
+  geom_tile(color = "white") +  
+  coord_fixed(ratio=6) +
+  geom_tile(data = df_final %>% filter(is_leader == 1),
+            aes(x = date, y = group_name),
+            fill = NA, color = "black", linetype = "dashed", linewidth = 0.4) +
+  scale_fill_manual(values = colors_dict, na.value = "white") +
+  scale_x_date(breaks = seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "3 weeks"), 
+               date_labels = "%b %d") +
+  theme_minimal() +
+  labs(x = "Date", y = "Groupe", fill = "Factions Leaders") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+print(p)
+dev.off()
+
+print(df_final[!complete.cases(df_final), ])
+
+
+stop()
+
+#Clusteriser des configurations typiques 
+
+#Détecter les points de changement de factions
+
 
 for (i in 1:(length(variables)-1)){
     leader <- variables[i]
