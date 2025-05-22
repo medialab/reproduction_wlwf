@@ -401,6 +401,5 @@ for (i in 1:(length(variables)-1)){
         follower <- variables[j]
         path_ij <- paste0(path_starting_bivariate, follower, "_", leader, ".png")
         biv_plot_TS(model_dtw$dyNetOut$dyNetWeightedMat[i, j,], model_dtw$dyNetOut$dyNetWeightedMat[j, i,], leader, follower, title = paste("Dynamiques d'influence entre", leader, "et", follower), path=path_ij) #Plot ligne i influencé par ligne j
-        stop()
     }
 }
