@@ -138,57 +138,7 @@ if (args$estimate_AT){
     }
     model_dtw <- readRDS(model_output)
 }
-
-top_topic_change <- function(group1, group2, seuil_delta){
-    #Idée pour faire différemment : calculer les lags, couper les données en 7, prendre le max et le min d'écart de chaque sous groupe, bind les db_topics, et choisir le max et le min de chaque période pour chaque acteur. Ensuite, virer les maxs et les mins osef selon seuil delta
-    lag_events1 <- data.frame(
-        topic = character(),
-        lag_value = numeric(),
-        stringsAsFactors = FALSE
-    )
-    lag_events2 <- data.frame(
-        topic = character(),
-        lag_value = numeric(),
-        stringsAsFactors = FALSE
-    )
-    for (topic_num in pol_issues){
-        db_topic <- db_date %>% filter (topic == topic_num)
-        db_topic$week_lags1 <- db_topic[[group1]] - dplyr::lag(db_topic[[group1]], 7)
-        db_topic$week_lags2 <- db_topic[[group2]] - dplyr::lag(db_topic[[group2]], 7)
-
-        to_add1 <- db_topic %>%
-                filter(!is.na(week_lags1) & abs(week_lags1) > seuil_delta) %>%
-                transmute(topic = topic_num, date = as.Date(date), lag_value = week_lags1)
-        
-        to_add1 <- to_add1 %>%
-            group_by(topic, date) %>%
-            filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
-            ungroup() %>%
-            arrange(topic,date) %>%
-            group_by(topic) %>%
-            mutate(ecart_date = as.numeric(date - lag(date, 1)), ecart_date = ifelse(is.na(ecart_date), 10, ecart_date)) %>%
-            ungroup() 
-        
-        to_add2 <- db_topic %>%
-                filter(!is.na(week_lags2) & abs(week_lags2) > seuil_delta) %>%
-                transmute(topic = topic_num, date = as.Date(date), lag_value = week_lags2)
-        
-        to_add2 <- to_add2 %>%
-            group_by(topic, date) %>%
-            filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
-            ungroup() %>%
-            arrange(topic,date) %>%
-            group_by(topic) %>%
-            mutate(ecart_date = as.numeric(date - lag(date, 1)), ecart_date = ifelse(is.na(ecart_date), 10, ecart_date)) %>%
-            ungroup() 
-        
-        lag_events1 <- rbind(lag_events1, to_add1)
-        lag_events2 <- rbind(lag_events2, to_add2)
-    }
-    return(list(group1_lags = lag_events1, group2_lags = lag_events2))
-}
-
-if(args$estimate_UT){
+if(args$estimate_UT){ #You can't do univariate like this 
     matrix_dtw_top <- array(NA, c(num_groups, num_timepoints, 1))
     for(topic_num in pol_issues){
         mat <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
@@ -209,7 +159,68 @@ if(args$estimate_UT){
     }
 }
 
-biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta=0.4){
+top_topic_change <- function(group1, group2, seuil_delta){
+    #Idée pour faire différemment : calculer les lags, couper les données en 7, prendre le max et le min d'écart de chaque sous groupe, bind les db_topics, et choisir le max et le min de chaque période pour chaque acteur. Ensuite, virer les maxs et les mins osef selon seuil delta
+    lag_events1 <- data.frame(
+        date = Date(),
+        topic = character(),
+        lag_value = numeric(),
+        stringsAsFactors = FALSE
+    )
+    lag_events2 <- data.frame(
+        date = Date(),
+        topic = character(),
+        lag_value = numeric(),
+        stringsAsFactors = FALSE
+    )
+    for (topic_num in pol_issues){
+        db_topic <- db_date %>% filter (topic == topic_num)
+        db_topic$week_lags1 <- db_topic[[group1]] - dplyr::lag(db_topic[[group1]], 7)
+        db_topic$week_lags2 <- db_topic[[group2]] - dplyr::lag(db_topic[[group2]], 7)
+
+        week_data <- db_topic %>%
+                mutate(weekgroup = (row_number() - 1) %/% 7 + 1) %>%
+                select(date, topic, weekgroup, week_lags1, week_lags2) %>%
+                group_by(weekgroup) %>%
+                summarise(
+                    date = first(date),  
+                    topic = topic_num,
+                    mean_lags1 = mean(week_lags1, na.rm = TRUE),
+                    mean_lags2 = mean(week_lags2, na.rm = TRUE),
+                    .groups = "drop"
+                )
+        
+        to_add1 <- week_data %>%
+                select(-mean_lags2) %>%
+                filter(mean_lags1 == max(mean_lags1, na.rm=TRUE) | mean_lags1 == min(mean_lags1, na.rm=TRUE)) %>%
+                filter(abs(mean_lags1) > seuil_delta) %>%
+                transmute(topic = topic_num, date = as.Date(date), lag_value = mean_lags1)
+
+        to_add2 <- week_data %>%
+                select(-mean_lags1) %>%
+                filter(mean_lags2 == max(mean_lags2, na.rm=TRUE) | mean_lags2 == min(mean_lags2, na.rm=TRUE)) %>%
+                filter(abs(mean_lags2) > seuil_delta) %>%
+                transmute(topic = topic_num, date = as.Date(date), lag_value = mean_lags2)
+        
+        lag_events1 <- rbind(lag_events1, to_add1)
+        lag_events2 <- rbind(lag_events2, to_add2)
+    }
+    lag_events1 <- lag_events1 %>%
+        group_by(date) %>%
+        filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
+        ungroup()
+
+    lag_events2 <- lag_events2 %>%
+        group_by(date) %>%
+        filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
+        ungroup()
+
+    return(list(group1_lags = lag_events1, group2_lags = lag_events2))
+}
+
+
+
+biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta=0.1){
     res <- top_topic_change(leader, follower, seuil_delta)
     topic_info_leader <- res$group1_lags
     topic_info_follower <- res$group2_lags
@@ -227,9 +238,9 @@ biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta
         mutate(
         couleur = ifelse(lag_value > 0, "green", "purple"),
         y_pos = case_when(
-            couleur == "green" & group == follower   ~ 1.15,
-            couleur == "green" & group == leader ~ -1.2,
-            couleur == "purple" & group == follower   ~ 1.1,
+            couleur == "green" & group == follower   ~ 1.25,
+            couleur == "green" & group == leader ~ -1.15,
+            couleur == "purple" & group == follower   ~ 1.15,
             couleur == "purple" & group == leader ~ -1.25
         ),
         label = topic)
@@ -247,23 +258,37 @@ biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta
              label = paste(leader, "lead", follower),
              color = "blue4", fontface = "bold", size = 4) +
         labs(x = "Date", y = "Lead/Follow relation Index", title = title) +
-        coord_cartesian(ylim = c(-1, 1), clip = "off") +
+        annotate("text", x = min(df$date) - 14, y = 1.2,
+            label = "Leader\nTop Δ topic",
+            color = "black", fontface = "bold", size = 3, angle = 90, hjust = 0.5) +
+
+        annotate("text", x = min(df$date) - 14, y = -1.2,
+                label = "Follower\nTop Δ topic",
+                color = "black", fontface = "bold", size = 3, angle = 90, hjust = 0.5) +
+        scale_y_continuous(limits = c(-1.4, 1.4), breaks = seq(-1, 1, by = 0.5)) + 
+        scale_x_date(limits = c(as.Date("2022-06-05"), as.Date("2023-03-14")),  breaks = seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "3 weeks"), date_labels = "%b %d") +
         theme(
         plot.title = element_text(hjust = 0.5, face = "bold"),
-        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.x = element_text(angle = 45, hjust = 1, margin = margin(t = 10)),
+        axis.title.x = element_text(margin = margin(t = 20)),
+        panel.ontop = FALSE,
         panel.grid.major = element_blank(),   
         panel.grid.minor = element_blank(),   
         panel.background = element_rect(fill = "white", color = NA),  
         plot.background = element_rect(fill = "white", color = NA),
-        plot.margin = margin(5, 5, 30, 5),  # marge en bas (top, right, bottom, left)
-        plot.clip = "off"                   # autorise le dépassement hors panel
+        plot.margin = margin(50, 50, 50, 5)          
         )
 
     if(nrow(annots) > 0){
         p <- p + geom_text(data = annots, aes(x = date, y = y_pos, label = label, color = couleur),
-                    size = 3, fontface = "bold", vjust = -0.5, show.legend = FALSE)
+            size = 4, fontface = "bold", show.legend = TRUE) +
+            scale_colour_manual(
+                name = paste0("Sens de variation \n  de Δ (|Δ| > ", seuil_delta, ")"), 
+                values = c("green" = "green4", "purple" = "purple4"),
+                labels = c("Δ > 0", "Δ < 0")
+            ) +
+        theme(legend.position = "right", legend.title = element_text(face = "bold"))
     }
-
     print(p)
     dev.off()
 }
@@ -376,5 +401,6 @@ for (i in 1:(length(variables)-1)){
         follower <- variables[j]
         path_ij <- paste0(path_starting_bivariate, follower, "_", leader, ".png")
         biv_plot_TS(model_dtw$dyNetOut$dyNetWeightedMat[i, j,], model_dtw$dyNetOut$dyNetWeightedMat[j, i,], leader, follower, title = paste("Dynamiques d'influence entre", leader, "et", follower), path=path_ij) #Plot ligne i influencé par ligne j
+        stop()
     }
 }
