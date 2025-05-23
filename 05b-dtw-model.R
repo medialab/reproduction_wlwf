@@ -496,7 +496,8 @@ for (i in seq_along(factions_ts)){
     }
 }
 
-#Investiguer : pourquoi même faction alors que des 0 apparaissent ? 
+#Heatmap des factions
+#Forcer chaque élément à être membre d'une seule faction
 heatmap_matrix <- matrix(0, nrow = num_groups, ncol = num_timepoints)
 leader_data <- matrix(0, nrow=num_groups, ncol=num_timepoints)
 
@@ -541,18 +542,20 @@ df_leader_long <- df_leader %>%
     is_leader = as.integer(is_leader)
   )
 
-# Fusionne les deux
-# Ajout des noms et dates AVANT le plot
+
+
 df_final <- left_join(df_long, df_leader_long, by = c("group", "time"))
-leader_dict <- setNames(variables, as.character(1:11))
-group_names <- variables
+variablesC <- c("Hors Faction", variables)
+leader_dict <- setNames(variablesC, as.character(0:11))
+print(leader_dict)
+group_names <- variablesC
 df_final$leader_name <- leader_dict[as.character(df_final$leader_id)]
-df_final$group_name <- factor(df_final$group, levels = 1:11, labels = group_names)
+df_final$group_name <- factor(df_final$group, levels = 0:11, labels = group_names)
 df_final$date <- dates[df_final$time]
-colors_dict["Hors Faction"] <- "white" #Améliorer affichage
+colors_dict["Hors Faction"] <- "white" 
 
 # Plot
-png(path_factions_heatmap, width=1400, height=400)
+png(path_factions_heatmap, width=2800, height=800)
 p <- ggplot(df_final, aes(x = date, y = group_name, fill = leader_name)) +
   geom_tile(color = "white") +  
   coord_fixed(ratio=6) +
@@ -569,14 +572,6 @@ print(p)
 dev.off()
 
 print(df_final[!complete.cases(df_final), ])
-
-
-stop()
-
-#Clusteriser des configurations typiques 
-
-#Détecter les points de changement de factions
-
 
 for (i in 1:(length(variables)-1)){
     leader <- variables[i]

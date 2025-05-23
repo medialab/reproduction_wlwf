@@ -133,6 +133,10 @@ if (args$estimate){
       }
     }
     
+    if(args$topic_model=='bertopic'){
+      cat("Export filtered csv for Stata because some tests can't be done with BERTopic Time Series \n")
+      write.csv(db, "data_prod/var/bertopic/general_TS_filt_logtransfo.csv", row.names = FALSE)
+    }
 
     if(count_stat != length(variables)){
       print("At least one group is represented by a non-stationary time series in one panel. Check the stationnarity after a differentiation")
@@ -302,11 +306,9 @@ if (args$estimate){
     }
   }
   if (args$topic_model == "lda"){
-    lags <- 15
-    lags_filter <- NA
+    lags <- 9
   } else {
     lags <- 8
-    lags_filter <- 8  
   }
 
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
@@ -678,6 +680,7 @@ max_value <- max(plot_db$upr)
 
 ggplot(plot_db,
        aes(x = cov, y = pe, ymin = lwr, ymax = upr, col = data_type)) +
+  geom_hline(yintercept = 0, color = "red", linewidth = 0.4) +
   geom_segment(aes(x = cov, xend = cov, y = lwr, yend = upr), 
                linewidth = 2.5) +
   facet_wrap(~ out, nrow = 1) +

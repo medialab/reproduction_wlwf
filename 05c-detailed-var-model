@@ -130,6 +130,7 @@ if (args$estimate){
       concat_statio[v,1] <- p_value
       if (count_msg == 0) {
          print("Start testing process")
+         print(paste("Nombre de topics", length(unique(db$topic))))
          count_msg <- 1
       }
 
@@ -247,14 +248,15 @@ if (args$estimate){
 
 
     if (length(results_list2) == 0) {
-      cat("results_list2 est vide, aucun résultat à transformer en dataframe.")
+      cat("results_list2 est vide, aucun résultat à transformer en dataframe. \n")
       stationary_topics2 <- non_full_stationarity_topics
     } else {
-      cat("results_list2 contient des données.")
+      cat("results_list2 contient des données. \n")
       results_df2 <- do.call(rbind, lapply(results_list2, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
       colnames(results_df2) <- c("topic", "variable", "p_value")
       non_full_stationarity_topics2 <- unique(results_df2$topic)
       stationary_topics2 <- setdiff(non_full_stationarity_topics, non_full_stationarity_topics2)
+      print(results_df2)
     }
     merged_statio <- c(stationary_topics, stationary_topics2)
 
@@ -288,8 +290,6 @@ if (args$estimate){
     rownames(PACF_data) <- c(variables, paste0(variables, "_diff"))
     counter_const <- 0
     iter_info <-0
-    print("Nombre de topic")
-    print(length(pol_issues))
     for (topic in pol_issues) {
       iter_info <- iter_info + 1
       infos_topic[iter_info, "Topic"] <- as.character(topic)
@@ -454,18 +454,23 @@ if (args$estimate){
   db$topic <- as.character(db$topic)
 
   #Model by topic
-  lags <- 7
-  for (topic in unique(as.character(db$topic))){
+  if(args$topic_model =='lda'){
+    lags <- 9
+  } else {
+    lags <- 8
+  }
+
+  for (topic_num in unique(as.character(db$topic))){
     print(paste("Start VAR", topic))
-    db_topic <- db %>% filter(as.character(topic) == topic)
+    db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
     #var_irfs_cum <- irf(var_model, n.ahead = 60, cumulative = TRUE)
     #save(var_irfs_cum, file = paste0("var/issue-level/var_irfs_topic_", topic, "_logit-UPD.Rdata"))
     if (args$tests){
       topic <- as.character(topic)
-      print(paste("Currently testing topic", topic))
+      print(paste("Currently testing topic", topic_num))
       AIC_and_co <- VARselect(db_topic[, variables], lag.max = 15, season = NULL)
-      row_index <- which(as.character(infos_topic$Topic) == topic)
+      row_index <- which(as.character(infos_topic$Topic) == topic_num)
       infos_topic[row_index, "Max Modul"] <- max(roots(var_model))
       infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
       infos_topic[row_index, "HQ"] <- AIC_and_co$selection[[2]]
