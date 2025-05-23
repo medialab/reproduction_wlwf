@@ -180,7 +180,7 @@ if (args$estimate){
     cat("The topic numbers that satisfy this property:", stationary_topics, "\n")
     cat("Number of topics where time series for each group are not stationary: ", count_full_top, "\n")
     cat("These topics are : ", paste(list_full_top, collapse= " "), "\n")
-    cat("Number of topics where time series are I(0) or I(1) according to group: ", count_partial_topic, "\n")
+    cat("Number of topics where time series are stationary and other are not according to group: ", count_partial_topic, "\n")
 
     count_coint <- 0
     count_ignor_coint <- 0
@@ -461,7 +461,7 @@ if (args$estimate){
   }
 
   for (topic_num in unique(as.character(db$topic))){
-    print(paste("Start VAR", topic))
+    print(paste("Model calculated", topic_num))
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
     #var_irfs_cum <- irf(var_model, n.ahead = 60, cumulative = TRUE)
