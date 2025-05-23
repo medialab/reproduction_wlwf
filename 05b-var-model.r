@@ -64,7 +64,7 @@ if (args$estimate){
   pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66)
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
-    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
+    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
     pol_issues_temp <- setdiff(c(0:91), throw_topic)
     db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
           mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>%

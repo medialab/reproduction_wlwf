@@ -1,7 +1,3 @@
-# mFLICA code for lead-follow relation inference
-# author: Carlo Santagiustina
-# data: 6 May 2025
- # Should print 20 100 10
 library(dplyr)
 library(tidyverse)
 library(tidyr)
@@ -9,11 +5,10 @@ library(ggplot2)
 library(argparse)
 library(reshape2)
 library(dtw)
-library(mFLICA)
+library(mFLICA) #detach to remove monkey
 parser <- ArgumentParser()
 
 parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
-
 
 parser$add_argument("--estimate", action = "store_true",
 help = "Estimate model")
@@ -42,27 +37,9 @@ variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nup
 
 cat("Choose saving paths according to topic model \n")
 if (args$topic_model == 'lda'){
-    path_densitycorr <- "data_prod/dtw/lda/densitycorrelation.png"
-    path_inst_corr <- "data_prod/dtw/lda/cormat_dtw_inst.png"
-    path_MultipleTimeSeries <- "data_prod/dtw/lda/coordination_evolution.png"
-    path_starting_bivariate <- "data_prod/dtw/lda/bivariate_plot/"
-    model_output <- "data_prod/dtw/lda/model_dtw.RDS"
-    path_test1 <- "data_prod/dtw/lda/relations_lags_followscore.csv"
-    path_mat_adj <- "data_prod/dtw/lda/adj_mat.png"
-    path_MultipleTimeSeries_faction <- "data_prod/dtw/lda/factions_evol.png"
-    path_evolv_leader <- "data_prod/dtw/lda/leaders_switch.png"
-    path_factions_heatmap <- "data_prod/dtw/lda/factions_heatmap.png"
+    init_unique <- "data_prod/dtw/lda/unique/"
 } else{
-    path_densitycorr <- "data_prod/dtw/bertopic/densitycorrelation.png"
-    path_inst_corr <- "data_prod/dtw/bertopic/cormat_dtw_inst.png"
-    path_MultipleTimeSeries <- "data_prod/dtw/bertopic/coordination_evolution.png"
-    path_starting_bivariate <- "data_prod/dtw/bertopic/bivariate_plot/"
-    model_output <- "data_prod/dtw/bertopic/model_dtw.RDS"
-    path_test1 <- "data_prod/dtw/bertopic/relations_lags_followscore.csv"
-    path_mat_adj <- "data_prod/dtw/bertopic/adj_mat.png"
-    path_MultipleTimeSeries_faction <- "data_prod/dtw/bertopic/factions_evol.png"
-    path_evolv_leader <- "data_prod/dtw/bertopic/leaders_switch.png"
-    path_factions_heatmap <- "data_prod/dtw/bertopic/factions_heatmap.png"
+    init_unique <- "data_prod/dtw/bertopic/unique/"
 }
 
 db_date <- db
@@ -73,130 +50,123 @@ num_topics <- length(pol_issues)   # Number of dimensions (features)
 timeWindow <- 15
 lagWindow <- 4/15 
 timeShift <- 1
-if (args$estimate){
-    matrix_dtw <- array(NA, c(num_groups, num_timepoints, num_topics))
 
-    i <- 1
+topic_follow = data.frame(
+    topic = numeric(),
+    leader = character(),
+    follower=character(),
+    value=numeric()
+)
 
-    for(topic_num in pol_issues){
-        matrix_dtw[,,i] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
-        i <- i+1
-    }
-
-    if(args$tests){
-        matrix_test <- array(NA, c(55,3))
-        k <- 1
-        for (i in 1:(length(variables)-1)){
-            leader <- variables[i]
-            ts_leader <- matrix_dtw[i,1:num_timepoints,]
-            for (j in (i+1):length(variables)){
-                follower <- variables[j]
-                ts_follower <- matrix_dtw[j,1:num_timepoints,]
-                obj <- dtw(x=ts_follower, y=ts_leader, K=TRUE)
-                lags <- abs(mean(obj$index1 - obj$index2))
-                score <- mean(sign(obj$index1 - obj$index2))
-                matrix_test[k,] <- c(paste(leader, follower), lags, score)
-                k <- k+1
-            }     
-        }
-    data_test <- data.frame(matrix_test)
-    colnames(data_test) <- c("Couple", "Mean Lags", "Following Score")
-    write.csv(data_test, path_test1, row.names = FALSE)
-    print(data_test)
-    #Creation de matrices adjacentes 
-    mat1 <-followingNetwork(TS=matrix_dtw[, 1:num_timepoints,], sigma =0.5)$adjWeightedMat
-    rownames(mat1) <- variables
-    colnames(mat1) <- variables
-    mat1_long <- melt(as.matrix(mat1), varnames = c("Var1", "Var2"), value.name = "Poids")
-    png(filename = path_mat_adj, width = 1000, height = 900)
-    p <- ggplot(mat1_long, aes(x = Var1, y = Var2, fill = Poids)) +
-        geom_tile(color = "white") +
-        scale_fill_gradient(low = "blue", high = "red", limits = c(0, 1), name = "Poids") +
-        theme_minimal() +
-        labs(title = "Matrice d'adjacence du réseau de followers") +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        axis.text = element_text(size = 8),
-        plot.title = element_text(hjust = 0.5))
-    print(p)
-    dev.off()
-    }
-    
-    model_dtw=mFLICA(
-    matrix_dtw,
-    timeWindow=  timeWindow,
-    lagWindow= lagWindow,
-    timeShift= timeShift,
-    sigma = 0.5,
-    silentFlag = FALSE
-    )
-    saveRDS(model_dtw, file=model_output)
-
-} else{
-    if (!file.exists(model_output)){
-        stop("Please use --estimate option, the model currently doesn't exist")
-    }
-    model_dtw <- readRDS(model_output)
-}
-
-top_topic_change <- function(group1, group2, seuil_delta){
-    #Idée pour faire différemment : calculer les lags, couper les données en 7, prendre le max et le min d'écart de chaque sous groupe, bind les db_topics, et choisir le max et le min de chaque période pour chaque acteur. Ensuite, virer les maxs et les mins osef selon seuil delta
-    lag_events1 <- data.frame(
-        date = Date(),
-        topic = character(),
-        lag_value = numeric(),
-        stringsAsFactors = FALSE
-    )
-    lag_events2 <- data.frame(
-        date = Date(),
-        topic = character(),
-        lag_value = numeric(),
-        stringsAsFactors = FALSE
-    )
-    for (topic_num in pol_issues){
-        db_topic <- db_date %>% filter (topic == topic_num)
-        db_topic$week_lags1 <- db_topic[[group1]] - dplyr::lag(db_topic[[group1]], 7)
-        db_topic$week_lags2 <- db_topic[[group2]] - dplyr::lag(db_topic[[group2]], 7)
-
-        week_data <- db_topic %>%
-                mutate(weekgroup = (row_number() - 1) %/% 7 + 1) %>%
-                select(date, topic, weekgroup, week_lags1, week_lags2) %>%
-                group_by(weekgroup) %>%
-                summarise(
-                    date = first(date),  
-                    topic = topic_num,
-                    mean_lags1 = mean(week_lags1, na.rm = TRUE),
-                    mean_lags2 = mean(week_lags2, na.rm = TRUE),
-                    .groups = "drop"
+matrix_dtw <- array(NA, c(num_groups, num_timepoints, 1))
+for(topic_num in pol_issues){
+    matrix_dtw[,,1] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
+    for(i in 1:(length(variables)-1)){
+        for (j in (i+1):length(variables)){
+            leader <- matrix_dtw[i,1:num_timepoints,]
+            follower <- matrix_dtw[j,1:num_timepoints,]
+            score <- mFLICA::followingRelation(Y=follower ,X=leader, lagWindow = lagWindow)$follVal
+            
+            if (score < 0) {
+                new_row <- data.frame(
+                topic = topic_num,
+                leader = variables[j],
+                follower = variables[i],
+                value = abs(score),
+                stringsAsFactors = FALSE
                 )
-        
-        to_add1 <- week_data %>%
-                select(-mean_lags2) %>%
-                filter(mean_lags1 == max(mean_lags1, na.rm=TRUE) | mean_lags1 == min(mean_lags1, na.rm=TRUE)) %>%
-                filter(abs(mean_lags1) > seuil_delta) %>%
-                transmute(topic = topic_num, date = as.Date(date), lag_value = mean_lags1)
+            } else {
+                new_row <- data.frame(
+                topic = topic_num,
+                leader = variables[i],
+                follower = variables[j],
+                value = score,
+                stringsAsFactors = FALSE
+                )
+            }
 
-        to_add2 <- week_data %>%
-                select(-mean_lags1) %>%
-                filter(mean_lags2 == max(mean_lags2, na.rm=TRUE) | mean_lags2 == min(mean_lags2, na.rm=TRUE)) %>%
-                filter(abs(mean_lags2) > seuil_delta) %>%
-                transmute(topic = topic_num, date = as.Date(date), lag_value = mean_lags2)
-        
-        lag_events1 <- rbind(lag_events1, to_add1)
-        lag_events2 <- rbind(lag_events2, to_add2)
+            topic_follow <- rbind(topic_follow, new_row)
+        }
     }
-    lag_events1 <- lag_events1 %>%
-        group_by(date) %>%
-        filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
-        ungroup()
-
-    lag_events2 <- lag_events2 %>%
-        group_by(date) %>%
-        filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
-        ungroup()
-
-    return(list(group1_lags = lag_events1, group2_lags = lag_events2))
 }
 
+print(head(topic_follow))
+
+stop()
+if (args$estimate){
+    getDynamicFollNet <- function(TS, timeWindow, timeShift, lagWindow, sigma = 0.5, silentFlag = FALSE){
+        if (length(dim(TS)) == 2) {
+            B <- array(0, c(dim(TS), 2))
+            B[, , 1] <- TS
+            TS <- B
+        }
+        invN <- dim(TS)[1]
+        Tlength <- dim(TS)[2]
+        dimensionsN <- dim(TS)[3]
+        if(dimensionsN==1){
+            B <- array(0, c(invN, Tlength, 2))
+            B[, , 1] <- TS[,,1]
+            TS <- B
+            dimensionsN <- dim(TS)[3]
+        }
+        dyNetBinMat <- array(0, dim = c(invN, invN, Tlength))
+        dyNetWeightedMat <- array(0, dim = c(invN, invN, Tlength))
+        dyNetBinDensityVec <- array(0, dim = c(1, Tlength))
+        dyNetWeightedDensityVec <- array(0, dim = c(1, Tlength))
+        if (missing(timeWindow)) {
+            timeWindow <- ceiling(0.1 * Tlength)
+        }
+        if (missing(timeShift)) {
+            timeShift <- max(1, ceiling(0.1 * timeWindow))
+        }
+        for (t in seq(1, Tlength, by = timeShift)) {
+            if (t + timeWindow >= Tlength) {
+                dyNetBinMat[, , t:Tlength] <- follOut$adjBinMat
+                dyNetWeightedMat[, , t:Tlength] <- follOut$adjWeightedMat
+                dyNetBinDensityVec[t:Tlength] <- dval1
+                dyNetWeightedDensityVec[t:Tlength] <- dval2
+                break
+            }
+            else {
+                currTWInterval <- t:(t + timeWindow - 1)
+                currTS <- TS[, currTWInterval, ]
+                follOut <- followingNetwork(TS = currTS, sigma = sigma, 
+                    lagWindow = lagWindow)
+                dyNetBinMat[, , currTWInterval] <- follOut$adjBinMat
+                dyNetWeightedMat[, , currTWInterval] <- follOut$adjWeightedMat
+                dval1 <- getADJNetDen(follOut$adjBinMat)
+                dval2 <- getADJNetDen(follOut$adjWeightedMat)
+                dyNetBinDensityVec[currTWInterval] <- dval1
+                dyNetWeightedDensityVec[currTWInterval] <- dval2
+                if (silentFlag == FALSE) 
+                    print(sprintf("TW%d shift-%d - t%d", timeWindow, 
+                    timeShift, t))
+            }
+        }
+        return(list(dyNetBinMat = dyNetBinMat, dyNetWeightedMat = dyNetWeightedMat, 
+            dyNetBinDensityVec = dyNetBinDensityVec, dyNetWeightedDensityVec = dyNetWeightedDensityVec))
+    }
+
+    assignInNamespace("getDynamicFollNet", getDynamicFollNet, ns = "mFLICA")
+
+#You can't do univariate like this 
+    matrix_dtw <- array(NA, c(num_groups, num_timepoints, 1))
+    for(topic_num in pol_issues){
+        print(paste("Model for topic", topic_num))
+        matrix_dtw[,,1] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
+        model_output_unique <- paste0(init_unique, "Model_topic", topic_num, ".RDS")
+        model_dtw=mFLICA::mFLICA(
+        matrix_dtw,
+        timeWindow=  timeWindow,
+        lagWindow= lagWindow,
+        timeShift= timeShift,
+        sigma = 0.5,
+        silentFlag = FALSE
+        )
+    saveRDS(model_dtw, file=model_output_unique)
+    }
+}
+stop()
 biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta=0.1){
     res <- top_topic_change(leader, follower, seuil_delta)
     topic_info_leader <- res$group1_lags

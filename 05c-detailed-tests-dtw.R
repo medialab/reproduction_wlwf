@@ -43,7 +43,7 @@ if(args$calculate){
         pol_issues_BQ <- c(12,8,20, 11, 4, 6, 18, 22, 31,35, 38, 39, 41, 47, 49, 54, 62, 67, 68, 14, 43, 69)
     } else {
         db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
-        throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
+        throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
         pol_issues <- setdiff(c(0:91), throw_topic)
         pol_issues_BQ <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 25, 41, 45)
     }

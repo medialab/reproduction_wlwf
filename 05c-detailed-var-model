@@ -22,41 +22,13 @@ help = "Run the script who estimate VAR and IRF")
 parser$add_argument("--tests", action = "store_true",
                     help = "Activate to do the part where we test stationnarity, stationnarity after differentiation, PACF and ACF informations")
 
-parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=21)
+parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=7)
 
 
 args <- parser$parse_args()
 
 if (!(args$topic_model %in% c('bertopic', 'lda'))){
   stop("The model name is incorrect. Choose between lda and bertopic")
-}
-
-if (!(args$estimate)){
-  if (args$topic_model == 'lda') {
-    if(args$media) {
-      if (!file.exists("data_prod/var/lda/var_model-MAIN_with_media.Rdata") ||
-      !file.exists("data_prod/var/lda/var_irfs-MAIN_with_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
-      }
-    } else {
-      if (!file.exists("data_prod/var/lda/var_model-MAIN_without_media.Rdata") ||
-      !file.exists("data_prod/var/lda/var_irfs-MAIN_without_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
-      }
-    }
-  } else {
-     if(args$media) {
-      if (!file.exists("data_prod/var/bertopic/var_model-MAIN_with_media.Rdata") ||
-      !file.exists("data_prod/var/bertopic/var_irfs-MAIN_with_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
-      }
-    } else {
-      if (!file.exists("data_prod/var/bertopic/var_model-MAIN_without_media.Rdata") ||
-      !file.exists("data_prod/var/bertopic/var_irfs-MAIN_without_media.Rdata")) {
-        stop("No var and irf files were found. Please run the --estimate option")
-      }
-    }
-  }
 }
 
 if (args$estimate){
@@ -72,7 +44,7 @@ if (args$estimate){
     pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66)
   } else {
     db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
-    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80)
+    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
     pol_issues_temp <- setdiff(c(0:91), throw_topic)
     db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
         mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>%
@@ -452,26 +424,37 @@ if (args$estimate){
 
   print("Preprocessing (continued)")
   db$topic <- as.character(db$topic)
-
-  #Model by topic
-  if(args$topic_model =='lda'){
-    lags <- 9
-  } else {
-    lags <- 8
-  }
+  exclude_issues <- c(52, 71, 79, 85, 86, 88) #Because of stability process problems
 
   for (topic_num in unique(as.character(db$topic))){
     print(paste("Model calculated", topic_num))
+    lags <- 1
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
-    #var_irfs_cum <- irf(var_model, n.ahead = 60, cumulative = TRUE)
-    #save(var_irfs_cum, file = paste0("var/issue-level/var_irfs_topic_", topic, "_logit-UPD.Rdata"))
+    if (!args$test && args$topic_model=='bertopic'){
+      if(topic_num %in% as.character(exclude_issues)){
+        print(paste("Skipping topic", topic_num, "because it will cause errors"))
+        next
+      }
+    }
+    var_irfs_cum <- irf(var_model, n.ahead = 20, cumulative = TRUE)
+    save(var_irfs_cum, file = paste0("data_prod/var/", args$topic_model, "/issue-level/var_irfs_topic_", topic_num, ".Rdata"))
     if (args$tests){
       topic <- as.character(topic)
       print(paste("Currently testing topic", topic_num))
       AIC_and_co <- VARselect(db_topic[, variables], lag.max = 15, season = NULL)
       row_index <- which(as.character(infos_topic$Topic) == topic_num)
-      infos_topic[row_index, "Max Modul"] <- max(roots(var_model))
+      var_roots <- tryCatch({
+        roots(var_model)
+        }, error = function(e) {
+        warning(paste("ERREUR dans roots() pour le topic", topic_num, ":", e$message))
+        return(Inf)  
+        })
+
+
+      if (all(is.finite(var_roots))) {
+        infos_topic[row_index, "Max Modul"] <- max(var_roots)
+      }
       infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
       infos_topic[row_index, "HQ"] <- AIC_and_co$selection[[2]]
       infos_topic[row_index, "SC"] <- AIC_and_co$selection[[3]]
@@ -487,33 +470,32 @@ if (args$estimate){
     }
     write.csv(infos_topic, file=path_info, row.names = FALSE)
   }
-
-  stop()
-
-
-  print("Cumulative IRF preparation")
-  var_irfs_cum_merged <- irf(var_model_merged, n.ahead = 60, cumulative = TRUE)
-
-  if (args$topic_model == 'lda') {
-    save(var_model_merged, file = "data_prod/var/lda/var_model-MAIN.Rdata")
-    save(var_irfs_cum_merged, file = "data_prod/var/lda/var_irfs-MAIN.Rdata")
-  } else {
-      save(var_model_merged, file = "data_prod/var/bertopic/var_model-MAIN.Rdata")
-      save(var_irfs_cum_merged, file = "data_prod/var/bertopic/var_irfs-MAIN.Rdata")
-  }
 } else {
   if (args$topic_model == 'lda') {
-    load("data_prod/var/lda/var_irfs-MAIN.Rdata")
+    pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66)
   } else {
-    load("data_prod/var/bertopic/var_irfs-MAIN.Rdata")
+    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 87, 65, 69, 78, 80, 29, 75, 89)
+    pol_issues <- setdiff(c(0:91), throw_topic)
+  }
+  last_topic <- tail(pol_issues, 1)
+  last_top_path <- paste0("data_prod/var/", args$topic_model, "/issue-level/var_irfs_topic_", last_topic, ".Rdata")
+  if (!file.exists(last_top_path)){
+    stop(paste("Tous les modèles VAR n'ont pas été estimés, veuillez recommencer avec l'option --estimate"))
   }
 }
 
-
 print("Format IRF data in a human-friendly way")
 
-# - load dataset with human-readble labels for the topics
-#pa2our <- read.csv("data/pa2our_topics_crosswalk_merged_subissues.csv")
+if(args$topic_model=='bertopic'){
+  print("Exclusion des topics dont la stabilité du processus n'est pas assurée")
+  exclude_issues <- c(52, 71, 79, 85, 86, 88) #Because of stability process problems
+  pol_issues <- setdiff(pol_issues, exclude_issues)
+  pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", col_names=FALSE, show_col_types=FALSE)
+} else {
+  pa2our <- read_csv("data_prod/figures/translate_number_name/LDA_merged.csv",col_names=FALSE, show_col_types=FALSE)
+}
+
+colnames(pa2our) <- c("issue_num", "label")
 
 # - a list with variables of interest
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
@@ -527,7 +509,7 @@ for (top in pol_issues) {
   # - update counter and report progress
   counter <- counter + 1
   print(paste0("[", counter, "/", total, "]"))
-  file_name <- paste0("var/issue-level/var_irfs_topic_", top, "_logit-UPD.Rdata")
+  file_name <- paste0("data_prod/var/", args$topic_model, "/issue-level/var_irfs_topic_", top, ".Rdata")
   load(file_name) # object name: 'var_irfs_cum'
   
   # - iterating through endogenous covariates and endogenous responses
@@ -557,7 +539,6 @@ for (top in pol_issues) {
           new_rows$upr <- inv.logit(cov_irf_est) - 0.5
         }
       }
-      #print(paste0(covariate, " -> ", response))
       # - appending new rows to the main dataset with all IRF info
       irf_data <- rbind(irf_data, new_rows)
     }
@@ -569,6 +550,7 @@ for (top in pol_issues) {
 irf_plot <- irf_data %>%
   filter(cov %in% variables,
          out %in% variables)
+
 
 # - removing rows where covariate and response are the same variable, and also
 #     removoing info about how public agendas influence public agendas, and how
@@ -591,137 +573,39 @@ irf_plot <- left_join(irf_plot, cov_agenda_type)
 irf_plot <- left_join(irf_plot, out_agenda_type)
 
 irf_plot <- irf_plot %>%
-  filter(cov_agenda_type != out_agenda_type)
+  filter(cov_agenda_type != out_agenda_type | cov_agenda_type == "pol") %>%
+  filter(cov != out)
 
 # - merging to the dataset a human readable name for the topics
-pa2our_tomerge <- pa2our %>%
-  dplyr::select("our_", "our_topic_label") %>%
-  rename(issue_num = our_, label = our_topic_label)
 
-pa2our_tomerge$issue_num <- as.character(pa2our_tomerge$issue_num)
-irf_plot$issue_num <- as.character(irf_plot$issue_num)
+irf_plot <- left_join(irf_plot, pa2our)
 
-irf_plot <- left_join(irf_plot, pa2our_tomerge)
-
-# - reorder the levels of the outcome and covariate factor variables
+print(head(irf_plot))
 irf_plot$cov <- recode(irf_plot$cov,
-                          `lr` = "LR in Congress",
-                          `majority` = "Majority in Congress",
-                          `nupes` = "NUPES in Congress",
-                          `rn` = "RN in Congress",
-                          `lr_supp` = "LR Supporters",
-                          `majority_supp` = "Majority Supporters",
-                          `nupes_supp` = "NUPES Supporters",
-                          `rn_supp` = "RN Supporters",
-                          `attentive` = "Attentive Public",
-                          `general` = "General Public",
-                          `media` = "Media")
+                    `lr` = "LR in\nCongress",
+                    `majority` = "Majority in\nCongress",
+                    `nupes` = "NUPES in\nCongress",
+                    `rn` = "RN in\nCongress",
+                    `lr_supp` = "LR\nSupporters",
+                    `majority_supp` = "Majority\nSupporters",
+                    `nupes_supp` = "NUPES\nSupporters",
+                    `rn_supp` = "RN\nSupporters",
+                    `attentive` = "Attentive\nPublic",
+                    `general` = "General\nPublic",
+                    `media` = "Media")
 
 irf_plot$out <- recode(irf_plot$out,
-                          `lr` = "LR in Congress",
-                          `majority` = "Majority in Congress",
-                          `nupes` = "NUPES in Congress",
-                          `rn` = "RN in Congress",
-                          `lr_supp` = "LR Supporters",
-                          `majority_supp` = "Majority Supporters",
-                          `nupes_supp` = "NUPES Supporters",
-                          `rn_supp` = "RN Supporters",
-                          `attentive` = "Attentive Public",
-                          `general` = "General Public",
-                          `media` = "Media")
-
-irf_plot$out <- factor(irf_plot$out,
-                                levels = c("LR in Congress",
-                                          "Majority in Congress",
-                                          "NUPES in Congress",
-                                          "RN in Congress",
-                                          "LR Supporters",
-                                          "Majority Supporters",
-                                          "NUPES Supporters",
-                                          "RN Supporters",
-                                          "Attentive Public",
-                                          "General Public",
-                                          "Media"))
-
-irf_plot$cov <- factor(irf_plot$cov,
-                                levels = c("LR in Congress",
-                                          "Majority in Congress",
-                                          "NUPES in Congress",
-                                          "RN in Congress",
-                                          "LR Supporters",
-                                          "Majority Supporters",
-                                          "NUPES Supporters",
-                                          "RN Supporters",
-                                          "Attentive Public",
-                                          "General Public",
-                                          "Media"))
-
-# - better labels for the data type
-all_irf_data_wide$data_type <- recode(
-  all_irf_data_wide$data_type,
-  `one_time_shock` =  "Effect of a one time 10 percentage point attention increase at day 0",
-  `structural` = "Effect of a structural 10 percentage point attention increase at day 0")
-
-
-if (args$topic_model == 'lda') {
-  if (args$media){
-    write.csv(all_irf_data_wide,
-            "data_prod/var/lda/onetime-structural-shock-irfs-results-media.csv",
-            row.names = FALSE)
-    final_input <- import("data_prod/var/lda/onetime-structural-shock-irfs-results-media.csv")
-  } else {
-    write.csv(all_irf_data_wide,
-          "data_prod/var/lda/onetime-structural-shock-irfs-results.csv",
-          row.names = FALSE)
-  final_input <- import("data_prod/var/lda/onetime-structural-shock-irfs-results.csv")
-  }
-} else {
-  if (args$media){
-    write.csv(all_irf_data_wide,
-          "data_prod/var/bertopic/onetime-structural-shock-irfs-results-media.csv",
-          row.names = FALSE)
-    final_input <- import("data_prod/var/bertopic/onetime-structural-shock-irfs-results-media.csv")
-
-  } else {
-    write.csv(all_irf_data_wide,
-          "data_prod/var/bertopic/onetime-structural-shock-irfs-results.csv",
-          row.names = FALSE)
-    final_input <- import("data_prod/var/bertopic/onetime-structural-shock-irfs-results.csv")
-  }
-   
-}
-print("Create plot data")
-
-
-# DATA WRANLGING
-#===============================================================================
-# - exploring only args$number_irf-day effects, and removing the Media from the analysis.
-plot_db <- final_input %>%
-  filter(day == args$number_irf)
-
-plot_db$cov <- recode(plot_db$cov,
-                    `LR in Congress` = "LR in\nCongress",
-                    `Majority in Congress` = "Majority in\nCongress",
-                    `NUPES in Congress` = "NUPES in\nCongress",
-                    `RN in Congress` = "RN in\nCongress",
-                    `LR Supporters` = "LR\nSupporters",
-                    `Majority Supporters` = "Majority\nSupporters",
-                    `NUPES Supporters` = "NUPES\nSupporters",
-                    `RN Supporters` = "RN\nSupporters",
-                    `Attentive Public` = "Attentive\nPublic",
-                    `General Public` = "General\nPublic")
-
-plot_db$out <- recode(plot_db$out,
-                    `LR in Congress` = "LR in\nCongress",
-                    `Majority in Congress` = "Majority in\nCongress",
-                    `NUPES in Congress` = "NUPES in\nCongress",
-                    `RN in Congress` = "RN in\nCongress",
-                    `LR Supporters` = "LR\nSupporters",
-                    `Majority Supporters` = "Majority\nSupporters",
-                    `NUPES Supporters` = "NUPES\nSupporters",
-                    `RN Supporters` = "RN\nSupporters",
-                    `Attentive Public` = "Attentive\nPublic",
-                    `General Public` = "General\nPublic")
+                    `lr` = "LR in\nCongress",
+                    `majority` = "Majority in\nCongress",
+                    `nupes` = "NUPES in\nCongress",
+                    `rn` = "RN in\nCongress",
+                    `lr_supp` = "LR\nSupporters",
+                    `majority_supp` = "Majority\nSupporters",
+                    `nupes_supp` = "NUPES\nSupporters",
+                    `rn_supp` = "RN\nSupporters",
+                    `attentive` = "Attentive\nPublic",
+                    `general` = "General\nPublic",
+                    `media` = "Media")
 
 # - reordering the covariate and outcome categories
 
@@ -751,13 +635,15 @@ irf_plot$out <- factor(irf_plot$out,
                                 "General\nPublic", 
                                 "Media"))
 
+
+print(head(irf_plot))
+
 plot_db <- irf_plot %>%
-  # - only keeping IRF that don't cross 0
   filter(day == args$number_irf) %>%
   arrange(out, cov, pe) %>%
   mutate(label = factor(label, levels = unique(label))) %>%
   filter(sign(lwr) == sign(upr))
-  
+print(head(plot_db))
 
 # - sort by the issues in which Democratic supporters are more likely to lead 
 #   the attention of Democrats in Congress
@@ -767,23 +653,34 @@ if(args$topic_model=="lda"){
 } else {
   path_img <- "data_prod/figures/bertopic/figure4.png"
 }
+
+colors_dict <- c(
+"LR in\nCongress" = "blue4",
+  "Majority in\nCongress" = "orange",
+  "NUPES in\nCongress" = "chartreuse4",
+  "RN in\nCongress" = "lightsalmon3",
+  "LR\nSupporters" = "cyan3",
+  "Majority\nSupporters" = "darkorange1",
+  "NUPES\nSupporters"= "seagreen1",
+  "RN\nSupporters" = "brown4",
+  "Attentive\nPublic" = "red", 
+  "General\nPublic"= "darkgrey",
+  "Media" = "darkorchid3"
+)
+
 # PLOT -- FIGURE 4
 #===============================================================================
 png(path_img, width = 1600, height = 1400)
-ggplot(plot_db %>% 
+p <- ggplot(plot_db %>% 
          mutate(pe = (pe * 100)/10, lwr = (lwr * 100)/10, upr = (upr * 100)/10),
        aes(x = label, y = pe, ymin = lwr, ymax = upr)) +
-  geom_pointrange(aes(col = cov), alpha = 0.4, size = 1.05) +
+  geom_pointrange(aes(col = cov), alpha = 0.4, size = 0.7) +
   geom_hline(yintercept = 0, color = "red") +
   facet_wrap(~out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  ylab("\nThe effect of a 10 percentage point increase in attention by the covariate group, measured in percentage point change") +
-  scale_color_manual("", values = c("blue", "yellow",
-                                    "red", "brown", 
-                                    "blue4", "yellow4",
-                                    "red4", "brown4", 
-                                    "gray50", "orange2", "purple")) +
+  ylab(paste("\nThe effect of a 10 percentage point increase in attention", args$number_irf, "days ago by the covariate group, measured in percentage point change")) +
+  scale_color_manual("", values = colors_dict) +
   theme(
     panel.background = element_blank(),
     panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
@@ -795,4 +692,11 @@ ggplot(plot_db %>%
     axis.title = element_text(size = 14),
     legend.text = element_text(size = 14, margin = margin(t = 20), vjust = 5)
   )
+
+  if(args$topic_model == 'bertopic'){
+    p <- p +
+      labs(caption = "Note: Les thématiques : Suppression redevance audiovisuelle, grève des éboueurs, résultats RN législatives 2022, conditions des travailleurs sans papiers, accident du travail Assemblée nationale et Prix Nobel Annie Ernaux ont été exclus.")
+  } 
+
+print(p)
 dev.off()
