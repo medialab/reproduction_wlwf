@@ -1,4 +1,3 @@
- library(mFLICA)
 library(dplyr)
 library(tidyverse)
 library(tidyr)
@@ -14,6 +13,9 @@ parser$add_argument("topic_model", help="Choose a model type between lda and ber
 
 parser$add_argument("--calculate", action = "store_true",
 help = "Do tests calculus")
+
+parser$add_argument("--calculate_dash", action = "store_true",
+help = "Do tests calculus for dashboard")
 
 args <- parser$parse_args()
 num_groups <- 11     # Number of time series
@@ -110,7 +112,7 @@ if(args$calculate){
         i <- i+1
     }
     timeWindow <- 30
-    lagWindow <- 6/30
+    lagWindow <- 4/15
     timeShift <- 1
 
     cat("Start test for sigma \n")
@@ -129,14 +131,14 @@ if(args$calculate){
         saveRDS(model_dtw, file=model_output)
     }
     cat("Start test for time Window")
-    TW_tests <- c(15,30,45,60)
+    TW_tests <- c(7,14,21,28,35,42,49,56)
     for (time_window in TW_tests){
         print(paste("TW", time_window))
         model_output = paste0(init_path, "windowtest_", time_window, ".RDS")
             model_dtw=mFLICA(
             matrix_dtw,
             timeWindow=  time_window,
-            lagWindow= 6/30,
+            lagWindow= lagWindow,
             timeShift= timeShift,
             sigma = 0.5,
             silentFlag = FALSE
@@ -159,6 +161,50 @@ if(args$calculate){
         saveRDS(model_dtw, file=model_output)
     }
 }
+
+if(args$calculate_dash){
+    if (args$topic_model=='lda'){
+        db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)    
+        pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66, 55, 60, 65, 40, 50, 59, 70)
+    } else {
+        db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
+        throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
+        pol_issues <- setdiff(c(0:91), throw_topic)
+    }
+
+    num_topics <- length(pol_issues) 
+    db <- db %>% select(-date)
+    matrix_dtw <- array(NA, c(num_groups, num_timepoints, num_topics))
+
+    i <- 1
+
+    for(topic_num in pol_issues){
+        matrix_dtw[,,i] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
+        i <- i+1
+    }
+
+    lagWindow <- 4/15
+    timeShift <- 1
+    TW_tests <- c(7,14,21,28,35,42,49,56)
+    sigma_seuils <- c(0.1, 0.3, 0.5, 0.7, 0.9)
+    for (TW in TW_tests){
+        print(TW)
+        for(sigma in sigma_seuils){
+            print(sigma)
+            model_output = paste0(init_path, "windowtest_", TW, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS")
+            model_dtw=mFLICA(
+            matrix_dtw,
+            timeWindow=  TW,
+            lagWindow= lagWindow,
+            timeShift= timeShift,
+            sigma = sigma,
+            silentFlag = FALSE
+            )
+        saveRDS(model_dtw, file=model_output)
+        }
+      }
+    }
+
 
 #Sigma Effects
 if (args$topic_model=='lda'){

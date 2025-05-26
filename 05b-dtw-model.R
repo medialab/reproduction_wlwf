@@ -52,6 +52,7 @@ if (args$topic_model == 'lda'){
     path_MultipleTimeSeries_faction <- "data_prod/dtw/lda/factions_evol.png"
     path_evolv_leader <- "data_prod/dtw/lda/leaders_switch.png"
     path_factions_heatmap <- "data_prod/dtw/lda/factions_heatmap.png"
+    path_dashboard <- data_prod/dtw/lda/dashboard
 } else{
     path_densitycorr <- "data_prod/dtw/bertopic/densitycorrelation.png"
     path_inst_corr <- "data_prod/dtw/bertopic/cormat_dtw_inst.png"
@@ -269,6 +270,8 @@ biv_plot_TS <- function(data1, data2, leader, follower, title, path, seuil_delta
     print(p)
     dev.off()
 }
+
+stop()
 cat("Start plots \n")
 png(filename = path_MultipleTimeSeries, width = 800, height = 600)
 plotMultipleTimeSeries(TS = model_dtw$dyNetOut$dyNetBinDensityVec, strTitle = "Coordination Mesure evolution")
@@ -545,8 +548,6 @@ p <- ggplot(df_final, aes(x = date, y = group_name, fill = leader_name)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 print(p)
 dev.off()
-
-print(df_final[!complete.cases(df_final), ])
 
 for (i in 1:(length(variables)-1)){
     leader <- variables[i]

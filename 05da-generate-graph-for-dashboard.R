@@ -1,0 +1,644 @@
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(tidyr)
+library(argparse)
+library(reshape2)
+library(dtw)
+library(mFLICA)
+
+parser <- ArgumentParser()
+
+parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
+
+args <- parser$parse_args()
+
+if (!(args$topic_model %in% c('bertopic', 'lda'))){
+  stop("The model name is incorrect. Choose between lda and bertopic")
+}
+
+lagWindow <- 4/15
+timeShift <- 1
+TW_tests <- c(7,14,21,28,35,42,49,56)
+sigma_seuils <- c(0.1, 0.3, 0.5, 0.7, 0.9)
+num_timepoints <- 268
+dates <- seq.Date(from = as.Date("2022-06-20"), by = "day", length.out = num_timepoints)
+init_path <- paste0("data_prod/dtw/", args$topic_model, "/tests/")
+init_unique <- paste0("data_prod/dtw/", args$topic_model,"/unique/tests/")
+scores <- read_csv(paste0("data_prod/dtw/", args$topic_model, "/unique/liste_fig4.csv"), show_col_types=FALSE)
+variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
+num_groups <- length(variables)
+
+if(args$topic_model=='lda'){
+    pa2our <- read_csv("data_prod/figures/translate_number_name/LDA_unmerged.csv",col_names=FALSE, show_col_types=FALSE)
+    db <- read_csv("data_prod/var/lda/general_TS.csv")
+    pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66, 55, 60, 65, 40, 50, 59, 70)
+} else {
+    db <- read_csv("data_prod/var/lda/general_TS.csv")
+    pa2our <- read_csv("data_prod/figures/translate_number_name/BERTopic_unmerged.csv",col_names=FALSE, show_col_types=FALSE)
+    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
+    pol_issues <- setdiff(c(0:91), throw_topic)
+}
+
+
+db_date <- db %>% filter (topic %in% pol_issues)
+colnames(pa2our) <- c("issue_num", "label")
+
+colors_dict <- c(
+  "lr" = "blue4",
+  "lr_supp" = "cyan3",
+  "majority" = "orange",
+  "majority_supp" = "darkorange1",
+  "nupes" = "chartreuse4",
+  "nupes_supp" = "seagreen1",
+  "rn" = "lightsalmon3",
+  "rn_supp" = "brown4",
+  "attentive" = "red",
+  "general" = "darkgrey",
+  "media" = "darkorchid3"
+)
+
+plot_sigma_FIXEDTW <- function(param1, param2, param3, param4, param5, TW, dates=dates){
+    path_test_density_sigma <- paste0("data_prod/dtw/", args$topic_model, "/tests/Evol_coord_Sigma_", TW, ".png")
+    df <- data.frame(
+    date = rep(dates, 5),
+    value = c(param1, param2, param3, param4, param5),
+    param = factor(rep(c("sigma=0.1", "sigma=0.3", "sigma=0.5", "sigma=0.7", "sigma=0.9"), each = num_timepoints))
+    )
+    png(filename = path_test_density_sigma, width = 800, height = 600)
+    p <- ggplot(df, aes(x = date, y = value, color = param)) +
+    geom_line(linewidth = 0.5) +
+    labs(title = "",
+        x = "Date", y = "Coordination Index", color = "Paramétrage") +
+    theme_minimal() +
+    theme(
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+    print(p)
+    dev.off()
+}
+
+plot_TW_FIXEDS <- function(param1, param2, param3, param4, param5, param6, param7, param8, sigma, dates=dates){
+    df <- data.frame(
+    date = rep(dates, 8),
+    value = c(param1, param2, param3, param4, param5, param6, param7, param8),
+    param = factor(rep(c("TW = 7 jours", "TW=14 jours", "TW=21 jours", "TW=28 jours", "TW=35 jours", "TW=42 jours", "TW=49 jours", "TW=56 jours"), each = num_timepoints))
+    )
+    path_test_density_TW <- paste0("data_prod/dtw/", args$topic_model, "/tests/Evol_coord_TW_", sub("^[^.]*\\.", "", as.character(sigma)), ".png")
+    png(filename = path_test_density_TW, width = 800, height = 600)
+    p <- ggplot(df, aes(x = date, y = value, color = param)) +
+    geom_line(linewidth = 0.5) +
+    labs(title = "",
+        x = "Date", y = "Coordination Index", color = "Paramétrage") +
+    theme_minimal() +
+    theme(
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    )
+    print(p)
+    dev.off()
+}
+
+plot_topic<- function(scores, sigma){
+    agenda_type <- data.frame(
+    var = variables,
+    type = c("pol", "pol", "pol", "pol", "pub", "pub", "pub", "pub", "pub", "pub", "media")
+    )
+    leader_agenda_type <- agenda_type %>%
+    rename(leader = var, leader_agenda_type = type)
+    follower_agenda_type <- agenda_type %>%
+    rename(follower = var, follower_agenda_type = type)
+
+    leader_agenda_type$leader <- as.character(leader_agenda_type$leader)
+    follower_agenda_type$follower <- as.character(follower_agenda_type$follower)
+    scores$leader <- as.character(scores$leader)
+    scores$follower <- as.character(scores$follower)
+
+    scores <- left_join(scores, leader_agenda_type)
+    scores <- left_join(scores, follower_agenda_type)
+
+    scores <- scores %>%
+    filter(leader_agenda_type != follower_agenda_type | leader_agenda_type == "pol") %>%
+    filter(value>sigma)
+
+    # - merging to the dataset a human readable name for the topics
+
+    scores$issue_num <- scores$topic
+
+    scores <- left_join(scores, pa2our)
+
+    scores$leader <- recode(scores$leader,
+                        `lr` = "LR in\nCongress",
+                        `majority` = "Majority in\nCongress",
+                        `nupes` = "NUPES in\nCongress",
+                        `rn` = "RN in\nCongress",
+                        `lr_supp` = "LR\nSupporters",
+                        `majority_supp` = "Majority\nSupporters",
+                        `nupes_supp` = "NUPES\nSupporters",
+                        `rn_supp` = "RN\nSupporters",
+                        `attentive` = "Attentive\nPublic",
+                        `general` = "General\nPublic",
+                        `media` = "Media")
+
+    scores$follower <- recode(scores$follower,
+                        `lr` = "LR in\nCongress",
+                        `majority` = "Majority in\nCongress",
+                        `nupes` = "NUPES in\nCongress",
+                        `rn` = "RN in\nCongress",
+                        `lr_supp` = "LR\nSupporters",
+                        `majority_supp` = "Majority\nSupporters",
+                        `nupes_supp` = "NUPES\nSupporters",
+                        `rn_supp` = "RN\nSupporters",
+                        `attentive` = "Attentive\nPublic",
+                        `general` = "General\nPublic",
+                        `media` = "Media")
+
+    # - reordering the covariate and outcome categories
+
+    scores$leader <- factor(scores$leader,
+                        levels = rev(c("LR in\nCongress",
+                                        "Majority in\nCongress",
+                                        "NUPES in\nCongress",
+                                        "RN in\nCongress",
+                                        "LR\nSupporters",
+                                        "Majority\nSupporters",
+                                        "NUPES\nSupporters",
+                                        "RN\nSupporters",
+                                        "Attentive\nPublic",
+                                        "General\nPublic",
+                                        "Media")))
+
+    scores$follower <- factor(scores$follower,
+                        levels = c("LR in\nCongress",
+                                    "Majority in\nCongress",
+                                    "NUPES in\nCongress",
+                                    "RN in\nCongress",
+                                    "LR\nSupporters",
+                                    "Majority\nSupporters",
+                                    "NUPES\nSupporters",
+                                    "RN\nSupporters",
+                                    "Attentive\nPublic",
+                                    "General\nPublic", 
+                                    "Media"))
+
+    plot_db <- scores %>%
+    mutate(label = factor(label, levels = unique(label)))
+
+    path_img <- paste0(init_path, "FLScore_bytopic_sigma", sub("^[^.]*\\.", "", as.character(sigma)), ".png")
+
+    colors_dict <- c(
+    "LR in\nCongress" = "blue4",
+    "Majority in\nCongress" = "orange",
+    "NUPES in\nCongress" = "chartreuse4",
+    "RN in\nCongress" = "lightsalmon3",
+    "LR\nSupporters" = "cyan3",
+    "Majority\nSupporters" = "darkorange1",
+    "NUPES\nSupporters"= "seagreen1",
+    "RN\nSupporters" = "brown4",
+    "Attentive\nPublic" = "red", 
+    "General\nPublic"= "darkgrey",
+    "Media" = "darkorchid3"
+    )
+
+    # PLOT -- FIGURE 4
+    #===============================================================================
+    png(path_img, width = 1600, height = 1400)
+    p <- ggplot(plot_db,
+        aes(x = label, y = value, ymin = 0, ymax = 1)) +
+    geom_point(aes(col = leader), alpha = 0.4, size = 3) +
+    facet_wrap(~follower, nrow = 1) +
+    coord_flip() +
+    xlab("") +
+    ylab("\nLead/Follow Score") +
+    scale_color_manual("", values = colors_dict) +
+    theme(
+        panel.background = element_blank(),
+        panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
+        axis.text.x = element_text(size = 10, angle=45),
+        axis.text.y = element_text(size = 16),
+        strip.text = element_text(size = 16),
+        panel.border = element_rect(colour = "black", fill = FALSE),
+        strip.background = element_rect(colour = "black"),
+        axis.title = element_text(size = 14),
+        legend.text = element_text(size = 14, margin = margin(t = 20), vjust = 5)
+    )
+
+    print(p)
+    dev.off()
+}
+
+plot_DTW_matrixcorr <- function(model_dtw, TW, sigma_name){
+    path_densitycorr <- paste0(init_path, "MatrixCorrDTW_", TW, "_", sigma_name, ".png")
+    mat_mean_dtw <- matrix(1, nrow=length(variables), ncol=length(variables))
+    for (var in 1:length(variables)){
+        for (var2 in 1:length(variables)){
+            if (var != var2){
+                mat_mean_dtw[var,var2] <- model_dtw$dyNetOut$dyNetWeightedMat[var, var2,] %>% mean() 
+            }
+        }
+    }
+    mat_mean_dtw <- data.frame(mat_mean_dtw)
+    colnames(mat_mean_dtw) <- variables
+    rownames(mat_mean_dtw) <- variables
+    mat_mean_dtw <- round(mat_mean_dtw,3) 
+    mat_mean_dtw_long <- melt(as.matrix(mat_mean_dtw))
+    mat_mean_dtw_long$Var1 <- factor(mat_mean_dtw_long$Var1, levels = rev(rownames(mat_mean_dtw)))
+    mat_mean_dtw_long$Var2 <- factor(mat_mean_dtw_long$Var2, levels = colnames(mat_mean_dtw))
+
+    # Créer la heatmap
+    png(path_densitycorr,  width = 800, height = 800)
+    p <- ggplot(mat_mean_dtw_long, aes(Var2, Var1, fill = value))+
+        geom_tile(color = "white")+
+        scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+        midpoint = 0, limit = c(-1,1), space = "Lab",
+        name="Densité") +
+        theme_minimal()+
+        labs(x = "", y = "", title = "Matrice moyenne des densités en décalage") +
+        theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+            size = 12, hjust = 1))+
+        coord_fixed() 
+
+        ggfinal <- p + 
+        geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) +
+        theme(
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        legend.justification = c(1, 0),
+        legend.position.inside = c(0.6, 0.7),
+        legend.direction = "horizontal")+
+        guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+                        title.position = "top", title.hjust = 0.5))
+        print(ggfinal)
+        dev.off()
+}
+
+plot_evol_leader<- function(model_dtw, TW, sigma_name){
+    df_evol_leader <- data.frame(
+    date = as.Date(character()),
+    is_leader = numeric(),
+    number_group = numeric()
+)
+
+    all_nums <- 1:11
+
+    for (i in 1:num_timepoints){
+        nums <- model_dtw$leadersTimeSeries[[i]]
+        presence <- as.integer(all_nums %in% nums)
+        add_df <- data.frame(
+        date = rep(dates[i], length(all_nums)),
+        is_leader = presence,
+        number_group = all_nums
+        )
+        df_evol_leader <- rbind(df_evol_leader, add_df)
+    }
+
+    df_evol_leader <- df_evol_leader %>%
+        mutate(group = variables[number_group]) %>%
+        mutate(y_pos = is_leader + number_group*1/12)
+
+    path_evolv_leader <- paste0(init_path, "EvolLeader_", TW, "_", sigma_name, ".png")
+    png(path_evolv_leader, width = 800, height = 800)
+    p <- ggplot(df_evol_leader, aes(x = date, y = y_pos, group = group, color=group)) +
+        geom_point() +        
+        geom_hline(yintercept = 1, color = "black") +
+        labs(x = "Date", y = "", title = "Évolution des positions de leader dans le temps") +
+        scale_x_date(breaks = seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "3 weeks"), date_labels = "%b %d") +
+        scale_colour_manual(values = colors_dict) +
+        scale_y_continuous(
+            limits = c(0, 2),
+            breaks = c(0.5, 1.5),
+            labels = c("Follower", "Leader")
+            ) + 
+        theme_minimal()
+
+        print(p)
+        dev.off()
+    
+}
+
+plot_heatmap_faction <- function(model_dtw, TW, sigma_name){
+    factions_ts <- model_dtw$factionMembersTimeSeries
+    #Exclure les cas où un groupe appartient à plusieurs factions en le forçant à appartenir à celle où le follow est le plus fort
+    for (i in seq_along(factions_ts)){
+        factions_i <-  factions_ts[[i]]
+        list_index_leaders <- c()
+        list_index_followers <- c()
+        leader_indices <- c()
+        for (j in seq_along(factions_i)){
+            elem <- factions_i[[j]]
+            if(length(elem)>1){ #Si le leader est seul dans le groupe, on a pas besoin de vérifier qu'un groupe de follower apparait dedans
+                for (k in 2:length(elem)){
+                    list_index_leaders <- c(list_index_leaders, elem[1])
+                    list_index_followers <- c(list_index_followers, elem[k])
+                    leader_indices <- c(leader_indices, j)
+                }
+            }
+        }
+        if (any(duplicated(list_index_followers))){
+            duplicated_elements <- as.integer(names(which(table(unlist(list_index_followers)) > 1)))
+            for (dup in duplicated_elements){
+                indexs_dup <- which(list_index_followers == dup)
+                values_follow <- numeric(length(indexs_dup))
+                for (l in seq_along(indexs_dup)) {
+                    val_follow <- model_dtw$dyNetOut$dyNetWeightedMat[dup, list_index_leaders[indexs_dup[l]], i]
+                    values_follow[l] <- val_follow
+                }
+
+                max_idx <- which.max(values_follow)
+                indexs_dup <- indexs_dup[-max_idx]
+                
+                for (rmv_idx in indexs_dup){
+                    j_faction <- leader_indices[rmv_idx] 
+                    factions_i[[j_faction]] <- factions_i[[j_faction]][factions_i[[j_faction]] != dup]
+                }
+            }
+        }
+    }
+
+    #Heatmap des factions
+    #Forcer chaque élément à être membre d'une seule faction
+    heatmap_matrix <- matrix(0, nrow = num_groups, ncol = num_timepoints)
+    leader_data <- matrix(0, nrow=num_groups, ncol=num_timepoints)
+
+    for (t in seq_len(num_timepoints)) {
+        factions_t <- factions_ts[[t]]
+        for (i in seq_along(factions_t)){
+            faction <-factions_t[[i]]
+            leader <- faction[1]
+            leader_data[leader, t] <- 1
+            for (member in faction){
+                heatmap_matrix[member, t] <- leader
+            }
+        }
+    }
+
+    df_heatmap <- as.data.frame(heatmap_matrix)
+    df_heatmap$group <- 1:11
+    df_leader <- as.data.frame(leader_data)
+    df_leader$group <- 1:11
+
+    df_long <- df_heatmap %>%
+    pivot_longer(
+        cols = -group,
+        names_to = "time",
+        values_to = "leader_id"
+    ) %>%
+    mutate(
+        time = as.integer(gsub("[^0-9]", "", time)),  # Nettoie noms de colonnes (ex: V1 → 1)
+        group = as.factor(group),
+        leader_id = as.factor(leader_id)
+    )
+
+    df_leader_long <- df_leader %>%
+    pivot_longer(
+        cols = -group,
+        names_to = "time",
+        values_to = "is_leader"
+    ) %>%
+    mutate(
+        time = as.integer(gsub("[^0-9]", "", time)),
+        group = as.factor(group),
+        is_leader = as.integer(is_leader)
+    )
+
+    df_final <- left_join(df_long, df_leader_long, by = c("group", "time"))
+    variablesC <- c("Hors Faction", variables)
+    leader_dict <- setNames(variablesC, as.character(0:11))
+    group_names <- variablesC
+    df_final$leader_name <- leader_dict[as.character(df_final$leader_id)]
+    df_final$group_name <- factor(df_final$group, levels = 0:11, labels = group_names)
+    df_final$date <- dates[df_final$time]
+    colors_dict["Hors Faction"] <- "white" 
+
+    # Plot
+    path_factions_heatmap <- paste0(init_path, "FactionHeatmap_", TW, "_", sigma_name, ".png")
+    png(path_factions_heatmap, width=2800, height=800)
+    p <- ggplot(df_final, aes(x = date, y = group_name, fill = leader_name)) +
+    geom_tile(color = "white") +  
+    coord_fixed(ratio=6) +
+    geom_tile(data = df_final %>% filter(is_leader == 1),
+                aes(x = date, y = group_name),
+                fill = NA, color = "black", linetype = "dashed", linewidth = 0.4) +
+    scale_fill_manual(values = colors_dict, na.value = "white") +
+    scale_x_date(breaks = seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "3 weeks"), 
+                date_labels = "%b %d") +
+    theme_minimal() +
+    labs(x = "Date", y = "Groupe", fill = "Factions Leaders") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    print(p)
+    dev.off()
+}
+
+top_topic_change <- function(group1, group2, seuil_delta){
+    #Idée pour faire différemment : calculer les lags, couper les données en 7, prendre le max et le min d'écart de chaque sous groupe, bind les db_topics, et choisir le max et le min de chaque période pour chaque acteur. Ensuite, virer les maxs et les mins osef selon seuil delta
+    lag_events1 <- data.frame(
+        date = Date(),
+        topic = character(),
+        lag_value = numeric(),
+        stringsAsFactors = FALSE
+    )
+    lag_events2 <- data.frame(
+        date = Date(),
+        topic = character(),
+        lag_value = numeric(),
+        stringsAsFactors = FALSE
+    )
+    for (topic_num in pol_issues){
+        db_topic <- db_date %>% filter(topic == topic_num)
+        db_topic$week_lags1 <- db_topic[[group1]] - dplyr::lag(db_topic[[group1]], 7)
+        db_topic$week_lags2 <- db_topic[[group2]] - dplyr::lag(db_topic[[group2]], 7)
+
+        week_data <- db_topic %>%
+                mutate(weekgroup = (row_number() - 1) %/% 7 + 1) %>%
+                select(date, topic, weekgroup, week_lags1, week_lags2) %>%
+                group_by(weekgroup) %>%
+                summarise(
+                    date = first(date),  
+                    topic = topic_num,
+                    mean_lags1 = mean(week_lags1, na.rm = TRUE),
+                    mean_lags2 = mean(week_lags2, na.rm = TRUE),
+                    .groups = "drop"
+                )
+        
+        to_add1 <- week_data %>%
+                select(-mean_lags2) %>%
+                filter(mean_lags1 == max(mean_lags1, na.rm=TRUE) | mean_lags1 == min(mean_lags1, na.rm=TRUE)) %>%
+                filter(abs(mean_lags1) > seuil_delta) %>%
+                transmute(topic = topic_num, date = as.Date(date), lag_value = mean_lags1)
+
+        to_add2 <- week_data %>%
+                select(-mean_lags1) %>%
+                filter(mean_lags2 == max(mean_lags2, na.rm=TRUE) | mean_lags2 == min(mean_lags2, na.rm=TRUE)) %>%
+                filter(abs(mean_lags2) > seuil_delta) %>%
+                transmute(topic = topic_num, date = as.Date(date), lag_value = mean_lags2)
+        
+        lag_events1 <- rbind(lag_events1, to_add1)
+        lag_events2 <- rbind(lag_events2, to_add2)
+    }
+    lag_events1 <- lag_events1 %>%
+        group_by(date) %>%
+        filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
+        ungroup()
+
+    lag_events2 <- lag_events2 %>%
+        group_by(date) %>%
+        filter(lag_value == max(lag_value) | lag_value == min(lag_value)) %>%
+        ungroup()
+
+    return(list(group1_lags = lag_events1, group2_lags = lag_events2))
+}
+
+create_readable_topic <- function(group1_lags, group2_lags, pa2our, TW, sigma_name){
+    merged <- rbind(group1_lags, group2_lags)
+    unique_topics <- as.numeric(unique(merged$topic))
+    to_save <- pa2our %>% filter(issue_num %in% unique_topics)
+    write.csv(to_save, file=paste0(init_unique, "Readable_topics_TW_", TW, "_", sigma_name, ".csv"), row.names=FALSE)
+}
+
+biv_plot_TS <- function(data1, data2, leader, follower, title, path, TW=TW, sigma = sigma_name, seuil_delta=0.1, pa2our=pa2our){
+    res <- top_topic_change(leader, follower, seuil_delta)
+    topic_info_leader <- res$group1_lags
+    topic_info_follower <- res$group2_lags
+    create_readable_topic(topic_info_leader, topic_info_follower, pa2our, TW, sigma_name)
+    TS_plot <- c()
+    dates <- seq.Date(from = as.Date("2022-06-20"), to = as.Date("2023-03-14"), length.out = num_timepoints)
+    for (k in 1:num_timepoints){
+        score_ij <- data1[k] - data2[k]
+        TS_plot <- c(TS_plot, score_ij)
+    }
+    df <- data.frame(date = dates, score = TS_plot)
+    annots <- bind_rows(
+        topic_info_leader %>% mutate(group = leader, topic = as.character(topic)),
+        topic_info_follower %>% mutate(group = follower, topic = as.character(topic))
+        ) %>%
+        mutate(
+        couleur = ifelse(lag_value > 0, "green", "purple"),
+        y_pos = case_when(
+            couleur == "green" & group == follower   ~ 1.25,
+            couleur == "green" & group == leader ~ -1.15,
+            couleur == "purple" & group == follower   ~ 1.15,
+            couleur == "purple" & group == leader ~ -1.25
+        ),
+        label = topic)
+
+    png(path,  width = 1000, height = 600)
+    p <- ggplot(df, aes(x = date, y = score)) +
+        geom_rect(aes(xmin = min(date), xmax = max(date), ymin = 0, ymax = 1), fill = "red", alpha = 0.3) +
+        geom_rect(aes(xmin = min(date), xmax = max(date), ymin = -1, ymax = 0), fill = "blue", alpha = 0.3) +
+        geom_line(color = "black", linewidth = 1) +
+        geom_hline(yintercept = 0, color = "white") +
+         annotate("text", x = max(df$date) - 20, y = 0.9,
+             label = paste(follower, "lead", leader),
+             color = "red4", fontface = "bold", size = 4) +
+    annotate("text", x = max(df$date) - 20, y = -0.9,
+             label = paste(leader, "lead", follower),
+             color = "blue4", fontface = "bold", size = 4) +
+        labs(x = "Date", y = "Lead/Follow relation Index", title = title) +
+        annotate("text", x = min(df$date) - 14, y = 1.2,
+            label = "Follower\nTop Δ topic",
+            color = "black", fontface = "bold", size = 3, angle = 90, hjust = 0.5) +
+
+        annotate("text", x = min(df$date) - 14, y = -1.2,
+                label = "Leader\nTop Δ topic",
+                color = "black", fontface = "bold", size = 3, angle = 90, hjust = 0.5) +
+        scale_y_continuous(limits = c(-1.4, 1.4), breaks = seq(-1, 1, by = 0.5)) + 
+        scale_x_date(limits = c(as.Date("2022-06-05"), as.Date("2023-03-14")),  breaks = seq(as.Date("2022-06-20"), as.Date("2023-03-14"), by = "3 weeks"), date_labels = "%b %d") +
+        theme(
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1, margin = margin(t = 10)),
+        axis.title.x = element_text(margin = margin(t = 20)),
+        panel.ontop = FALSE,
+        panel.grid.major = element_blank(),   
+        panel.grid.minor = element_blank(),   
+        panel.background = element_rect(fill = "white", color = NA),  
+        plot.background = element_rect(fill = "white", color = NA),
+        plot.margin = margin(50, 50, 50, 5)          
+        )
+
+    if(nrow(annots) > 0){
+        p <- p + geom_text(data = annots, aes(x = date, y = y_pos, label = label, color = couleur),
+            size = 4, fontface = "bold", show.legend = TRUE) +
+            scale_colour_manual(
+                name = paste0("Sens de variation \n  de Δ (|Δ| > ", seuil_delta, ")"), 
+                values = c("green" = "green4", "purple" = "purple4"),
+                labels = c("Δ > 0", "Δ < 0")
+            ) +
+        theme(legend.position = "right", legend.title = element_text(face = "bold"))
+    }
+    print(p)
+    dev.off()
+}
+
+plot_bivariates<- function(model_dtw, TW, sigma_name){
+    for (i in 1:(length(variables)-1)){
+    leader <- variables[i]
+    for (j in (i+1):length(variables)){
+        follower <- variables[j]
+        path_ij <- paste0(init_unique, follower, "_", leader, "_TW_", TW, "_", sigma_name, ".png")
+        biv_plot_TS(model_dtw$dyNetOut$dyNetWeightedMat[i, j,], model_dtw$dyNetOut$dyNetWeightedMat[j, i,], leader, follower, title = paste("Dynamiques d'influence entre", leader, "et", follower), path=path_ij, pa2our = pa2our, TW=TW, sigma = sigma_name) #Plot ligne i influencé par ligne j
+        }
+    }
+}
+
+for(sigma in sigma_seuils){
+    model1 <- readRDS(paste0(init_path, "windowtest_", 7, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+    model2 <- readRDS(paste0(init_path, "windowtest_", 14, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+    model3 <- readRDS(paste0(init_path, "windowtest_", 21, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+    model4 <- readRDS(paste0(init_path, "windowtest_", 28, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+    model5 <- readRDS(paste0(init_path, "windowtest_", 35, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+    model6 <- readRDS(paste0(init_path, "windowtest_", 42, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+    model7 <- readRDS(paste0(init_path, "windowtest_", 49, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+    model8 <- readRDS(paste0(init_path, "windowtest_", 56, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+
+    param1 <- model1$dyNetOut$dyNetBinDensityVec
+    param2 <- model2$dyNetOut$dyNetBinDensityVec
+    param3 <- model3$dyNetOut$dyNetBinDensityVec
+    param4 <- model4$dyNetOut$dyNetBinDensityVec
+    param5 <- model5$dyNetOut$dyNetBinDensityVec
+    param6 <- model6$dyNetOut$dyNetBinDensityVec
+    param7 <- model7$dyNetOut$dyNetBinDensityVec
+    param8 <- model8$dyNetOut$dyNetBinDensityVec
+
+    plot_TW_FIXEDS(param1, param2, param3, param4, param5, param6, param7, param8, sigma, dates=dates)
+    plot_topic(scores, sigma)
+}
+
+
+for (TW in TW_tests){
+    model1 <- readRDS(paste0(init_path, "windowtest_", TW, "sigma_", as.character(1), ".RDS"))
+    model2 <- readRDS(paste0(init_path, "windowtest_", TW, "sigma_", as.character(3), ".RDS"))
+    model3 <- readRDS(paste0(init_path, "windowtest_", TW, "sigma_", as.character(5), ".RDS"))
+    model4 <- readRDS(paste0(init_path, "windowtest_", TW, "sigma_", as.character(7), ".RDS"))
+    model5 <- readRDS(paste0(init_path, "windowtest_", TW, "sigma_", as.character(9), ".RDS"))
+
+    param1 <- model1$dyNetOut$dyNetBinDensityVec
+    param2 <- model2$dyNetOut$dyNetBinDensityVec
+    param3 <- model3$dyNetOut$dyNetBinDensityVec
+    param4 <- model4$dyNetOut$dyNetBinDensityVec
+    param5 <- model5$dyNetOut$dyNetBinDensityVec
+
+    plot_sigma_FIXEDTW(param1, param2, param3, param4, param5, TW, dates=dates)
+
+    for(sigma in sigma_seuils){
+        sigma_name <- sub("^[^.]*\\.", "", as.character(sigma))
+        model_dtw <- readRDS(paste0(init_path, "windowtest_", TW, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
+
+        #Plot Faction Sizes
+        path_MultipleTimeSeries_faction <- paste0(init_path, "_", TW, "_", sigma, "FactionsSize.png")
+        png(filename = path_MultipleTimeSeries_faction, width = 800, height = 600)
+        plotMultipleTimeSeries (TS=model_dtw$factionSizeRatioTimeSeries , strTitle ="Faction Size Ratios", TSnames=variables)
+        dev.off()
+
+        #Plots 
+        plot_DTW_matrixcorr(model_dtw, TW, sigma_name)
+        plot_evol_leader(model_dtw, TW, sigma_name)
+        plot_heatmap_faction(model_dtw, TW, sigma_name)
+        plot_bivariates(model_dtw, TW, sigma_name)
+    }
+}
+
