@@ -52,39 +52,36 @@ if (args$estimate){
     topic = numeric(),
     leader = character(),
     follower=character(),
-    value=numeric()
+    value=numeric(), 
+    TimeW = numeric()
 )  
-    matrix_dtw <- array(NA, c(num_groups, num_timepoints, 1))
-    for(topic_num in pol_issues){
-        print(topic_num)
-        matrix_dtw[,,1] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
-        for(i in 1:(length(variables)-1)){
-            for (j in (i+1):length(variables)){
-                leader <- matrix_dtw[i,1:num_timepoints,]
-                follower <- matrix_dtw[j,1:num_timepoints,]
-                score <- mFLICA::followingRelation(Y=follower ,X=leader, lagWindow = lagWindow)$follVal
-                
-                if (score < 0) {
-                    new_row <- data.frame(
-                    topic = topic_num,
-                    leader = variables[j],
-                    follower = variables[i],
-                    value = abs(score),
-                    stringsAsFactors = FALSE
-                    )
-                    topic_follow <- rbind(topic_follow, new_row)
-                } else if (score > 0) {
-                    new_row <- data.frame(
-                    topic = topic_num,
-                    leader = variables[i],
-                    follower = variables[j],
-                    value = score,
-                    stringsAsFactors = FALSE
-                    )
-                    topic_follow <- rbind(topic_follow, new_row)
-                }
-            }
-        }
+    TW_tests <- c(7,14,21,28,35,42,49,56)
+
+    for (TW in TW_tests){
+      matrix_dtw <- array(NA, c(num_groups, num_timepoints, 2))
+      for(topic_num in pol_issues){
+          print(topic_num)
+          matrix_dtw[,,1] <- t(as.matrix(db %>% filter (topic == topic_num) %>% select(-topic)))
+          matrix_dtw[,,2] <- matrix(0, nrow = num_groups, ncol = num_timepoints)
+          follnet <- mFLICA::getDynamicFollNet(matrix_dtw, TW, timeShift, lagWindow)
+          for(i in 1:(length(variables))){
+              for (j in 1:length(variables)){
+                  score <- follnet$dyNetWeightedMat[i, j,] %>% mean() 
+                  
+                  if (score > 0) {
+                      new_row <- data.frame(
+                      topic = topic_num,
+                      leader = variables[j],
+                      follower = variables[i],
+                      value = abs(score),
+                      TimeW = TW,
+                      stringsAsFactors = FALSE
+                      )
+                      topic_follow <- rbind(topic_follow, new_row)
+                  } 
+              }
+          }
+      }
     }
     write.csv(topic_follow, paste0(init_unique, "liste_fig4.csv"), row.names=FALSE)
 } else{
@@ -93,7 +90,6 @@ if (args$estimate){
     }
 }
 
-sigma <- 0.5
 scores <- read_csv(paste0(init_unique, "liste_fig4.csv"), show_col_types=FALSE)
 
 if(args$topic_model=='lda'){
@@ -120,8 +116,7 @@ scores <- left_join(scores, leader_agenda_type)
 scores <- left_join(scores, follower_agenda_type)
 
 scores <- scores %>%
-  filter(leader_agenda_type != follower_agenda_type | leader_agenda_type == "pol") %>%
-  filter(value>sigma)
+  filter(leader_agenda_type != follower_agenda_type | leader_agenda_type == "pol") 
 
 # - merging to the dataset a human readable name for the topics
 
@@ -180,49 +175,59 @@ scores$follower <- factor(scores$follower,
                                 "Attentive\nPublic",
                                 "General\nPublic", 
                                 "Media"))
-
-
-plot_db <- scores %>%
-  mutate(label = factor(label, levels = unique(label)))
-
-path_img <- paste0(init_unique, "FLScore_bytopic.png")
-
 colors_dict <- c(
-"LR in\nCongress" = "blue4",
-  "Majority in\nCongress" = "orange",
-  "NUPES in\nCongress" = "chartreuse4",
-  "RN in\nCongress" = "lightsalmon3",
-  "LR\nSupporters" = "cyan3",
-  "Majority\nSupporters" = "darkorange1",
-  "NUPES\nSupporters"= "seagreen1",
-  "RN\nSupporters" = "brown4",
-  "Attentive\nPublic" = "red", 
-  "General\nPublic"= "darkgrey",
-  "Media" = "darkorchid3"
-)
+    "LR in\nCongress" = "blue4",
+      "Majority in\nCongress" = "orange",
+      "NUPES in\nCongress" = "chartreuse4",
+      "RN in\nCongress" = "lightsalmon3",
+      "LR\nSupporters" = "cyan3",
+      "Majority\nSupporters" = "darkorange1",
+      "NUPES\nSupporters"= "seagreen1",
+      "RN\nSupporters" = "brown4",
+      "Attentive\nPublic" = "red", 
+      "General\nPublic"= "darkgrey",
+      "Media" = "darkorchid3"
+    )
 
-# PLOT -- FIGURE 4
-#===============================================================================
-png(path_img, width = 1600, height = 1400)
-p <- ggplot(plot_db,
-       aes(x = label, y = value, ymin = 0, ymax = 1)) +
-  geom_point(aes(col = leader), alpha = 0.4, size = 3) +
-  facet_wrap(~follower, nrow = 1) +
-  coord_flip() +
-  xlab("") +
-  ylab("\nLead/Follow Score") +
-  scale_color_manual("", values = colors_dict) +
-  theme(
-    panel.background = element_blank(),
-    panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
-    axis.text.x = element_text(size = 10, angle=45),
-    axis.text.y = element_text(size = 16),
-    strip.text = element_text(size = 16),
-    panel.border = element_rect(colour = "black", fill = FALSE),
-    strip.background = element_rect(colour = "black"),
-    axis.title = element_text(size = 14),
-    legend.text = element_text(size = 14, margin = margin(t = 20), vjust = 5)
-  )
+sigma_tests <- c(0.1, 0.3, 0.5, 0.7, 0.9)
+TW_tests <- c(7,14,21,28,35,42,49,56)
+for(TW in TW_tests){
+  for (sigma in sigma_tests){
+    sigma_name <-  sub("^[^.]*\\.", "", as.character(sigma))
+    plot_db <- scores %>%
+      filter(TimeW == TW)
+      filter(value>=sigma) %>%
+      mutate(label = factor(label, levels = unique(label)))  
 
-print(p)
-dev.off()
+    path_img <- paste0(init_unique, "tests/FLScore_bytopic_", TW, "_", sigma_name, ".png")
+
+    # PLOT -- FIGURE 4
+    #===============================================================================
+    png(path_img, width = 1600, height = 1400)
+    p <- ggplot(plot_db,
+          aes(x = label, y = value, ymin = 0, ymax = 1)) +
+      geom_point(aes(col = leader), alpha = 0.4, size = 3) +
+      facet_wrap(~follower, nrow = 1) +
+      coord_flip() +
+      xlab("") +
+      ylab("\nLead/Follow Score") +
+      scale_color_manual("", values = colors_dict) +
+      theme(
+        panel.background = element_blank(),
+        panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
+        axis.text.x = element_text(size = 10, angle=45),
+        axis.text.y = element_text(size = 16),
+        strip.text = element_text(size = 16),
+        panel.border = element_rect(colour = "black", fill = FALSE),
+        strip.background = element_rect(colour = "black"),
+        axis.title = element_text(size = 14),
+        legend.text = element_text(size = 14, margin = margin(t = 20), vjust = 5)
+      )
+
+    print(p)
+    dev.off()
+
+  }
+}
+
+   

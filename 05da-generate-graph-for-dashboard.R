@@ -120,7 +120,7 @@ plot_topic<- function(scores, sigma){
 
     scores <- scores %>%
     filter(leader_agenda_type != follower_agenda_type | leader_agenda_type == "pol") %>%
-    filter(value>sigma)
+    filter(value>=sigma)
 
     # - merging to the dataset a human readable name for the topics
 
@@ -493,18 +493,18 @@ top_topic_change <- function(group1, group2, seuil_delta){
     return(list(group1_lags = lag_events1, group2_lags = lag_events2))
 }
 
-create_readable_topic <- function(group1_lags, group2_lags, pa2our, TW, sigma_name){
+create_readable_topic <- function(group1_lags, group2_lags, leader, follower, pa2our, TW, sigma_name){
     merged <- rbind(group1_lags, group2_lags)
     unique_topics <- as.numeric(unique(merged$topic))
     to_save <- pa2our %>% filter(issue_num %in% unique_topics)
-    write.csv(to_save, file=paste0(init_unique, "Readable_topics_TW_", TW, "_", sigma_name, ".csv"), row.names=FALSE)
+    write.csv(to_save, file=paste0(init_unique, "Readable_topics_",leader,"_", follower, "_", TW, "_", sigma_name, ".csv"), row.names=FALSE)
 }
 
 biv_plot_TS <- function(data1, data2, leader, follower, title, path, TW=TW, sigma = sigma_name, seuil_delta=0.1, pa2our=pa2our){
     res <- top_topic_change(leader, follower, seuil_delta)
     topic_info_leader <- res$group1_lags
     topic_info_follower <- res$group2_lags
-    create_readable_topic(topic_info_leader, topic_info_follower, pa2our, TW, sigma_name)
+    create_readable_topic(topic_info_leader, topic_info_follower, leader, follower, pa2our, TW, sigma_name)
     TS_plot <- c()
     dates <- seq.Date(from = as.Date("2022-06-20"), to = as.Date("2023-03-14"), length.out = num_timepoints)
     for (k in 1:num_timepoints){
@@ -629,9 +629,10 @@ for (TW in TW_tests){
         model_dtw <- readRDS(paste0(init_path, "windowtest_", TW, "sigma_", sub("^[^.]*\\.", "", as.character(sigma)), ".RDS"))
 
         #Plot Faction Sizes
-        path_MultipleTimeSeries_faction <- paste0(init_path, "_", TW, "_", sigma, "FactionsSize.png")
+        path_MultipleTimeSeries_faction <- paste0(init_path, "FactionsSize_", TW, "_", sigma_name, ".png")
         png(filename = path_MultipleTimeSeries_faction, width = 800, height = 600)
-        plotMultipleTimeSeries (TS=model_dtw$factionSizeRatioTimeSeries , strTitle ="Faction Size Ratios", TSnames=variables)
+        p <- plotMultipleTimeSeries(TS=model_dtw$factionSizeRatioTimeSeries , strTitle ="Faction Size Ratios", TSnames=variables)
+        print(p)
         dev.off()
 
         #Plots 
