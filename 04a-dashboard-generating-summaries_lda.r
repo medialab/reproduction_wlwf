@@ -261,7 +261,7 @@ build_ts <- function(
     arrange(topic, date, actor)
 }
 
-# >> medias ----
+#### >> medias ----
 
 media <- build_ts(
   actor_ldafile_naming = "media",
@@ -269,39 +269,39 @@ media <- build_ts(
   )
 
 
-# >> supporters (majority) ----
+#### >> supporters (majority) ----
 
 majority <- build_ts(
   actor_ldafile_naming = "majority_supporters",
   actor_label = "sup. majo."
 )
 
-# >> supporters (lr) ----
+#### >> supporters (lr) ----
 lr <- build_ts(
   "lr_supporters",
   "sup. lr"
 )
 
-# >> supporters (nupes) ----
+#### >> supporters (nupes) ----
 nupes <- build_ts(
   "nupes_supporters",
   "sup. nupes"
 )
 
 
-# >> supporters (rn) ----
+#### >> supporters (rn) ----
 rn <- build_ts(
   "rn_supporters",
   "sup. rn"
 )
 
-# >> attentive public ----
+#### >> attentive public ----
 attentive <- build_ts(
   "attentive",
   "pub. attentif"
 )
 
-# >> general public ----
+#### >> general public ----
 
 general <- build_ts(
   "general",
@@ -396,10 +396,11 @@ qois <- qois |>
 # # saving to disk
 save(qois, file="data_prod/dashboard/qois.rdata")
 #
-# ###############################################################################
+################################################################################
 # ### D) Representative tweets ----
-# ###############################################################################
-### >> Deputies ----
+################################################################################
+# > Deputies ----
+
 cat("selecting representative deputies' tweets for each topic\n")
 #
 suppressPackageStartupMessages(library(slam))
@@ -467,7 +468,7 @@ tw.embed <- function(text, name, screen_name, id_str, created_at, dt, js=FALSE){
 }
 
 # preparing embed ----
-# > for LDA ----
+#### >> for LDA ----
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
@@ -478,7 +479,7 @@ for (i in 1:nrow(rs)){
 congress_rs <- rs
 save(congress_rs, file="data_prod/dashboard/lda/congress-rs-tweets.rdata")
 
-# for BERTOPIC ----
+#### >> for BERTOPIC ----
 rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_congress.csv")
 
 rs$embed <- NA
@@ -494,7 +495,7 @@ rep_docs_congress <- rs
 save(rep_docs_congress, file="data_prod/dashboard/bertopic/representative_docs_congress.rdata")
 
 #
-### >> Medias ----
+# > Medias ----
 cat("selecting representative medias tweets for each topic\n")
 
 ind <- scan("data_prod/dfm/media-rs-dtm-indices.txt")
@@ -559,7 +560,7 @@ tw.embed <- function(text, name,
 }
 
 # preparing embed ----
-# > for LDA ----
+#### >> for LDA ----
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
@@ -572,7 +573,7 @@ for (i in 1:nrow(rs)){
 media_rs <- rs
 save(media_rs, file="data_prod/dashboard/lda/media-rs-tweets.rdata")
 
-# > for BERTOPIC ----
+#### >> for BERTOPIC ----
 
 rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
 
@@ -587,6 +588,14 @@ for (i in 1:nrow(rs)){
 rep_docs_media <- rs
 
 save(rep_docs_media, file="data_prod/dashboard/bertopic/representative_docs_media.rdata")
+
+# > Supporters ----
+
+
+# > Attentive ----
+
+# > General ----
+
 #
 # file.remove("data_temp/all_media_IPG_tweets.csv",
 #             "data_temp/all_deputesXVI_tweets.csv")
