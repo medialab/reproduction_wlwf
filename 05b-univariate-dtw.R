@@ -189,25 +189,25 @@ colors_dict <- c(
       "Media" = "darkorchid3"
     )
 
+
 sigma_tests <- c(0.1, 0.3, 0.5, 0.7, 0.9)
 TW_tests <- c(7,14,21,28,35,42,49,56)
 for(TW in TW_tests){
   for (sigma in sigma_tests){
     sigma_name <-  sub("^[^.]*\\.", "", as.character(sigma))
     plot_db <- scores %>%
-      filter(TimeW == TW)
-      filter(value>=sigma) %>%
+      filter(TimeW == TW) %>%
+      filter(value >= sigma) %>%
       mutate(label = factor(label, levels = unique(label)))  
 
     path_img <- paste0(init_unique, "tests/FLScore_bytopic_", TW, "_", sigma_name, ".png")
-
     # PLOT -- FIGURE 4
     #===============================================================================
     png(path_img, width = 1600, height = 1400)
     p <- ggplot(plot_db,
           aes(x = label, y = value, ymin = 0, ymax = 1)) +
       geom_point(aes(col = leader), alpha = 0.4, size = 3) +
-      facet_wrap(~follower, nrow = 1) +
+      facet_wrap(~follower, nrow = 1, drop = FALSE) +
       coord_flip() +
       xlab("") +
       ylab("\nLead/Follow Score") +

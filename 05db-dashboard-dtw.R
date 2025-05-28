@@ -46,10 +46,9 @@ ui <- fluidPage(
         imageOutput("plotTWSV", height=600, width=800),
         textOutput("textTWVS"),
         imageOutput("plotTWVS", height=600, width=800),
-        imageOutput("plotFactionSize"),
+        imageOutput("plotFactionSize", height=600, width=800),
         textOutput("texttopic"),
         imageOutput("plottopic", height=1600, width=1400),
-        #textOutput("textevolead"),
         imageOutput("plotevolead", height=800, width=800),
         textOutput("textfaction"),
         imageOutput("plotfaction", height=800, width=2800),
@@ -143,7 +142,7 @@ server <- function(input, output, session) {
 
     output$plottopic <- renderImage({
     list(
-        src = paste0("data_prod/dtw/", topic_model_lwr(), "/tests/FLScore_bytopic_sigma", sigma_name(), ".png"),
+        src = paste0("data_prod/dtw/", topic_model_lwr(), "/unique/tests/FLScore_bytopic_", TW(), "_", sigma_name(), ".png"),
         contentType = 'image/png'
     )
     }, deleteFile = FALSE)
@@ -212,7 +211,8 @@ server <- function(input, output, session) {
 
     output$plotFactionSize <- renderImage ({
         list(
-            src = paste0("data_prod/dtw/", topic_model_lwr(), "/tests/FactionsSize_", TW(), "_", sigma_name(), ".png")
+            src = paste0("data_prod/dtw/", topic_model_lwr(), "/tests/FactionsSize_", TW(), "_", sigma_name(), ".png"),
+            contentType = 'image/png'
         )
     }, deleteFile=FALSE)
 }
