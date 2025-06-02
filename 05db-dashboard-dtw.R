@@ -49,12 +49,12 @@ ui <- fluidPage(
         imageOutput("plotFactionSize", height=600, width=800),
         textOutput("texttopic"),
         imageOutput("plottopic", height=1600, width=1400),
+              textOutput("textbiv"),
+        imageOutput("plotbiv", height=600, width=1000),
+        tableOutput("tablelegtop"), 
         imageOutput("plotevolead", height=800, width=800),
         textOutput("textfaction"),
-        imageOutput("plotfaction", height=800, width=2800),
-        textOutput("textbiv"),
-        imageOutput("plotbiv", height=600, width=1000),
-        tableOutput("tablelegtop")), 
+        imageOutput("plotfaction", height=800, width=2800)),
 
         tabsetPanel(
             tabPanel("Page principale", p("Résumé des résultats DTW")),
