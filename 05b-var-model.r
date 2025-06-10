@@ -18,8 +18,6 @@ library(resample)
 
 parser <- ArgumentParser()
 
-parser$add_argument("topic_model", help="Choose a model type between lda and bertopic")
-
 parser$add_argument("--estimate", action = "store_true",
 help = "Run the script who estimate PVAR and IRF")
 
@@ -36,42 +34,25 @@ if (!(args$topic_model %in% c('bertopic', 'lda'))){
 }
 
 if (!(args$estimate)){
-  if (args$topic_model == 'lda') {
-    if (!file.exists("data_prod/var/lda/Pvar_model-MAIN.Rdata") ||
-    !file.exists("data_prod/var/lda/Pvar_irfs-MAIN.Rdata")) {
-      stop("No var and irf files were found. Please run the --estimate option")
-      }
-  } else {
-    if (!file.exists("data_prod/var/bertopic/Pvar_model-MAIN.Rdata") ||
-    !file.exists("data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")) {
-      stop("No var and irf files were found. Please run the --estimate option")
-    }
+  if (!file.exists("data_prod/var/bertopic/Pvar_model-MAIN.Rdata") ||
+  !file.exists("data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")) {
+    stop("No var and irf files were found. Please run the --estimate option")
   }
 }
 
 if (args$estimate){
   count_msg <- 0
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
-  #Put our main databse generated thanks to script 05a 
   print("Files recuperation and preprocessing")
-  if (args$topic_model=='lda'){
-  db <- read_csv("data_prod/var/lda/general_TS.csv", show_col_types = FALSE)
-  db <-  db %>% mutate(topic = ifelse(topic == 55, 16, topic)) %>% 
-              mutate(topic = ifelse(topic == 60, 51, topic)) %>%
-              mutate(topic = ifelse(topic %in% c(65, 40, 50, 59, 70), 27, topic)) %>%
-              group_by(date, topic) %>%                                  
-              summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")       
-  pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 42, 44, 45, 51, 52, 53, 56, 63, 64, 66)
-  } else {
-    db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
-    throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
-    pol_issues_temp <- setdiff(c(0:91), throw_topic)
-    db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
-          mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>%
-          group_by(date, topic) %>%                                  
-          summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-    pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))  
-  }
+  db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
+  throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
+  pol_issues_temp <- setdiff(c(0:91), throw_topic)
+  db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
+        mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>%
+        group_by(date, topic) %>%                                  
+        summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
+  pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))  
+
   
   db <- db %>%
     filter(topic %in% pol_issues)
@@ -133,10 +114,9 @@ if (args$estimate){
       }
     }
     
-    if(args$topic_model=='bertopic'){
-      cat("Export filtered csv for Stata because some tests can't be done with BERTopic Time Series \n")
-      write.csv(db, "data_prod/var/bertopic/general_TS_filt_logtransfo.csv", row.names = FALSE)
-    }
+    cat("Export filtered csv for Stata because some tests can't be done with BERTopic Time Series \n")
+    write.csv(db, "data_prod/var/bertopic/general_TS_filt_logtransfo.csv", row.names = FALSE)
+
 
     if(count_stat != length(variables)){
       print("At least one group is represented by a non-stationary time series in one panel. Check the stationnarity after a differentiation")
@@ -177,85 +157,69 @@ if (args$estimate){
           print(paste("Diff", v, "H0 not rejected", p_value2, "All panels are stationary"))
         }
       }
+    }
 
-      if(args$topic_model == 'lda'){
-        topic_ips <- setdiff(pol_issues, unlist(unique(list_const_top)))
-
-        cat("Topics", unlist(unique(list_const_top)), "will be remove for following tests to avoid constants or quasi-constants \n")
-        cat("Test IPS test (H0 : All panels contain unit root) \n")
-        pdb_ips <- pdb %>% filter(topic %in% topic_ips)
-        cat("Dimensions de pdb_ips :", dim(pdb_ips), "\n")
-        if (!is.pbalanced(pdb_ips)){
-          stop("Unbalanced panel data in ips test")
-        }
-        for (v in variables){
-          ips <- purtest(data_p, test="ips", exo="intercept", lags="AIC", pmax=10)
-          p_val <- ips$statistic$p.value
-          if(p_val < 0.05){
-            print(paste(v, "H0 rejected", p_val, "At least one panel is stationary"))
-          } else {
-            print(paste(v, "H0 not rejected", p_val, "All panels are not stationary"))
-            count_stat_top_ips <- count_stat_top_ips + 1
-          }
-        } 
-
-        Groen_Kleibergen_Test <- function(db, n_boot=500){
-          print("Start panel cointegration test")
-          jo_mat <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
-          iter_jo <- 0
-          list_subdb <- list()
-          for(i in unique(db$topic)){
-            iter_jo <- iter_jo+1
-            data_jo <- db %>%
-                      filter(topic==i)
-            jo <- summary(ca.jo(data_jo[, variables], type="trace", ecdet = "const", spec="longrun"))@teststat
-            jo_mat[iter_jo,] <- jo 
-            list_subdb[[iter_jo]] <- data_jo
-          }
-      
-          mean_jo <- colMeans(jo_mat, na.rm = TRUE)
-
-          bootstrap_stats <- matrix(NA, nrow=n_boot, ncol=length(variables))
-          N <- length(unique(db$topic))
-          seq <- seq(1:length(unique(db$topic)))
-          for (b in 1:n_boot){
-            boot_sample <- sample(1:N, N, replace = TRUE)
-            boot_trace_stats <- matrix(NA, nrow=length(unique(db$topic)), ncol=length(variables))
-            iter_jo <- 0
-            for (i in boot_sample){
-              iter_jo <- iter_jo+1
-              jo_sim <- ca.jo(list_subdb[[boot_sample[i]]][, variables], type="trace", ecdet = "const", spec="longrun")@teststat
-              boot_trace_stats[iter_jo, ] <- jo_sim 
-            }
-            bootstrap_stats[b,] <- colMeans(boot_trace_stats)
-          }
-
-          Esp_jo <- colMeans(bootstrap_stats)
-          V_jo <- colVars(bootstrap_stats)
-
-          stats_GK <- (mean_jo - Esp_jo) / V_jo
-          p_value <- 2 * (1 - pnorm(abs(stats_GK)))
-          num_ranks <- rev(seq_along(stats_GK)) - 1
-          line_rank <- paste0("r<=", num_ranks)
-
-          result_table <- data.frame(
-            Rank = line_rank,
-            GK_Stat = stats_GK,
-            P_value = p_value
-          )
-          return(result_table)
-        } 
-        db_ips <- db %>% filter(topic %in% topic_ips)
-        GK_res <- Groen_Kleibergen_Test(db_ips)
-        print(GK_res)
-      } else {
-        cat("No further stationarity or cointegration tests can be performed for BERTopic because of data structure \n")
-        #Refer to a do file with these tests 
-      }
+    PVAR_BP_test <-function(model){
+      pdim <- c(length(pol_issues), 268, length(pol_issues)*268)
+      N_obs <- pdim[2]
+      id <- "topic"
+      time <- "date"
+      T_i <- rep(268, length(pol_issues))
+      N_t <- rep(length(pol_issues), 268)
+      res <- model$residuals
     }
 
 
-    PVAR_post <- function(model){
+    PVAR_post <- function(data, dependent_vars, lag.max, panel_identifier){ #A modifier car on a clairement raconté des conneries je pense.
+    #Créer les lags et demean en tenant compte de la structure panel (voir comment les lags sont fait dans panelVAR)
+      y <- as.matrix(data)
+      data <- droplevels(data)
+      required_vars <- c(dependent_vars)
+      colnames(y) <- make.names(colnames(y))
+      if (is.numeric(panel_identifier)) {
+        Set_Vars <- data[, c(colnames(data)[panel_identifier], required_vars)]
+      } else {
+        Set_Vars <-
+          data[, c(panel_identifier, required_vars)]
+      }
+      K <- ncol(y)
+      nof_dependent_vars <- length(dependent_vars)
+      nof_exog_vars <- 0
+      categories <- sort(unique(Set_Vars[, 1]))
+      periods <- sort(unique(Set_Vars[, 2]))
+
+      nof_categories <- length(categories)
+      nof_periods <- length(periods)
+
+      lag.max <- abs(as.integer(lag.max))
+      lag <- abs(as.integer(lag.max + 1))
+      ylagged <- embed(y, lag)[, -c(1:K)]
+      yendog <- y[-c(1:lag.max), ]
+      sample <- nrow(ylagged)
+      rhs <- rep(1, sample)
+      idx <- seq(K, K * lag.max, K)
+      detint <- ncol(as.matrix(rhs))
+      criteria <- matrix(NA, nrow = 4, ncol = lag.max)
+      rownames(criteria) <- c("AIC(n)", "HQ(n)", "SC(n)", "FPE(n)")
+      colnames(criteria) <- paste(seq(1:lag.max))
+      for (i in 1:lag.max) {
+          ys.lagged <- cbind(ylagged[, c(1:idx[i])], rhs)
+          sampletot <- nrow(y)
+          nstar <- ncol(ys.lagged)
+          resids <- lm.fit(x = ys.lagged, y = yendog)$residuals
+          sigma.det <- det(crossprod(resids)/sample)
+          criteria[1, i] <- log(sigma.det) + (2/sample) * (i * 
+              K^2 + K * detint)
+          criteria[2, i] <- log(sigma.det) + (2 * log(log(sample))/sample) * 
+              (i * K^2 + K * detint)
+          criteria[3, i] <- log(sigma.det) + (log(sample)/sample) * 
+              (i * K^2 + K * detint)
+          criteria[4, i] <- ((sample + nstar)/(sample - nstar))^K * 
+              sigma.det
+      }
+      order <- apply(criteria, 1, which.min)
+      return(list(selection = order, criteria = criteria))
+
       residuals <- model$residuals
       lags <- model$lags
       n_obs <- nrow(residuals)
@@ -291,26 +255,15 @@ if (args$estimate){
     cat("Selection criteria suggests to choose the following number(s) of lags: \n")
     cat("AIC", max_AIC, "\n", "SC", max_SC, "\n", "HQ", max_HQ, "\n", "FPE", max_FPE, "\n")
     
-    if(args$topic_model == 'lda') {
-      write.csv(pdb, "data_prod/var/lda/general_filt_nodiff.csv", row.names = FALSE)
-      write.csv(pdb_diff, "data_prod/var/lda/general__filt_diff.csv", row.names = FALSE)
-      write.csv(df_test,
-      "data_prod/var/lda/tests_results.csv",
-      row.names = FALSE)
-    } else {
-      write.csv(pdb, "data_prod/var/bertopic/general_filt_nodiff.csv", row.names = FALSE)
-      write.csv(pdb_diff, "data_prod/var/bertopic/general_filt_diff.csv", row.names = FALSE)
-      write.csv(df_test,
-      "data_prod/var/bertopic/tests_results.csv",
-      row.names = FALSE)
-    }
-  }
-  if (args$topic_model == "lda"){
-    lags <- 9
-  } else {
-    lags <- 8
-  }
 
+    write.csv(pdb, "data_prod/var/bertopic/general_filt_nodiff.csv", row.names = FALSE)
+    write.csv(pdb_diff, "data_prod/var/bertopic/general_filt_diff.csv", row.names = FALSE)
+    write.csv(df_test,
+    "data_prod/var/bertopic/tests_results.csv",
+    row.names = FALSE)
+    
+  }
+  lags <- 8
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
   print("Non-Cumulative IRF preparation")
   irf_NC <- panelvar::oirf(PVAR_model, n.ahead = 60)
