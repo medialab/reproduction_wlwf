@@ -20,7 +20,7 @@ from utils import (
 
 
 def run_xan_command(topic_model):
-    command = f"xan cat rows data_prod/dashboard/{topic_model}/data/*.csv | xan groupby date,topic 'values(prop)' | xan sort -s topic,date"
+    command = f"xan cat rows data_prod/dashboard/{topic_model}/data/*.csv | xan drop prop | xan groupby date,topic 'values(nb_tweets)' | xan sort -s topic,date"
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     return result.stdout
 
@@ -31,23 +31,18 @@ def parse_csv_data(csv_text):
 
 def split_val(data, groups):
     for row in data:
-        values = row["values(prop)"].split("|")  # Séparation par '|'
+        values = row["values(nb_tweets)"].split("|")  # Séparation par '|'
         
-        # Ajouter dynamiquement des colonnes group1_prop, group2_prop...
+        # Ajouter dynamiquement des colonnes
         for i, value in enumerate(values):
             row[f"{groups[i]}"] = value
         
         # Supprimer l'ancienne colonne
-        del row["values(prop)"]
+        del row["values(nb_tweets)"]
 
     return data
 
 parser = argparse.ArgumentParser()
-
-parser.add_argument(
-    "topic_model",
-    help="Name of the topic model chosen. Write lda or bertopic",
-)
 
 parser.add_argument(
     "--origin_path",
@@ -56,35 +51,16 @@ parser.add_argument(
     default=os.getcwd(), 
 )
 
+parser.add_argument("--retweets", action = "store_true",
+help = "Run the script counting the retweets")
+
 args = parser.parse_args()
 
-if args.topic_model not in ['lda', 'bertopic']:
-    raise ValueError("The current topic model is incorrect. Choose lda or bertopic as input for model type")
+reader_G = casanova.reader("data_prod/dashboard/bertopic/data/bertopic_ts_1.csv")
+groups = list(dict.fromkeys(list(reader_G.cells('party'))))
 
-if args.topic_model=='lda':
-    reader_G = casanova.reader("data_prod/dashboard/lda/data/ts-1.csv")
-    groups = list(dict.fromkeys(list(reader_G.cells('actor'))))
-    mapping_dict = {
-    "dep. lr": "lr",
-    "dep. majo.": "majority",
-    "dep. nupes": "nupes",
-    "dep. rn": "rn",
-    "sup. lr": "lr_supp",
-    "sup. majo.": "majority_supp",
-    "sup. nupes": "nupes_supp",
-    "sup. rn": "rn_supp",
-    "pub. attentif": "attentive",
-    "pub. general": "general",
-    "medias": "media"
-    }
-    
-    groups = [mapping_dict.get(actor, actor) for actor in groups] 
-else:
-    reader_G = casanova.reader("data_prod/dashboard/bertopic/data/bertopic_ts_1.csv")
-    groups = list(dict.fromkeys(list(reader_G.cells('party'))))
-
-df = split_val(parse_csv_data(run_xan_command(args.topic_model)), groups)
-output_file = f"data_prod/var/{args.topic_model}/general_TS.csv"
+df = split_val(parse_csv_data(run_xan_command("bertopic")), groups)
+output_file = f"data_prod/var/bertopic/general_TS.csv"
 with open(output_file, "w", newline="") as f:
     writer = csv.DictWriter(f, fieldnames=df[0].keys())
     writer.writeheader()
