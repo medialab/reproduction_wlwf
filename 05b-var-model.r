@@ -159,14 +159,59 @@ if (args$estimate){
       }
     }
 
-    PVAR_BP_test <-function(model){
-      pdim <- c(length(pol_issues), 268, length(pol_issues)*268)
-      N_obs <- pdim[2]
-      id <- "topic"
-      time <- "date"
-      T_i <- rep(268, length(pol_issues))
-      N_t <- rep(length(pol_issues), 268)
-      res <- model$residuals
+    WITHIN_TRANSFO <- function(dependent_vars, lags, data, panel_identifier){
+      data <- droplevels(data)
+      required_vars <- c(dependent_vars)
+
+      if (is.numeric(panel_identifier)) {
+        Set_Vars <-
+          data[, c(colnames(data)[panel_identifier], required_vars)]
+      } else {
+        Set_Vars <-
+          data[, c(panel_identifier, required_vars)]
+      }
+      
+      nof_dependent_vars <- length(dependent_vars)
+      nof_exog_vars <- 0
+      categories <- sort(unique(Set_Vars[, 1]))
+      periods <- sort(unique(Set_Vars[, 2]))
+      nof_categories <- length(categories)
+      nof_periods <- length(periods)
+      lags <- abs(as.integer(lags))
+
+      name_category <- names(Set_Vars)[1]
+      name_period <- names(Set_Vars)[2]
+      names(Set_Vars)[1:2] <- c("category", "period")
+
+      Set_Vars <- Set_Vars[order(Set_Vars$category, Set_Vars$period,decreasing = FALSE),]
+      Set_Vars$category <- factor(Set_Vars$category)
+      Set_Vars$period <- factor(Set_Vars$period)
+
+      # Add lags of dependent_vars
+      Set_Vars <- cbind(Set_Vars,
+                        do.call(
+                          rbind,
+                          mapply(
+                            function(i)
+                              panel_lag(Set_Vars[Set_Vars$category == categories[i], c("period", dependent_vars)], lags),
+                            1:length(categories),
+                            SIMPLIFY = FALSE
+                          )
+                        )) #Check ce que ça fait
+
+      #Demeaning
+      Set_Vars <- cbind(Set_Vars,
+                  do.call(
+                    rbind,
+                    mapply(
+                      function(i)
+                        panel_demean(Set_Vars[Set_Vars$category == categories[i],], demean),
+                      1:length(categories),
+                      SIMPLIFY = FALSE
+                    )
+                  )) #Check aussi
+      
+      return(Set_Vars)
     }
 
 
@@ -187,12 +232,23 @@ if (args$estimate){
       nof_exog_vars <- 0
       categories <- sort(unique(Set_Vars[, 1]))
       periods <- sort(unique(Set_Vars[, 2]))
-
       nof_categories <- length(categories)
       nof_periods <- length(periods)
-
       lag.max <- abs(as.integer(lag.max))
       lag <- abs(as.integer(lag.max + 1))
+      ylagged <- data.frame(ncol=11)
+      colnames(ylagged) <- variables
+      for (lag_num in 1:(lag.max +1)){
+        i <- 1
+        for (v in variables){ #C'est faux il faut améliorer pour stocker tous les lags 
+          data_temp <- data.frame(n-col = 11)
+          colnames(data_lag) <- variables
+          data_temp[,i] <- lag(pdb[[v]], lag_num)
+          i <- i+1 
+        }
+        rbind(ylagged, data_temp)
+        
+      }
       ylagged <- embed(y, lag)[, -c(1:K)]
       yendog <- y[-c(1:lag.max), ]
       sample <- nrow(ylagged)
@@ -231,6 +287,20 @@ if (args$estimate){
       HQ <- log(det(Sigma)) + log(log(n_obs))*lags*k^2/n_obs
       FPE <- det(Sigma)*((n_obs + n_star)/(n_obs - n_star))^k
       return(c(AIC = AIC, SC = SC, HQ = HQ, FPE=FPE))
+    }
+
+    PVAR_HETSER_TEST <- function(model){  #Reprendre serial.test de vars avec l'option asymptotique
+      res1 <- model$residuals 
+    }
+
+    PVAR_BP_test <-function(model){
+      pdim <- c(length(pol_issues), 268, length(pol_issues)*268)
+      N_obs <- pdim[2]
+      id <- "topic"
+      time <- "date"
+      T_i <- rep(268, length(pol_issues))
+      N_t <- rep(length(pol_issues), 268)
+      res <- model$residuals
     }
     
     data_test = matrix(NA, nrow=30, ncol = 6)
