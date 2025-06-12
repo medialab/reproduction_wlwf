@@ -1008,6 +1008,6 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             group_type,
                             topic,
                             round(topics_info[topic][day] / (doc_count), 5),
-                            topics_info[topic][party][day] 
+                            topics_info[topic][day] 
                         ]
                     )
