@@ -323,9 +323,23 @@ if (args$estimate){
       infos_topic_post <- rbind(infos_topic_post, new_row)
       for (v in variables){
         resids <- residuals(var_model)[,v]
-        path_resid <- paste0("data_prod/var/bertopic/issue-level/residus_", topic_num, "_", v, ".png")
+        fitted_val <- as.numeric(var_model$varresult[[v]]$fitted.values)
+        path_resid <- paste0("data_prod/var/bertopic/issue-level/residusHIST_", topic_num, "_", v, ".png")
         png(path_resid, width=800, height=800)
         p <- hist(resids, breaks = 30)
+        dev.off()
+        path_resid <- paste0("data_prod/var/bertopic/issue-level/residusPOINT_", topic_num, "_", v, ".png")
+        df_diag <- data.frame(
+          Fitted = fitted_val,
+          Residuals = resids
+        )
+        png(path_resid, width=800, height=800)
+        p <- plot(df_diag$Fitted, df_diag$Residuals,
+                xlab = "Valeurs prédites",
+                ylab = "Résidus",
+                main = paste("Résidus vs Valeurs prédites pour", v),
+                pch = 20, col = "darkblue")
+            abline(h = 0, col = "red", lty = 2)
         dev.off()
       }
       }
