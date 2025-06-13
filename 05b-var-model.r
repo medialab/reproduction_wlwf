@@ -18,6 +18,9 @@ library(resample)
 
 parser <- ArgumentParser()
 
+parser$add_argument("--retweets", action = "store_true",
+help = "Run the script counting the retweets")
+
 parser$add_argument("--estimate", action = "store_true",
 help = "Run the script who estimate PVAR and IRF")
 
@@ -28,10 +31,6 @@ parser$add_argument("--number_irf", help="Choose a int who will represent the nu
 
 
 args <- parser$parse_args()
-
-if (!(args$topic_model %in% c('bertopic', 'lda'))){
-  stop("The model name is incorrect. Choose between lda and bertopic")
-}
 
 if (!(args$estimate)){
   if (!file.exists("data_prod/var/bertopic/Pvar_model-MAIN.Rdata") ||
@@ -44,7 +43,12 @@ if (args$estimate){
   count_msg <- 0
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
   print("Files recuperation and preprocessing")
-  db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
+  if (args$retweets){
+    db <- read_csv("data_prod/var/bertopic/general_TS_RT.csv", show_col_types = FALSE) #Change Name when retweets will be available
+  }
+  else(
+    db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
+  )
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
   pol_issues_temp <- setdiff(c(0:91), throw_topic)
   db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
@@ -57,40 +61,7 @@ if (args$estimate){
   db <- db %>%
     filter(topic %in% pol_issues)
 
-  # - logit transform all series
-  for (v in variables) {
-    # - pulling the series-agenda for that group
-    db[[v]] <- as.numeric(db[[v]])
-    x <- db[,v]
-
-    if (any(x > 0.998)) { #Treat the case of a proportion value >= 1 (x can be > 1 because of the previous line). We chose 0.999 because rounding of 0.9999 is equal to 1 in db 
-      for (i in 1:nrow(x)) {
-        if (db[i, v] > 0.998) {
-          print(paste("WARNING: due to proportion value equal to 1 or almost equal to 1,  small transformation has been applied for a value in the following group :", v))
-          db[i, v] <- 0.998
-          }
-        }
-      }
-
-    x <- db[,v]
-    # - adding 1 percentage point to avoid 0s before the logit transformation
-    x <- x + 0.001
-
-    # - applying the non-linear transformation
-    logit_x <- log(x / (1 - x))
-    db[,v] <- logit_x
-  }
-
   print("VAR Estimation")
-  # - estimating the model for p lags
-
-  #db <- db %>%  #Remove the two first days to have a number of days divisible by 7. 
-  #group_by(topic) %>%
-  #mutate(group = ceiling(row_number() /2)) %>% 
-  #group_by(group, topic) %>%
-  #summarise(date = first(group), across(where(is.numeric), mean), .groups='drop') %>%
-  #arrange(as.numeric(topic)) 
-
   db <- as.data.frame(db)
 
   db$topic <- as.character(db$topic)
@@ -100,7 +71,7 @@ if (args$estimate){
 
   if (args$tests) {
     count_stat <- 0
-    pdb <- pdata.frame(db, index=c("topic", "date"))
+    pdb <- pdata.frame(db, index=c("topic", "date")) 
     cat("Hadri Test (H0 : All panels don't contain unit root) \n")
     for (v in variables){
       data_p <- pdb[[v]]
@@ -114,8 +85,21 @@ if (args$estimate){
       }
     }
     
+    cat("IPS Test (H0 : All panels contain unit root) \n")
+    for (v in variables){
+      data_p <- pdb[[v]]
+      hadri <- purtest(data_p, test="ips", exo="intercept")
+      p_value <- hadri$statistic$p.value
+      if (p_value <0.05){
+        print(paste(v, "H0 rejected", p_value, "At least one panel is stationary"))
+      } else{
+        print(paste(v, "H0 not rejected", p_value, "All panels are not stationary"))
+        count_stat <- count_stat + 1
+      }
+    }
+    
     cat("Export filtered csv for Stata because some tests can't be done with BERTopic Time Series \n")
-    write.csv(db, "data_prod/var/bertopic/general_TS_filt_logtransfo.csv", row.names = FALSE)
+    write.csv(db, "data_prod/var/bertopic/general_TS_filt_logtransfo.csv", row.names = FALSE) #DELETE IF BETTER WITH TWEET NUMBER
 
 
     if(count_stat != length(variables)){

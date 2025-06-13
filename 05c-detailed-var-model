@@ -1,16 +1,19 @@
 library(dplyr)
+library(car)
 library(tidyverse)
 library(tidyr)
+library(stats)
 library(ggplot2)
 library(vars)
 library(boot)
 library(rio)
 library(tseries)
 library(argparse)
-library(stats)
 library(stringr)
 library(data.table)
+library(lubridate)
 library(urca)
+source("utils_R.r")
 
 parser <- ArgumentParser()
 
@@ -19,6 +22,9 @@ help = "Run the script who estimate VAR and IRF")
 
 parser$add_argument("--tests", action = "store_true",
                     help = "Activate to do the part where we test stationnarity, stationnarity after differentiation, PACF and ACF informations")
+
+parser$add_argument("--tests_post", action = "store_true",
+                    help = "Compute check tests after estimation with optimal parameters")
 
 parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=7)
 
@@ -42,50 +48,43 @@ if (args$estimate){
 
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
-
   if (args$tests){
-    count_msg <- 0
+    print("Start testing process")
+    print(paste("Nombre de topics", length(unique(db$topic))))
     results_list <- list()
     results_list2 <- list()
+    infos_topic <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=6)) #Seuil ACF, seuil PACF, Stationnarité, VAR select (4), Serial, Heteroskedasticity, Normality 
+    colnames(infos_topic) <- c("Topic", "Statio_type", "AIC", "HQ", "SC", "FPE")
+    for (v in variables){
+      for (topic_n in pol_issues) { 
+        # Augmented Dickey-Fuller (ADF) test for stationarity
+        db[[v]] <- log(db[[v]] + 0.00001)
+        db_topic <- db[db$topic == topic_n, ]
+        data <- db_topic[[v]]
+        data <- as.ts(data)
+        if (sd(data) > 0) {
+          adf <- adf.test(data)
+          p_value <- adf$p.value
+          if (is.nan(p_value)) { #ADF ne gère pas certains cas. On va donc vérifier manuellement par ACF et PACF si les données sont stationnaires
+            cat("P-value not calculated for topic:", topic_n, "and variable:", v, "because of data structure and weak variance of the time series. The variance is:", var(data), "A special treatment was done to determine stationnarity using ACF and PACF functions")
+            acf_values <- acf(data, plot = FALSE, lag.max = 6)
+            pacf_values <- pacf(data, plot = FALSE, lag.max = 6)
 
-    concat_statio <- as.data.frame(matrix(NA, nrow = length(variables), ncol=1))
-    colnames(concat_statio) <- c("p-value")
-    rownames(concat_statio) <- variables
-
-    infos_topic <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=7)) #Seuil ACF, seuil PACF, Stationnarité, Max Modul VAR, VAR select (4), 
-    colnames(infos_topic) <- c("Topic", "Statio_type", "Max Modul", "AIC", "HQ", "SC", "FPE")
-    data <- as.ts(db[[v]])
-    adf <- adf.test(data)
-    p_value <- adf$p.value
-    concat_statio[v,1] <- p_value
-    if (count_msg == 0) {
-        print("Start testing process")
-        print(paste("Nombre de topics", length(unique(db$topic))))
-        count_msg <- 1
-    }
-
-    no_stationarity_TS_data <- data.frame()
-    for (topic_n in pol_issues) { 
-      # Augmented Dickey-Fuller (ADF) test for stationarity
-      db_topic <- db[db$topic == topic_n, ]
-      data <- db_topic[[v]]
-      data <- as.ts(data)
-      if (sd(data) > 0) {
-        adf <- adf.test(data)
-        p_value <- adf$p.value
-        if (is.nan(p_value)) { #ADF ne gère pas certains cas. On va donc vérifier manuellement par ACF et PACF si les données sont stationnaires
-          cat("P-value not calculated for topic:", topic_n, "and variable:", v, "because of data structure and weak variance of the time series. The variance is:", var(data), "A special treatment was done to determine stationnarity using ACF and PACF functions")
-          acf_values <- acf(data, plot = FALSE, lag.max = 6)
-          pacf_values <- pacf(data, plot = FALSE, lag.max = 6)
-
-          if ((acf_values$acf[3] > 0.1 && acf_values$acf[4] > 0.1 && acf_values$acf[5] > 0.1) || (pacf_values$acf[3] > 0.1 && pacf_values$acf[4] > 0.1 && pacf_values$acf[5] > 0.1)) { #Si l'ACF et la PACF décroient pas assez rapidement, on suppose que la série est pas stationnaire
+            if ((acf_values$acf[3] > 0.1 && acf_values$acf[4] > 0.1 && acf_values$acf[5] > 0.1) || (pacf_values$acf[3] > 0.1 && pacf_values$acf[4] > 0.1 && pacf_values$acf[5] > 0.1)) { #Si l'ACF et la PACF décroient pas assez rapidement, on suppose que la série est pas stationnaire
+              results_list <- append(results_list, list(list(topic_n, v, p_value)))
+            }
+          } else if (p_value > 0.05) {  # Vérifier si la série est non stationnaire
             results_list <- append(results_list, list(list(topic_n, v, p_value)))
           }
-        } else if (p_value > 0.05) {  # Vérifier si la série est non stationnaire
-          results_list <- append(results_list, list(list(topic_n, v, p_value)))
+          pathqq <- paste0("data_prod/var/bertopic/issue-level/QQ_PLOT_", topic_n, "_", v, ".png")
+          #log_data <- log(data + 0.0001)
+          png(pathqq, width = 800, height = 800)
+          p <- qqPlot(data)
+          print(p)
+          dev.off()
         }
-      }
-    }  
+      }  
+    }
     cat("Résultats de stationnarité sur les séries concaténées \n")
     results_df <- do.call(rbind, lapply(results_list, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
     colnames(results_df) <- c("topic", "variable", "p_value")
@@ -165,8 +164,8 @@ if (args$estimate){
     colnames(PACF_data) <- as.character(pol_issues)
     rownames(ACF_data) <- c(variables, paste0(variables, "_diff"))
     rownames(PACF_data) <- c(variables, paste0(variables, "_diff"))
-    counter_const <- 0
     iter_info <-0
+    list_const <- c()
     for (topic in pol_issues) {
       iter_info <- iter_info + 1
       infos_topic[iter_info, "Topic"] <- as.character(topic)
@@ -185,7 +184,7 @@ if (args$estimate){
         data <- db_topic[[v]]
         data <- as.ts(data)
         if (sd(data) == 0) {
-          counter_const <- counter_const + 1
+          list_const <- c(list_const, topic)
         } else{
           data_differ <- diff(data)
 
@@ -234,33 +233,10 @@ if (args$estimate){
     }
 
     # Résumé du nombre de séries constantes
-    cat("Nombre de séries constantes :", counter_const, "\n")
-
-    transfo_acf <- function(data){
-      df <- as.data.frame(data)
-      df$value <- sapply(strsplit(as.character(df$Freq), ":"), function(x) x[2])
-      if (any(grepl("NA's\\s*", df$Freq, ignore.case = TRUE))) {
-        print("NA detected")
-        nrow_exp <- 7
-        rows_exp <- c("Min", "Q1", "Median", "Mean", "Q3", "Max", "Missing")
-      } else {
-        print("NA Undetected")
-        nrow_exp <- 6
-        rows_exp <- c("Min", "Q1", "Median", "Mean", "Q3", "Max")
-      }
-      dfexp <- as.data.frame(matrix(NA, nrow=nrow_exp, ncol=length(variables)*2))
-      colnames(dfexp) <- c(variables, paste0(variables, "_diff"))
-      rownames(dfexp) <- rows_exp
-      k <- 0
-      for (i in 1:ncol(dfexp)){
-        print(i)
-        for (j in 1:nrow_exp){
-          dfexp[j,i] <- str_trim(df[j + k*nrow_exp, "value"])
-        }
-        k <- k+1
-      }
-      return(dfexp)
-    }
+    list_const <- unique(list_const)
+    cat("Nombre de séries constantes :", length(list_const), "\n")
+    cat("Then, we will remove the following topics from analysis : \n")
+    print(list_const)
 
     acf_sum <- summary(t(ACF_data))
     pacf_sum <- summary(t(PACF_data))
@@ -269,78 +245,54 @@ if (args$estimate){
     pacf_exp <- transfo_acf(pacf_sum)
 
     #Afficher et enregistrer les résultats
-    write.csv(ACF_data, file=paste0("data_prod/var/", args$topic_model, "/issue-level/ACF_full.csv"))
-    write.csv(PACF_data, file=paste0("data_prod/var/", args$topic_model, "/issue-level/PACF_full.csv"))
-    write.csv(acf_exp, file=paste0("data_prod/var/", args$topic_model, "/issue-level/ACF_results.csv"))
-    write.csv(pacf_exp, file=paste0("data_prod/var/", args$topic_model, "/issue-level/PACF_results.csv"))
-
-    print(acf_sum)
-    print(pacf_sum)
-
-    #Create ACF and PACF plots
-    plot_PACFS <- function(data, type){
-      if (!(type %in% c("ACF", "PACF"))){
-        stop("Choose ACF or PACF type for schem")
-      }
-      path_ACF <- paste0("data_prod/var/", args$topic_model, "/issue-level/", type, "_plot.png")
-      png(file=path_ACF, width = 1800, height = 1200)
-      db_plot <- as.data.frame(t(data))
-      db_plot <- db_plot[, variables]
-      db_plot$stationarity <- ifelse(rownames(db_plot) %in% as.character(stationary_topics), TRUE, FALSE)
-      db_plot$topic <- rownames(db_plot)
-      db_plot_long <-  db_plot %>% gather(key="groups", value = "value", variables)
-      max_y <- max(db_plot_long$value)
-      p <- ggplot(data = db_plot_long, aes(x = as.integer(topic), y = value, color=groups, shape = as.factor(stationarity), xmin = 0, xmax = 101, ymin=0, ymax= max_y + 1)) +
-          geom_jitter(width = 0.3, size = 5) +  
-          scale_shape_manual(values = c("TRUE" = 18, "FALSE" = 16), labels = c("TRUE" = "Stationnaire", "FALSE" = "Mixte"), name = "Stationnarité") +
-          scale_color_manual(values = c(
-                                  "lr" = "blue",
-                                  "majority" = "orange",
-                                  "nupes" = "red",
-                                  "rn" = "purple",
-                                  "media" = "black", 
-                                  "majority_supp" = "darkorange", 
-                                  "lr_supp" = "darkblue", 
-                                  "nupes_supp" = "darkred", 
-                                  "rn_supp" = "purple4", 
-                                  "attentive" = "forestgreen", 
-                                  "general" = "lightgrey"
-                                  )) +
-         labs(
-          title = paste(type, "day where value was < 0.1 for model", args$topic_model),
-          x = "Topics",
-          y = "Number of days")
-      print(p)
-      dev.off()
-    }
+    write.csv(ACF_data, file=paste0("data_prod/var/bertopic/issue-level/ACF_full.csv"))
+    write.csv(PACF_data, file=paste0("data_prod/var/bertopic/issue-level/PACF_full.csv"))
+    write.csv(acf_exp, file=paste0("data_prod/var/bertopic/issue-level/ACF_results.csv"))
+    write.csv(pacf_exp, file=paste0("data_prod/var/bertopic/issue-level/PACF_results.csv"))
+    
     plot_PACFS(ACF_data, "ACF")
     plot_PACFS(PACF_data, "PACF")
 
-
+    for (topic_num in pol_issues){
+      if (topic_num %in% c(52, 71, 79, 85, 86)){
+        next
+      }
+      png("")
+      topic_num <- as.character(topic_num)
+      db_topic <- db %>% filter(as.character(topic) == topic_num)
+      print(paste("Currently testing topic", topic_num))
+      AIC_and_co <- VARselect(db_topic[, variables], lag.max = 30, season = NULL)
+      row_index <- which(as.character(infos_topic$Topic) == topic_num)
+      infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
+      infos_topic[row_index, "HQ"] <- AIC_and_co$selection[[2]]
+      infos_topic[row_index, "SC"] <- AIC_and_co$selection[[3]]
+      infos_topic[row_index, "FPE"] <- AIC_and_co$selection[[4]]
+    }
   }
 
   print("Preprocessing (continued)")
   db$topic <- as.character(db$topic)
-  #exclude_issues <- c(52, 71, 79, 85, 86, 88) #Because of stability process problems
+  exclude_issues <- c(52, 71, 79, 85, 86,88) #Constants are excluded or they cause problems
+  list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
+  if(args$tests_post){
+    infos_topic_post <- data.frame(matrix(NA, ncol=4))
+    colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
+  }
 
-  for (topic_num in unique(as.character(db$topic))){
+  for (topic_num in list_topic_iter){
     print(paste("Model calculated", topic_num))
-    lags <- 1
+    lags <- 3
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
-    if (!args$tests ){
+    if (!args$tests){
       if(topic_num %in% as.character(exclude_issues)){
         print(paste("Skipping topic", topic_num, "because it will cause errors"))
         next
       }
     }
-    var_irfs_cum <- irf(var_model, n.ahead = 20, cumulative = TRUE)
-    save(var_irfs_cum, file = paste0("data_prod/var/", args$topic_model, "/issue-level/var_irfs_topic_", topic_num, ".Rdata"))
-    if (args$tests){
-      topic <- as.character(topic)
-      print(paste("Currently testing topic", topic_num))
-      AIC_and_co <- VARselect(db_topic[, variables], lag.max = 30, season = NULL)
-      row_index <- which(as.character(infos_topic$Topic) == topic_num)
+    #var_irfs_cum <- irf(var_model, n.ahead = 20, cumulative = TRUE)
+    #save(var_irfs_cum, file = paste0("data_prod/var/", args$topic_model, "/issue-level/var_irfs_topic_", topic_num, ".Rdata"))
+    if (args$tests_post){
       var_roots <- tryCatch({
         roots(var_model)
         }, error = function(e) {
@@ -350,104 +302,44 @@ if (args$estimate){
 
 
       if (all(is.finite(var_roots))) {
-        infos_topic[row_index, "Max Modul"] <- max(var_roots)
+        max_mod <- max(var_roots)
       }
-      infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
-      infos_topic[row_index, "HQ"] <- AIC_and_co$selection[[2]]
-      infos_topic[row_index, "SC"] <- AIC_and_co$selection[[3]]
-      infos_topic[row_index, "FPE"] <- AIC_and_co$selection[[4]]
-
-      #Serial autocorrelation test which is robust to heteroskedasticity
-      serial.test <- function(x, lags.pt, lags.bg, q=NULL, type=c("PT.asymptotic", "PT.adjusted", "PT.EL", "BG", "ES")){
-        if (!(is(x, "varest") || is(x, "vec2var"))) {
-            stop("\nPlease provide an object of class 'varest', generated by 'var()', or an object of class 'vec2var' generated by 'vec2var()'.\n")
-        }
-        obj.name <- deparse(substitute(x))
-        type <- match.arg(type)
-        K <- x$K
-        obs <- x$obs
-        resids <- resid(x)
-        if ((type == "PT.asymptotic") || (type == "PT.adjusted")) {
-            lags.pt <- abs(as.integer(lags.pt))
-            ptm <- .pt.multi(x, K = K, obs = obs, lags.pt = lags.pt, 
-                obj.name = obj.name, resids = resids)
-            ifelse(type == "PT.asymptotic", test <- ptm[[1]], test <- ptm[[2]])
-        } else if (type=="PT.EL") {
-          mean_resid <- mean(resids)
-          list_gamma <- c()
-          list_theta<- c()
-          list_forpi <- c()
-          for (j in 1:obs){
-            sum_j <-0
-            sum_j2 <-0
-            for (t in (j+1):n){
-              sum_j <- (resids[t] - mean_resid) * (resids[t-j] - mean_resid) + sum_j
-              sum_j2 <- (resids[t] - mean_resid)^2 * (resids[t-j] - mean_resid)^2 + sum_j2
-            }
-            gamma_j <- (1/(n-j) * sum_j)^2
-            theta_j <- 1/(n-j) * sum_j2
-
-            list_gamma <- c(list_gamma, gamma_j)
-            list_theta <- c(list_theta, theta_j)
-            list_forpi <- abs(gamma_j/theta_j) *sqrt(obs)
-
-          }
-          sum_forQ <- 0
-          #Define p order (automatic test)
-          list_p <- c()
-          list_pi <- c()
-          for (h in 1:obs){
-            if(max(list_forpi) > sqrt(q*log(obs))){
-              pi_h <- 2*h
-            } else {
-              pi_h <- h*log(n)
-            }
-          list_pi <- c(list_pi, pi_h)
-          }
-          for (p in 1:obs){
-            sum_forQ <- 0
-            for (j in 1:p){
-              sum_forQ <- sum_forQ + list_gamme[j]/list_theta[j]
-            }
-            test_stat <- obs*sum_forQ
-            Lp <- test_stat - list_pi[p]
-            for (h in 1:obs){
-              Lh <- test_stat - list_pi[h]
-              if (Lp>=Lh){
-                list_p <- c(list_p, p)
-              }
-            }
-          }
-          p <- min(list_p)
-          sum_forQ <- 0
-          for (j in 1:p){
-            sum_forQ <- sum_forQ + list_gamme[j]/list_theta[j]
-          }
-          test_stat <- obs*sum_forQ
-          #Maintenant voir comment on discirmine 
-
-
-
-        } else {
-            lags.bg <- abs(as.integer(lags.bg))
-            bgm <- .bgserial(x, K = K, obs = obs, lags.bg = lags.bg, 
-                obj.name = obj.name, resids = resids)
-            ifelse(type == "BG", test <- bgm[[1]], test <- bgm[[2]])
-        }
-        result <- list(resid = resids, serial = test)
-        class(result) <- "varcheck"
-        return(result)
+      #Serial autocorrelation test robust to heteroskedasticity 
+      p_val_SAC <- serial.test.H(var_model, type="PT.EL")$serial$p.value
+      if (p_val_SAC < 0.05) {
+        SAC_Info <- "AC_PB"
+      } else {
+        SAC_Info <- "OK"
+      }
+      #Normality Test
+      p_val_norm <- normality.test(var_model)$jb.mul$JB$p.value[1]
+      if (p_val_norm < 0.05) {
+        N_Info <- 0
+      } else {
+        N_Info <- 1
+      }
+      #Add elements on table and save
+      new_row <- c(topic_num, max_mod, SAC_Info, N_Info)
+      infos_topic_post <- rbind(infos_topic_post, new_row)
+      for (v in variables){
+        resids <- residuals(var_model)[,v]
+        path_resid <- paste0("data_prod/var/bertopic/issue-level/residus_", topic_num, "_", v, ".png")
+        png(path_resid, width=800, height=800)
+        p <- hist(resids, breaks = 30)
+        dev.off()
       }
       }
     }
-  }
-
   if (args$tests){
     path_info <- "data_prod/var/bertopic/issue-level/infos_topics.csv"
     write.csv(infos_topic, file=path_info, row.names = FALSE)
   }
-}
- else {
+
+  if (args$tests_post){
+    path_post <-  "data_prod/var/bertopic/issue-level/post_checks.csv"
+    write.csv(infos_topic_post, file=path_post, row.names = FALSE)
+  }
+} else {
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 87, 65, 69, 78, 80, 29, 75, 89)
   pol_issues <- setdiff(c(0:91), throw_topic)
   last_topic <- tail(pol_issues, 1)
@@ -474,7 +366,7 @@ irf_data <- NULL
 
 total <- length(pol_issues)
 counter <- 0
-for (top in pol_issues) {
+for (top in pol_issues_conserved) {
   # - update counter and report progress
   counter <- counter + 1
   print(paste0("[", counter, "/", total, "]"))
