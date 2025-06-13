@@ -20,7 +20,7 @@ from utils import (
 
 
 def run_xan_command(topic_model):
-    command = f"xan cat rows data_prod/dashboard/{topic_model}/data/*.csv | xan drop prop | xan groupby date,topic 'values(nb_tweets)' | xan sort -s topic,date"
+    command = f"xan cat rows /store/medialex/reproduction_wlwf/data_prod/dashboard/{topic_model}/data/*.csv | xan drop prop | xan groupby date,topic 'values(nb_tweets)' | xan sort -s topic,date"
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     return result.stdout
 
@@ -51,8 +51,10 @@ parser.add_argument(
     default=os.getcwd(), 
 )
 
-parser.add_argument("--retweets", action = "store_true",
-help = "Run the script counting the retweets")
+parser.add_argument("--retweets", 
+    action = "store_true",
+    help = "Run the script counting the retweets",
+)
 
 args = parser.parse_args()
 
