@@ -14,7 +14,7 @@ library(data.table)
 library(lubridate)
 library(urca)
 source("utils_R.r")
-
+library(MSTest)
 parser <- ArgumentParser()
 
 parser$add_argument("--estimate", action = "store_true",
@@ -45,6 +45,8 @@ if (args$estimate){
 
   db <- db %>%
     filter(topic %in% pol_issues)
+  
+  write.csv(db, file="data_prod/var/bertopic/general_TS_clean.csv")
 
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
@@ -56,9 +58,9 @@ if (args$estimate){
     infos_topic <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=6)) #Seuil ACF, seuil PACF, Stationnarité, VAR select (4), Serial, Heteroskedasticity, Normality 
     colnames(infos_topic) <- c("Topic", "Statio_type", "AIC", "HQ", "SC", "FPE")
     for (v in variables){
+      db[[v]] <- log(db[[v]] + 1)
       for (topic_n in pol_issues) { 
         # Augmented Dickey-Fuller (ADF) test for stationarity
-        db[[v]] <- log(db[[v]] + 0.00001)
         db_topic <- db[db$topic == topic_n, ]
         data <- db_topic[[v]]
         data <- as.ts(data)
@@ -77,10 +79,8 @@ if (args$estimate){
             results_list <- append(results_list, list(list(topic_n, v, p_value)))
           }
           pathqq <- paste0("data_prod/var/bertopic/issue-level/QQ_PLOT_", topic_n, "_", v, ".png")
-          #log_data <- log(data + 0.0001)
           png(pathqq, width = 800, height = 800)
           p <- qqPlot(data)
-          print(p)
           dev.off()
         }
       }  
@@ -256,11 +256,13 @@ if (args$estimate){
     for (topic_num in pol_issues){
       if (topic_num %in% c(52, 71, 79, 85, 86)){
         next
-      }
-      png("")
+      } 
       topic_num <- as.character(topic_num)
       db_topic <- db %>% filter(as.character(topic) == topic_num)
       print(paste("Currently testing topic", topic_num))
+      #RegimeTest 
+      print(MMCLRTest(as.matrix(db_topic[,variables]), 2, 1, 2)) #Pb de solve
+      #Selection criteria
       AIC_and_co <- VARselect(db_topic[, variables], lag.max = 30, season = NULL)
       row_index <- which(as.character(infos_topic$Topic) == topic_num)
       infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
@@ -281,7 +283,7 @@ if (args$estimate){
 
   for (topic_num in list_topic_iter){
     print(paste("Model calculated", topic_num))
-    lags <- 3
+    lags <- 7
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
     if (!args$tests){

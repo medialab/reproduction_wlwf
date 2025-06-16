@@ -223,9 +223,10 @@ if (args$estimate){
       ylagged <- data.frame(ncol=11)
       colnames(ylagged) <- variables
       for (lag_num in 1:(lag.max +1)){
+        next
         i <- 1
         for (v in variables){ #C'est faux il faut améliorer pour stocker tous les lags 
-          data_temp <- data.frame(n-col = 11)
+          data_temp <- data.frame(ncol = 11)
           colnames(data_lag) <- variables
           data_temp[,i] <- lag(pdb[[v]], lag_num)
           i <- i+1 
