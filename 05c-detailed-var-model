@@ -14,7 +14,8 @@ library(data.table)
 library(lubridate)
 library(urca)
 source("utils_R.r")
-library(MSTest)
+#library(MSTest)
+library(sovereign)
 parser <- ArgumentParser()
 
 parser$add_argument("--estimate", action = "store_true",
@@ -260,8 +261,6 @@ if (args$estimate){
       topic_num <- as.character(topic_num)
       db_topic <- db %>% filter(as.character(topic) == topic_num)
       print(paste("Currently testing topic", topic_num))
-      #RegimeTest 
-      print(MMCLRTest(as.matrix(db_topic[,variables]), 2, 1, 2)) #Pb de solve
       #Selection criteria
       AIC_and_co <- VARselect(db_topic[, variables], lag.max = 30, season = NULL)
       row_index <- which(as.character(infos_topic$Topic) == topic_num)
