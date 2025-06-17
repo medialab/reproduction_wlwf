@@ -1,4 +1,3 @@
-library(dplyr)
 library(car)
 library(tidyverse)
 library(tidyr)
@@ -15,7 +14,8 @@ library(lubridate)
 library(urca)
 source("utils_R.r")
 #library(MSTest)
-library(sovereign)
+#library(sovereign)
+library(dplyr)
 parser <- ArgumentParser()
 
 parser$add_argument("--estimate", action = "store_true",
@@ -262,7 +262,7 @@ if (args$estimate){
       db_topic <- db %>% filter(as.character(topic) == topic_num)
       print(paste("Currently testing topic", topic_num))
       #Selection criteria
-      AIC_and_co <- VARselect(db_topic[, variables], lag.max = 30, season = NULL)
+      AIC_and_co <- VARselect(db_topic[, variables], lag.max = 20, season = NULL)
       row_index <- which(as.character(infos_topic$Topic) == topic_num)
       infos_topic[row_index, "AIC"] <- AIC_and_co$selection[[1]]
       infos_topic[row_index, "HQ"] <- AIC_and_co$selection[[2]]
@@ -282,7 +282,7 @@ if (args$estimate){
 
   for (topic_num in list_topic_iter){
     print(paste("Model calculated", topic_num))
-    lags <- 7
+    lags <- 1
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
     if (!args$tests){
