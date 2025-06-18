@@ -39,7 +39,7 @@ if (args$estimate){
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
   pol_issues_temp <- setdiff(c(0:91), throw_topic)
   db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
-      mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>%
+      mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>% #Retraite 
       group_by(date, topic) %>%                                  
       summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
   pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))  
@@ -58,9 +58,13 @@ if (args$estimate){
     results_list2 <- list()
     infos_topic <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=6)) #Seuil ACF, seuil PACF, Stationnarité, VAR select (4), Serial, Heteroskedasticity, Normality 
     colnames(infos_topic) <- c("Topic", "Statio_type", "AIC", "HQ", "SC", "FPE")
+    statio_by_group <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=length(variables)+1))
+    colnames(statio_by_group) <- c('Topic', variables)
+    statio_by_group$Topic <- pol_issues 
     for (v in variables){
       db[[v]] <- scale(log(db[[v]] + 1))
-      for (topic_n in pol_issues) { 
+      for (topic_n in pol_issues) {
+        status <- NA
         # Augmented Dickey-Fuller (ADF) test for stationarity
         db_topic <- db[db$topic == topic_n, ]
         data <- db_topic[[v]]
@@ -75,17 +79,26 @@ if (args$estimate){
 
             if ((acf_values$acf[3] > 0.1 && acf_values$acf[4] > 0.1 && acf_values$acf[5] > 0.1) || (pacf_values$acf[3] > 0.1 && pacf_values$acf[4] > 0.1 && pacf_values$acf[5] > 0.1)) { #Si l'ACF et la PACF décroient pas assez rapidement, on suppose que la série est pas stationnaire
               results_list <- append(results_list, list(list(topic_n, v, p_value)))
+            } else {
+              status <- "OK"
             }
           } else if (p_value > 0.05) {  # Vérifier si la série est non stationnaire
             results_list <- append(results_list, list(list(topic_n, v, p_value)))
+            status <- "PB"
+          } else {
+            status <- "OK"
           }
           pathqq <- paste0("data_prod/var/bertopic/issue-level/QQ_PLOT_", topic_n, "_", v, ".png")
           png(pathqq, width = 800, height = 800)
           p <- qqPlot(data)
           dev.off()
+        } else {
+          status <- "CST"
         }
-      }  
+        statio_by_group[statio_by_group$Topic == topic_n, v] <- status 
+      } 
     }
+    write.csv(statio_by_group, file="data_prod/var/bertopic/issue-level/statio_details.csv",  row.names = FALSE)
     cat("Résultats de stationnarité sur les séries concaténées \n")
     results_df <- do.call(rbind, lapply(results_list, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
     colnames(results_df) <- c("topic", "variable", "p_value")
@@ -306,7 +319,7 @@ if (args$estimate){
           } else {
             coint <- 0 
           }
-          new_row <- c(topic, v, coint, order)
+          new_row <- c(topic_num, v, coint, order)
           ardl_infos <- rbind(ardl_infos, new_row)
         }
       }
@@ -376,7 +389,7 @@ if (args$estimate){
   if (args$tests){
     path_info <- "data_prod/var/bertopic/issue-level/infos_topics.csv"
     write.csv(infos_topic, file=path_info, row.names = FALSE)
-    #path_ardl <- "data_prod/var/bertopic/issue-level/ardl_infos.csv"
+    path_ardl <- "data_prod/var/bertopic/issue-level/ardl_infos.csv"
     #write.csv(ardl_infos, file=path_ardl, row.names = FALSE)
   }
 
