@@ -87,6 +87,27 @@ class(result) <- "varcheck"
 return(result)
 }
 
+girf <- function(model, data, n.ahead, cumulative=FALSE){
+    Phi_list <- vars::Phi(x=model,nstep=n.ahead) #Attention y'a des n.ahead à cette fonction
+    variables <- names(model$varresult)
+    if (!(all(variables==colnames(data)))){
+        stop("Model and original dataset don't match")
+    }
+    list_var <- c()
+    for (v in variables){
+        var <- var(data[[v]])
+        list_var <- c(list_var, var)
+    }
+    cov_mat <- summary(model)$corres
+    #Fill IRF table 
+    #See how to bootstrap 
+    #Set cumulative option
+
+    return(girfobject)
+
+    
+}
+
 #Format ACF table
 transfo_acf <- function(data){
     df <- as.data.frame(data)

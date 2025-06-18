@@ -13,8 +13,8 @@ library(data.table)
 library(lubridate)
 library(urca)
 source("utils_R.r")
-#library(MSTest)
-#library(sovereign)
+library(ARDL)
+library(ICglm)
 library(dplyr)
 parser <- ArgumentParser()
 
@@ -59,7 +59,7 @@ if (args$estimate){
     infos_topic <- data.frame(matrix(NA, nrow=length(pol_issues), ncol=6)) #Seuil ACF, seuil PACF, Stationnarité, VAR select (4), Serial, Heteroskedasticity, Normality 
     colnames(infos_topic) <- c("Topic", "Statio_type", "AIC", "HQ", "SC", "FPE")
     for (v in variables){
-      db[[v]] <- log(db[[v]] + 1)
+      db[[v]] <- scale(log(db[[v]] + 1))
       for (topic_n in pol_issues) { 
         # Augmented Dickey-Fuller (ADF) test for stationarity
         db_topic <- db[db$topic == topic_n, ]
@@ -109,7 +109,7 @@ if (args$estimate){
     cat("Number of topics where time series are stationary and other are not according to group: ", count_partial_topic, "\n")
 
     ind_top <- 0
-    for (topic in non_full_stationarity_topics) {
+    for (topic in non_full_stationarity_topics){
       ind_top <- ind_top + 1
       db_topic <- db[db$topic == topic, ]
       for (v in variables) {
@@ -173,8 +173,10 @@ if (args$estimate){
       if (topic %in% non_full_stationarity_topics){
         if(topic %in% unlist(list_full_top)){
           infos_topic[iter_info, "Statio_type"] <- "I(1)"
-        } else {
+        } else if (topic %in% merged_statio){
           infos_topic[iter_info, "Statio_type"] <- "Mixed"
+        } else {
+          infos_topic[iter_info, "Statio_type"] <- "Other"
         }
       } else {
         infos_topic[iter_info, "Statio_type"] <- "I(0)"
@@ -285,6 +287,32 @@ if (args$estimate){
     lags <- 1
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
+    if (args$tests){ #Cointegration test pour ARDL
+      ardl_infos <- as.data.frame(matrix(NA, nrow=0, ncol=length(c('topic', 'depvar', 'coint', variables))))
+      colnames(ardl_infos) <- c('topic', 'depvar', 'coint', paste0('V', seq_len(length(variables))))
+      if (!(topic_num %in% stationary_topics)){
+        for (v in variables){
+          next
+          autres_vars <- setdiff(variables, v)
+          formule <- as.formula(
+            paste(v, "~", paste(autres_vars, collapse = " + "))
+          )
+          autoardl <- auto_ardl(formule, data=db_topic[,variables], max_order=rep(7, length(variables)), selection= "HQIC")
+          order <- c(unname(as.numeric(autoardl$best_order)))
+          ardl <- ardl(formule,  data=db_topic[,variables], order=order)
+          ftest_p <- bounds_f_test(ardl, case=2)$p.value
+          if (ftest_p <0.05){
+            coint <- 1
+          } else {
+            coint <- 0 
+          }
+          new_row <- c(topic, v, coint, order)
+          ardl_infos <- rbind(ardl_infos, new_row)
+        }
+      }
+    }
+  
+        
     if (!args$tests){
       if(topic_num %in% as.character(exclude_issues)){
         print(paste("Skipping topic", topic_num, "because it will cause errors"))
@@ -348,6 +376,8 @@ if (args$estimate){
   if (args$tests){
     path_info <- "data_prod/var/bertopic/issue-level/infos_topics.csv"
     write.csv(infos_topic, file=path_info, row.names = FALSE)
+    #path_ardl <- "data_prod/var/bertopic/issue-level/ardl_infos.csv"
+    #write.csv(ardl_infos, file=path_ardl, row.names = FALSE)
   }
 
   if (args$tests_post){
