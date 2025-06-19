@@ -11,6 +11,16 @@ ldaf <- read_csv("data_prod/figures/corrldafilter.csv", show_col_types=FALSE)
 names = c("barbera", "ldanf", "ldaf")
 i <-0
 
+db <- read_csv("data_prod/var/bertopic/issue-level/statio_details.csv",show_col_types=FALSE)
+titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", ,show_col_types=FALSE)
+
+db <- db %>%
+  mutate(n_OK = rowSums(across(everything(), ~ . == "OK")))
+
+db <- merge(db, titles, by="Topic", all.x = TRUE)
+
+write.csv(db, file="data_prod/var/bertopic/issue-level/statio_10.csv", row.names=FALSE)
+stop()
 for (mat in list(barbera, ldanf, ldaf)){
     cormat <- as.matrix(mat[,-1])
     cormat <- round(cormat,3)  

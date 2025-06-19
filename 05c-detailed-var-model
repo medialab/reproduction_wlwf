@@ -42,7 +42,7 @@ if (args$estimate){
       mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>% #Retraite 
       group_by(date, topic) %>%                                  
       summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))  
+  pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))
 
   db <- db %>%
     filter(topic %in% pol_issues)
@@ -52,6 +52,8 @@ if (args$estimate){
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
 
   if (args$tests){
+    ardl_infos <- as.data.frame(matrix(NA, nrow=0, ncol=length(c('topic', 'depvar', 'coint', variables))))
+    colnames(ardl_infos) <- c('topic', 'depvar', 'coint', paste0('V', seq_len(length(variables))))
     print("Start testing process")
     print(paste("Nombre de topics", length(unique(db$topic))))
     results_list <- list()
@@ -98,6 +100,12 @@ if (args$estimate){
         statio_by_group[statio_by_group$Topic == topic_n, v] <- status 
       } 
     }
+    titles <- read_csv("data_prod/figures/translate_number_name/BERTopic_merged.csv", ,show_col_types=FALSE)
+
+    statio_by_group <- statio_by_group %>%
+      mutate(n_OK = rowSums(across(everything(), ~ . == "OK")))
+
+    statio_by_group <- merge(statio_by_group, titles, by="Topic", all.x = TRUE)
     write.csv(statio_by_group, file="data_prod/var/bertopic/issue-level/statio_details.csv",  row.names = FALSE)
     cat("Résultats de stationnarité sur les séries concaténées \n")
     results_df <- do.call(rbind, lapply(results_list, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
@@ -301,8 +309,6 @@ if (args$estimate){
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     var_model <- VAR(db_topic[, variables], p=lags, type="const")
     if (args$tests){ #Cointegration test pour ARDL
-      ardl_infos <- as.data.frame(matrix(NA, nrow=0, ncol=length(c('topic', 'depvar', 'coint', variables))))
-      colnames(ardl_infos) <- c('topic', 'depvar', 'coint', paste0('V', seq_len(length(variables))))
       if (!(topic_num %in% stationary_topics)){
         for (v in variables){
           next
