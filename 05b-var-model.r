@@ -14,6 +14,7 @@ library(stats)
 library(urca)
 library(plm)
 library(panelvar)
+source("utils_R.r")
 library(resample)
 
 parser <- ArgumentParser()
@@ -25,6 +26,9 @@ parser$add_argument("--estimate", action = "store_true",
 help = "Run the script who estimate PVAR and IRF")
 
 parser$add_argument("--tests", action = "store_true",
+                    help = "Activate to test the absence of unit roots and to print the selection criteria")
+
+parser$add_argument("--tests_post", action = "store_true",
                     help = "Activate to test the absence of unit roots and to print the selection criteria")
 
 parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=21)
@@ -61,6 +65,10 @@ if (args$estimate){
   db <- db %>%
     filter(topic %in% pol_issues)
 
+  for (v in variables){
+    db[[v]] <- log(1 + db[[v]])
+  }
+
   print("VAR Estimation")
   db <- as.data.frame(db)
 
@@ -70,256 +78,21 @@ if (args$estimate){
 
 
   if (args$tests) {
-    count_stat <- 0
-    pdb <- pdata.frame(db, index=c("topic", "date")) 
-    cat("Hadri Test (H0 : All panels don't contain unit root) \n")
-    for (v in variables){
-      data_p <- pdb[[v]]
-      hadri <- purtest(data_p, test="hadri", exo="intercept")
-      p_value <- hadri$statistic$p.value
-      if (p_value <0.05){
-        print(paste(v, "H0 rejected", p_value, "At least one panel is not stationary"))
-      } else{
-        print(paste(v, "H0 not rejected", p_value, "All panels are stationary"))
-        count_stat <- count_stat + 1
-      }
-    }
-    
-    cat("IPS Test (H0 : All panels contain unit root) \n")
-    for (v in variables){
-      data_p <- pdb[[v]]
-      hadri <- purtest(data_p, test="ips", exo="intercept")
-      p_value <- hadri$statistic$p.value
-      if (p_value <0.05){
-        print(paste(v, "H0 rejected", p_value, "At least one panel is stationary"))
-      } else{
-        print(paste(v, "H0 not rejected", p_value, "All panels are not stationary"))
-        count_stat <- count_stat + 1
-      }
-    }
-    
-    cat("Export filtered csv for Stata because some tests can't be done with BERTopic Time Series \n")
-    write.csv(db, "data_prod/var/bertopic/general_TS_filt_logtransfo.csv", row.names = FALSE) #DELETE IF BETTER WITH TWEET NUMBER
-
-
-    if(count_stat != length(variables)){
-      print("At least one group is represented by a non-stationary time series in one panel. Check the stationnarity after a differentiation")
-      cat("Hadri Test (H0 : All panels don't contain unit root) \n")
-      pdb_diff <- pdb
-      for (v in variables){
-        pdb_diff[[v]] <- diff(pdb[[v]], 1L)
-      }
-
-      pdb_diff <- na.omit(pdb_diff)
-      pdb_diffc <- pdb_diff
-
-      list_const_top <- list()
-
-      for (v in variables){
-        count_stat_topic <- 0
-        for (i in unique(pdb_diff$topic)){
-          pdb_topic <- pdb_diff %>% filter(topic == i)
-          if (sd(pdb_topic[[v]]) == 0) {
-            list_const_top <- append(list_const_top, i)
-            pdb_diffc <- pdb_diffc %>% filter(topic !=i)
-            print(paste("For variable", v, "topic", i, "removed for Hadri Test in diff data because constant"))
-            count_stat_topic <- 1
-          }
-        }
-
-        if(count_stat_topic==1){
-          rownames(pdb_diffc) <- NULL
-          pdb_diffc <- pdata.frame(pdb_diffc, index=c("topic", "date"))
-        }
-
-        data_p <- pdb_diffc[[v]]
-        hadri2 <- purtest(data_p, test="hadri", exo="intercept")
-        p_value2 <- hadri2$statistic$p.value
-        if (p_value2 <0.05){
-          print(paste("Diff", v, "H0 rejected", p_value2, "At least one panel is not stationary"))
-        } else{
-          print(paste("Diff", v, "H0 not rejected", p_value2, "All panels are stationary"))
-        }
-      }
-    }
-
-    WITHIN_TRANSFO <- function(dependent_vars, lags, data, panel_identifier){
-      data <- droplevels(data)
-      required_vars <- c(dependent_vars)
-
-      if (is.numeric(panel_identifier)) {
-        Set_Vars <-
-          data[, c(colnames(data)[panel_identifier], required_vars)]
-      } else {
-        Set_Vars <-
-          data[, c(panel_identifier, required_vars)]
-      }
-      
-      nof_dependent_vars <- length(dependent_vars)
-      nof_exog_vars <- 0
-      categories <- sort(unique(Set_Vars[, 1]))
-      periods <- sort(unique(Set_Vars[, 2]))
-      nof_categories <- length(categories)
-      nof_periods <- length(periods)
-      lags <- abs(as.integer(lags))
-
-      name_category <- names(Set_Vars)[1]
-      name_period <- names(Set_Vars)[2]
-      names(Set_Vars)[1:2] <- c("category", "period")
-
-      Set_Vars <- Set_Vars[order(Set_Vars$category, Set_Vars$period,decreasing = FALSE),]
-      Set_Vars$category <- factor(Set_Vars$category)
-      Set_Vars$period <- factor(Set_Vars$period)
-
-      # Add lags of dependent_vars
-      Set_Vars <- cbind(Set_Vars,
-                        do.call(
-                          rbind,
-                          mapply(
-                            function(i)
-                              panel_lag(Set_Vars[Set_Vars$category == categories[i], c("period", dependent_vars)], lags),
-                            1:length(categories),
-                            SIMPLIFY = FALSE
-                          )
-                        )) #Check ce que ça fait
-
-      #Demeaning
-      Set_Vars <- cbind(Set_Vars,
-                  do.call(
-                    rbind,
-                    mapply(
-                      function(i)
-                        panel_demean(Set_Vars[Set_Vars$category == categories[i],], demean),
-                      1:length(categories),
-                      SIMPLIFY = FALSE
-                    )
-                  )) #Check aussi
-      
-      return(Set_Vars)
-    }
-
-
-    PVAR_post <- function(data, dependent_vars, lag.max, panel_identifier){ #A modifier car on a clairement raconté des conneries je pense.
-    #Créer les lags et demean en tenant compte de la structure panel (voir comment les lags sont fait dans panelVAR)
-      y <- as.matrix(data)
-      data <- droplevels(data)
-      required_vars <- c(dependent_vars)
-      colnames(y) <- make.names(colnames(y))
-      if (is.numeric(panel_identifier)) {
-        Set_Vars <- data[, c(colnames(data)[panel_identifier], required_vars)]
-      } else {
-        Set_Vars <-
-          data[, c(panel_identifier, required_vars)]
-      }
-      K <- ncol(y)
-      nof_dependent_vars <- length(dependent_vars)
-      nof_exog_vars <- 0
-      categories <- sort(unique(Set_Vars[, 1]))
-      periods <- sort(unique(Set_Vars[, 2]))
-      nof_categories <- length(categories)
-      nof_periods <- length(periods)
-      lag.max <- abs(as.integer(lag.max))
-      lag <- abs(as.integer(lag.max + 1))
-      ylagged <- data.frame(ncol=11)
-      colnames(ylagged) <- variables
-      for (lag_num in 1:(lag.max +1)){
-        next
-        i <- 1
-        for (v in variables){ #C'est faux il faut améliorer pour stocker tous les lags 
-          data_temp <- data.frame(ncol = 11)
-          colnames(data_lag) <- variables
-          data_temp[,i] <- lag(pdb[[v]], lag_num)
-          i <- i+1 
-        }
-        rbind(ylagged, data_temp)
-        
-      }
-      ylagged <- embed(y, lag)[, -c(1:K)]
-      yendog <- y[-c(1:lag.max), ]
-      sample <- nrow(ylagged)
-      rhs <- rep(1, sample)
-      idx <- seq(K, K * lag.max, K)
-      detint <- ncol(as.matrix(rhs))
-      criteria <- matrix(NA, nrow = 4, ncol = lag.max)
-      rownames(criteria) <- c("AIC(n)", "HQ(n)", "SC(n)", "FPE(n)")
-      colnames(criteria) <- paste(seq(1:lag.max))
-      for (i in 1:lag.max) {
-          ys.lagged <- cbind(ylagged[, c(1:idx[i])], rhs)
-          sampletot <- nrow(y)
-          nstar <- ncol(ys.lagged)
-          resids <- lm.fit(x = ys.lagged, y = yendog)$residuals
-          sigma.det <- det(crossprod(resids)/sample)
-          criteria[1, i] <- log(sigma.det) + (2/sample) * (i * 
-              K^2 + K * detint)
-          criteria[2, i] <- log(sigma.det) + (2 * log(log(sample))/sample) * 
-              (i * K^2 + K * detint)
-          criteria[3, i] <- log(sigma.det) + (log(sample)/sample) * 
-              (i * K^2 + K * detint)
-          criteria[4, i] <- ((sample + nstar)/(sample - nstar))^K * 
-              sigma.det
-      }
-      order <- apply(criteria, 1, which.min)
-      return(list(selection = order, criteria = criteria))
-
-      residuals <- model$residuals
-      lags <- model$lags
-      n_obs <- nrow(residuals)
-      k <- ncol(residuals)
-      Sigma <- cov(residuals)
-      n_star <- k*lags
-      AIC <- log(det(Sigma)) + 2*k^2*lags/n_obs
-      SC <- log(det(Sigma)) + log(n_obs)*k^2*lags/n_obs
-      HQ <- log(det(Sigma)) + log(log(n_obs))*lags*k^2/n_obs
-      FPE <- det(Sigma)*((n_obs + n_star)/(n_obs - n_star))^k
-      return(c(AIC = AIC, SC = SC, HQ = HQ, FPE=FPE))
-    }
-
-    PVAR_HETSER_TEST <- function(model){  #Reprendre serial.test de vars avec l'option asymptotique
-      res1 <- model$residuals 
-    }
-
-    PVAR_BP_test <-function(model){
-      pdim <- c(length(pol_issues), 268, length(pol_issues)*268)
-      N_obs <- pdim[2]
-      id <- "topic"
-      time <- "date"
-      T_i <- rep(268, length(pol_issues))
-      N_t <- rep(length(pol_issues), 268)
-      res <- model$residuals
-    }
-    
-    data_test = matrix(NA, nrow=30, ncol = 6)
-    for (p in 1:nrow(data_test)){
-      print(p)
-      model <- pvarfeols(variables, lags = p, data = db, panel_identifier=c("topic", "date"))
-      modulus <- panelvar::stability(model)$Modulus
-      max_modul <- max(modulus)
-      list_crit <- PVAR_post(model)
-      criteria <- c(list_crit[[1]], list_crit[[2]], list_crit[[3]], list_crit[[4]])
-      data_test[p,] = c(p, max_modul, criteria)
-    }
-
-    df_test <- as.data.frame(data_test)
-    colnames(df_test) <- c("Lags", "Max eigenvalue process", "AIC", "SC", "HQ", "FPE")
-
-    max_AIC <- df_test$Lags[which.min(df_test$AIC)]
-    max_SC <- df_test$Lags[which.min(df_test$SC)]
-    max_HQ <- df_test$Lags[which.min(df_test$HQ)]
-    max_FPE <- df_test$Lags[which.min(df_test$FPE)]
-
-    cat("Selection criteria suggests to choose the following number(s) of lags: \n")
-    cat("AIC", max_AIC, "\n", "SC", max_SC, "\n", "HQ", max_HQ, "\n", "FPE", max_FPE, "\n")
-    
-
-    write.csv(pdb, "data_prod/var/bertopic/general_filt_nodiff.csv", row.names = FALSE)
-    write.csv(pdb_diff, "data_prod/var/bertopic/general_filt_diff.csv", row.names = FALSE)
-    write.csv(df_test,
-    "data_prod/var/bertopic/tests_results.csv",
-    row.names = FALSE)
-    
+    print(PVARselect(db, variables, 20, panel_identifier=c("topic", "date")))
   }
-  lags <- 8
+  lags <- 16
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
+  if (args$tests_post){
+    stab <- max(panelvar::stability(PVAR_model)$Modulus)
+    if(stab>=1){
+      cat(paste("Stability problem, max Modul = ", stab, "\n"))
+    } else {
+      cat("PVAR Process is stable \n")
+    }
+    print(PVAR_normality.test(PVAR_model)$jb.mul$JB)
+    AC_Test <- PVAR_PAC_TEST(PVAR_model)
+    write.csv(AC_Test, file="data_prod/var/bertopic/AC_tests.csv", row.names = FALSE)
+  }
   print("Non-Cumulative IRF preparation")
   irf_NC <- panelvar::oirf(PVAR_model, n.ahead = 60)
   irf_NC_BS <- panelvar::bootstrap_irf(PVAR_model, typeof_irf="OIRF", n.ahead = 60, nof_Nstar_draws=500, mc.cores = 50)

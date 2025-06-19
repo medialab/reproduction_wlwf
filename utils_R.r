@@ -8,6 +8,7 @@ library(rio)
 library(stringr)
 library(data.table)
 library(urca)
+library(stats)
 
  #Serial autocorrelation test which is robust to heteroskedasticity
 serial.test.H <- function(x, lags.pt, lags.bg, q=2.4, type=c("PT.asymptotic", "PT.adjusted", "PT.EL", "BG", "ES")){ #default q Penalty term similar as the article
@@ -172,4 +173,257 @@ plot_PACFS <- function(data, type){
         y = "Number of days")
     print(p)
     dev.off()
+}
+
+#panelvar
+panel_lag <- function(x, k) {
+  # first column contains time
+  # other columns the data
+  # k number of lags
+  res <-
+    rbind(matrix(NA, 1, ncol(x) - 1), as.matrix(x[1:(nrow(x) - 1), -1]), deparse.level = 1)
+  colnames(res) <- colnames(x)[-1]
+  
+  if (k > 1) {
+    for (l in 2:k) {
+      res <-
+        cbind(res, rbind(matrix(NA, l, ncol(x) - 1), as.matrix(x[1:(nrow(x) - l), -1])))
+    }
+  }
+  
+  #if (k > 1){
+  res[rep(is.na(x[, -1]), k)] <- NA # multiple lags
+  #}
+  
+  # only necessary if single variable with multiple lags
+  if(ncol(x) == 2) colnames(res) <- rep(colnames(res)[1], ncol(res))
+  
+  colnames(res) <- paste0("lag", rep(1:k, each = ncol(x)-1), "_", colnames(res))
+  rownames(res) <- NULL
+  res
+}
+
+demean <- function(x) {
+  x - mean(x, na.rm = TRUE)
+}
+
+panel_demean <- function(x, transformation) {
+  res <- apply(x[, -(1:2)], 2, demean)
+  colnames(res) <- paste("demeaned", colnames(res), sep = "_")
+  rownames(res) <- NULL
+  res
+}
+
+WITHIN_TRANSFO <- function(dependent_vars, lags, data, panel_identifier){
+  data <- droplevels(data)
+  required_vars <- c(dependent_vars)
+  if (is.numeric(panel_identifier)) {
+    Set_Vars <-
+      data[, c(colnames(data)[panel_identifier], required_vars)]
+  } else {
+    Set_Vars <-
+      data[, c(panel_identifier, required_vars)]
+  }
+  
+  nof_dependent_vars <- length(dependent_vars)
+  nof_exog_vars <- 0
+  categories <- sort(unique(Set_Vars[, 1]))
+  periods <- sort(unique(Set_Vars[, 2]))
+  nof_categories <- length(categories)
+  nof_periods <- length(periods)
+  lags <- abs(as.integer(lags))
+  
+  name_category <- names(Set_Vars)[1]
+  name_period <- names(Set_Vars)[2]
+  names(Set_Vars)[1:2] <- c("category", "period")
+  
+  Set_Vars <- Set_Vars[order(Set_Vars$category, Set_Vars$period,decreasing = FALSE),]
+  Set_Vars$category <- factor(Set_Vars$category)
+  Set_Vars$period <- factor(Set_Vars$period)
+  # Add lags of dependent_vars
+  Set_Vars <- cbind(Set_Vars,
+                    do.call(
+                      rbind,
+                      mapply(
+                        function(i)
+                          panel_lag(Set_Vars[Set_Vars$category == categories[i], c("period", dependent_vars)], lags),
+                        1:length(categories),
+                        SIMPLIFY = FALSE
+                      )
+                    )) 
+  #Demeaning
+  Set_Vars <- cbind(Set_Vars,
+                    do.call(
+                      rbind,
+                      mapply(
+                        function(i)
+                          panel_demean(Set_Vars[Set_Vars$category == categories[i],], demean),
+                        1:length(categories),
+                        SIMPLIFY = FALSE
+                      )
+                    )) 
+  Set_Vars <- na.exclude(Set_Vars)
+  return(Set_Vars)
+}
+
+PVARselect <- function(data, dependent_vars, lag.max, panel_identifier){ 
+  lag <- abs(as.integer(lag.max + 1))
+  K <- length(dependent_vars)
+  max_NotUsed <- K*(lag) + 2
+  data <- as.data.frame(data)
+  demeaned_data <- WITHIN_TRANSFO(variables, lag.max, data, panel_identifier)
+  cols_to_exclude <- names(demeaned_data)[1:max_NotUsed]
+  demeaned_data <- demeaned_data[, -(1:max_NotUsed)]
+  yendog <- as.matrix(demeaned_data[, 1:K])
+  ylagged <- as.matrix(demeaned_data[, -(1:K)])
+  sample <- nrow(ylagged)
+  rhs <- NULL
+  detint <- 0
+  idx <- seq(K, K * lag.max, K)
+  criteria <- matrix(NA, nrow = 4, ncol = lag.max)
+  rownames(criteria) <- c("AIC(n)", "HQ(n)", "SC(n)", "FPE(n)")
+  colnames(criteria) <- paste(seq(1:lag.max))
+  for (i in 1:lag.max) {
+    ys.lagged <- cbind(ylagged[, c(1:idx[i])], rhs)
+    sampletot <- nrow(data)
+    nstar <- ncol(ys.lagged)
+    resids <- lm.fit(x = ys.lagged, y = yendog)$residuals
+    sigma.det <- det(crossprod(resids)/sample)
+    criteria[1, i] <- log(sigma.det) + (2/sample) * (i * 
+                                                       K^2 + K * detint)
+    criteria[2, i] <- log(sigma.det) + (2 * log(log(sample))/sample) * 
+      (i * K^2 + K * detint)
+    criteria[3, i] <- log(sigma.det) + (log(sample)/sample) * 
+      (i * K^2 + K * detint)
+    criteria[4, i] <- ((sample + nstar)/(sample - nstar))^K * 
+      sigma.det
+  }
+  order <- apply(criteria, 1, which.min)
+  return(list(selection = order, criteria = criteria))
+}
+
+PVAR_PAC_TEST <- function(model, q=2.4){
+    category_indices <- levels(model$Set_Vars$category)
+    num_periods <- length(levels(PVAR_model$Set_Vars$period))
+    lags <- model$lags
+    obs <- num_periods-lags
+    i <- 1
+    table_test <- data.frame(matrix(NA, nrow=0, ncol=3))
+    colnames(table_test) <- c("Topic", "AQ_Stat", "pvalue")
+    for (idx in category_indices){
+        start <- (i-1)*obs + 1
+        end <- i*obs
+        resids <- model$residuals[start:end,]
+        mean_resid <- mean(resids)
+        list_gamma <- c()
+        list_theta<- c()
+        list_forpi <- c()
+        for (j in 1:(obs-1)){
+            sum_j <-0
+            sum_j2 <-0
+            for (t in (j+1):obs){
+                sum_j <- (resids[t] - mean_resid) * (resids[t-j] - mean_resid) + sum_j
+                sum_j2 <- (resids[t] - mean_resid)^2 * (resids[t-j] - mean_resid)^2 + sum_j2
+            }
+            gamma_j <- (1/(obs-j) * sum_j)^2
+            theta_j <- 1/(obs-j) * sum_j2
+
+            list_gamma <- c(list_gamma, gamma_j)
+            list_theta <- c(list_theta, theta_j)
+            list_forpi <- abs(gamma_j/theta_j) *sqrt(obs)
+        }
+        sum_forQ <- 0
+        list_p <- c()
+        list_pi <- c()
+        for (h in 1:(obs-1)){
+            if(max(list_forpi) > sqrt(q*log(obs))){
+                pi_h <- 2*h
+            } else {
+                pi_h <- h*log(obs)
+            }
+            list_pi <- c(list_pi, pi_h)
+        }
+        for (p in 1:(obs-1)){
+            sum_forQ <- 0
+            for (j in 1:p){
+                sum_forQ <- sum_forQ + list_gamma[j]/list_theta[j]
+            }
+            test_stat <- obs*sum_forQ
+            Lp <- test_stat - list_pi[p]
+            for (h in 1:(obs-1)){
+                Lh <- test_stat - list_pi[h]
+                if (Lp>=Lh){
+                    list_p <- c(list_p, p)
+                }
+            }
+        }
+        p <- min(list_p)
+        sum_forQ <- 0
+        for (j in 1:p){
+            sum_forQ <- sum_forQ + list_gamma[j]/list_theta[j]
+        }
+        test_stat <- obs*sum_forQ
+        p_value <- 1 - pchisq(test_stat, df=1)
+        test <- list(statistic_AQ = test_stat, p.value = p_value)
+        new_row <- new_row <- data.frame(
+        Topic = category_indices[i],
+        AQ_Stat = test$statistic_AQ,
+        pvalue = test$p.value
+        )
+        table_test <- rbind(table_test, new_row)
+        i <- i+1
+    }
+    return(table_test)
+}
+
+jb_multi <- function (x, obs, K, obj.name) {
+    P <- chol(crossprod(x)/obs)
+    resids.std <- x %*% solve(P)
+    b1 <- apply(resids.std, 2, function(x) sum(x^3)/obs)
+    b2 <- apply(resids.std, 2, function(x) sum(x^4)/obs)
+    s3 <- obs * t(b1) %*% b1/6
+    s4 <- obs * t(b2 - rep(3, K)) %*% (b2 - rep(3, K))/24
+    STATISTIC <- s3 + s4
+    names(STATISTIC) <- "Chi-squared"
+    PARAMETER <- 2 * K
+    names(PARAMETER) <- "df"
+    PVAL <- 1 - pchisq(STATISTIC, df = PARAMETER)
+    METHOD <- "JB-Test (multivariate)"
+    result1 <- list(statistic = STATISTIC, parameter = PARAMETER, 
+        p.value = PVAL, method = METHOD, data.name = paste("Residuals of VAR object", 
+            obj.name))
+    class(result1) <- "htest"
+    STATISTIC <- s3
+    names(STATISTIC) <- "Chi-squared"
+    PARAMETER <- K
+    names(PARAMETER) <- "df"
+    PVAL <- 1 - pchisq(STATISTIC, df = PARAMETER)
+    METHOD <- "Skewness only (multivariate)"
+    result2 <- list(statistic = STATISTIC, parameter = PARAMETER, 
+        p.value = PVAL, method = METHOD, data.name = paste("Residuals of VAR object", 
+            obj.name))
+    class(result2) <- "htest"
+    STATISTIC <- s4
+    names(STATISTIC) <- "Chi-squared"
+    PARAMETER <- K
+    names(PARAMETER) <- "df"
+    PVAL <- 1 - pchisq(STATISTIC, df = PARAMETER)
+    METHOD <- "Kurtosis only (multivariate)"
+    result3 <- list(statistic = STATISTIC, parameter = PARAMETER, 
+        p.value = PVAL, method = METHOD, data.name = paste("Residuals of VAR object", 
+            obj.name))
+    class(result3) <- "htest"
+    result <- list(JB = result1, Skewness = result2, Kurtosis = result3)
+    return(result)
+}
+
+PVAR_normality.test <-function(model){
+    obj.name <- deparse(substitute(x))
+    K <- ncol(model$residuals)
+    obs <- nrow(model$residuals)
+    resid <-  model$residuals
+    resids <- scale(resid, scale = FALSE)
+    jbm.resids <- jb_multi(resids, obs = obs, K = K, obj.name = obj.name)
+    result <- list(resid = resid, jb.mul = jbm.resids)
+    return(result)
 }
