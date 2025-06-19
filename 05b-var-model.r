@@ -94,8 +94,8 @@ if (args$estimate){
     write.csv(AC_Test, file="data_prod/var/bertopic/AC_tests.csv", row.names = FALSE)
   }
   print("Non-Cumulative IRF preparation")
-  irf_NC <- panelvar::oirf(PVAR_model, n.ahead = 60)
-  irf_NC_BS <- panelvar::bootstrap_irf(PVAR_model, typeof_irf="OIRF", n.ahead = 60, nof_Nstar_draws=500, mc.cores = 50)
+  irf_NC <- panelvar::girf(PVAR_model, n.ahead = 60) #Check si ça marche pour pvarfeols
+  irf_NC_BS <- panelvar::bootstrap_irf(PVAR_model, typeof_irf="GIRF", n.ahead = 60, nof_Nstar_draws=500, mc.cores = 50)
 
   print("Create data according to vars package (including cumulation)")
   for (v in variables){
@@ -119,14 +119,9 @@ if (args$estimate){
   )
 
   class(var_irfs) <- "varirf"
+  save(PVAR_model, file = "data_prod/var/bertopic/Pvar_model-MAIN.Rdata")
+  save(var_irfs, file = "data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")
 
-  if (args$topic_model == 'lda') {
-    save(PVAR_model, file = "data_prod/var/lda/Pvar_model-MAIN.Rdata")
-    save(var_irfs, file = "data_prod/var/lda/Pvar_irfs-MAIN.Rdata")
-  } else {
-    save(PVAR_model, file = "data_prod/var/bertopic/Pvar_model-MAIN.Rdata")
-    save(var_irfs, file = "data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")
-  }
 } else {
   variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
   if (args$topic_model == 'lda') {
