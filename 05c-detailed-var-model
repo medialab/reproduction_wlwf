@@ -38,11 +38,10 @@ if (args$estimate){
   db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
   pol_issues_temp <- setdiff(c(0:91), throw_topic)
-  db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
-      mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>% #Retraite 
+  db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
       group_by(date, topic) %>%                                  
       summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))
+  pol_issues <- setdiff(pol_issues_temp, 89)
 
   db <- db %>%
     filter(topic %in% pol_issues)
@@ -71,7 +70,7 @@ if (args$estimate){
         db_topic <- db[db$topic == topic_n, ]
         data <- db_topic[[v]]
         data <- as.ts(data)
-        if (sd(data) > 0) {
+        if (sd(data) > 0) {lr
           adf <- adf.test(data)
           p_value <- adf$p.value
           if (is.nan(p_value)) { #ADF ne gère pas certains cas. On va donc vérifier manuellement par ACF et PACF si les données sont stationnaires
@@ -100,7 +99,7 @@ if (args$estimate){
         statio_by_group[statio_by_group$Topic == topic_n, v] <- status 
       } 
     }
-    titles <- read_csv("data_prod/figures/translate_number_name/BERTopic_merged.csv", ,show_col_types=FALSE)
+    titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", ,show_col_types=FALSE)
 
     statio_by_group <- statio_by_group %>%
       mutate(n_OK = rowSums(across(everything(), ~ . == "OK")))
