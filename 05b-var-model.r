@@ -58,8 +58,9 @@ if (args$estimate){
   db <- db %>% mutate(topic = ifelse(topic == 29, 20, topic)) %>%
         mutate(topic = ifelse(topic %in% c(75,89), 74, topic)) %>%
         group_by(date, topic) %>%                                  
-        summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- setdiff(pol_issues_temp, c(29, 75, 89))  
+        summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")
+  exclude_issues <- c(52, 71, 79, 85, 86, 29, 75, 39) #We exclude also topics where a group is constant 
+  pol_issues <- setdiff(pol_issues_temp, exclude_issues)  
 
   
   db <- db %>%
@@ -80,7 +81,7 @@ if (args$estimate){
   if (args$tests) {
     print(PVARselect(db, variables, 20, panel_identifier=c("topic", "date")))
   }
-  lags <- 16
+  lags <- 7
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
   if (args$tests_post){
     stab <- max(panelvar::stability(PVAR_model)$Modulus)
