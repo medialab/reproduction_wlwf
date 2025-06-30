@@ -104,7 +104,16 @@ if (args$estimate){
     }
     print(PVAR_normality.test(PVAR_model)$jb.mul$JB)
     AC_Test <- PVAR_PAC_TEST(PVAR_model)
-    write.csv(AC_Test, file="data_prod/var/bertopic/AC_tests.csv", row.names = FALSE)
+    AC_Test$PB <- apply(AC_Test[, -1], 1, function(row) {
+    cols <- names(AC_Test)[-1][which(row < 0.05)]
+    if (length(cols) == 0) {
+      return("Aucun")
+    } else {
+      return(paste(cols, collapse = ", "))
+    }
+    })
+  colnames(AC_Test) <- c("Topic", variables, "PB")
+  write.csv(AC_Test, file="data_prod/var/bertopic/AC_tests.csv", row.names = FALSE)
   }
   print("Non-Cumulative IRF preparation")
   irf_NC_BS <- panelvar::bootstrap_irf(PVAR_model, typeof_irf="GIRF", n.ahead = 30, nof_Nstar_draws=500, mc.cores = 50)
