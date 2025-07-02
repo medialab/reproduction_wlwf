@@ -590,15 +590,16 @@ def generate_threads(
 
     for key, value in sorted(thread_ids.items()):
         if not value:
-            threads[key] = ""
+            threads[key] = ["", []]
         else:
             origin = value[0]
             while origin not in threads:
                 if thread_ids[origin] is not None:
                     origin = thread_ids[origin][0]
                 else:
-                    threads[origin] = ""
-            threads[origin] += " " + value[1]
+                    threads[origin] = ["", []]
+            threads[origin][0] += " " + value[1]
+            threads[origin][1].append(key)
 
     if compressed:
         input_file = io.TextIOWrapper(tar.extractfile(file))
@@ -611,10 +612,12 @@ def generate_threads(
         if not row[rt_pos]:
             doc_id = row[id_pos]
             if doc_id in threads:
-                doc = row[text_pos] + " " + threads[doc_id]
+                doc = row[text_pos] + " " + threads[doc_id][0]
+                ids = threads[doc_id][1]
 
             elif doc_id not in thread_ids:
                 doc = row[text_pos]
+                ids = []
 
             else:
                 continue
@@ -640,6 +643,7 @@ def generate_threads(
                         "text": doc,
                         "user_screen_name": row[screen_name_pos],
                         "retweet_count": row[rt_count_pos],
+                        "reply_chain": ids,
                     }
                 yield doc
     if not compressed:
@@ -655,7 +659,11 @@ def preprocess(
     small=False,
     small_size=NB_DOCS_SMALL_TRAIN,
 ):
-    counters = {"counter_all": 0, "counter_original": 0, "counter_threads": 0}
+    counters = {
+        "counter_all": 0,
+        "counter_original": 0,
+        "counter_threads": 0,
+    }
 
     tar, loop, compressed = iter_on_files(root, nb_files)
     empty_warn = []
@@ -817,12 +825,13 @@ def extract_representative_docs(docs, topics, topic_model):
 
 
 def write_ids_and_representative_docs(
-    repr_docs_ids, party_day_counts, public, path, small, small_size
+    repr_docs_ids, topics, party_day_counts, public, path, small, small_size
 ):
     doc_topic_pairs = []
-    for topic_id, doc_ids in enumerate(repr_docs_ids):
+    min_topic = min(topics)
+    for topic_enum, doc_ids in enumerate(repr_docs_ids):
         for doc_id in doc_ids:
-            doc_topic_pairs.append((doc_id, topic_id - 1))
+            doc_topic_pairs.append((doc_id, min_topic + topic_enum))
     doc_topic_pairs = sorted(doc_topic_pairs)
 
     with open(
@@ -857,12 +866,17 @@ def write_ids_and_representative_docs(
             [
                 "id",
                 "topic",
+                "is_reply",
             ]
         )
 
         doc_index = 0
         doc_topic_pairs_index = 0
-        counters = {"counter_all": 0, "counter_original": 0, "counter_threads": 0}
+        counters = {
+            "counter_all": 0,
+            "counter_original": 0,
+            "counter_threads": 0,
+        }
         doc_count_sum = 0
         for row in tqdm(party_day_counts, desc="Write representative documents"):
             if len(row) == 3:
@@ -877,11 +891,6 @@ def write_ids_and_representative_docs(
 
             doc_count_sum += doc_count
 
-            # Skip file if no representative doc inside
-            if doc_topic_pairs[doc_topic_pairs_index][0] > doc_count_sum:
-                doc_index += doc_count
-                continue
-
             for doc in generate_threads(
                 file_path,
                 f"{day}.csv",
@@ -895,25 +904,31 @@ def write_ids_and_representative_docs(
                 party_day_counts=party_day_counts,
                 metadata=True,
             ):
-                if doc_topic_pairs_index >= len(doc_topic_pairs):
+                topic = topics[doc_index]
+                writer_ids.writerow([doc["id"], topic, 0])
+                for reply_id in doc["reply_chain"]:
+                    writer_ids.writerow([reply_id, topic, 1])
+
+                if doc_topic_pairs_index < len(doc_topic_pairs):
+                    repr_doc_id, repr_topic = doc_topic_pairs[doc_topic_pairs_index]
+
+                    if doc_index == repr_doc_id:
+                        writer.writerow(
+                            [
+                                doc["id"],
+                                doc["local_time"],
+                                doc["text"],
+                                doc["user_screen_name"],
+                                repr_topic,
+                                party,
+                            ]
+                        )
+
+                        doc_topic_pairs_index += 1
+
+                if small and counters["counter_threads"] >= small_size:
                     return
-                doc_id, topic = doc_topic_pairs[doc_topic_pairs_index]
 
-                if int(doc["retweet_count"]) > 0:
-                    writer_ids.writerow([doc["id"], topic])
-
-                if doc_index == doc_id:
-                    writer.writerow(
-                        [
-                            doc["id"],
-                            doc["local_time"],
-                            doc["text"],
-                            doc["user_screen_name"],
-                            topic,
-                            party,
-                        ]
-                    )
-                    doc_topic_pairs_index += 1
                 doc_index += 1
 
 

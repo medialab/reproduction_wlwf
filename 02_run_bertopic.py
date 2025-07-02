@@ -211,11 +211,12 @@ if "congress" in group_list:
     )
     topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
 
-    repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
+    repr_docs_ids = extract_representative_docs(docs, new_topics, topic_model)
 
     # Write representative docs for one public in one file
     write_ids_and_representative_docs(
         repr_docs_ids,
+        new_topics,
         party_day_counts,
         "congress",
         args.origin_path,
@@ -284,6 +285,7 @@ if group_list & set(choices):
         # Write representative docs for one public in one file
         write_ids_and_representative_docs(
             repr_docs_ids,
+            topics,
             party_day_counts,
             group,
             args.origin_path,
