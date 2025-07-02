@@ -25,12 +25,12 @@ parser$add_argument("--tests", action = "store_true",
 parser$add_argument("--tests_post", action = "store_true",
                     help = "Compute check tests after estimation with optimal parameters")
 
-parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=7)
+parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=15)
 
 
 args <- parser$parse_args()
 
-variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
+variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'media')
 
 if (args$estimate || args$tests || args$tests_post){
   #Put our main databse generated thanks to script 05a 
@@ -43,6 +43,7 @@ if (args$estimate || args$tests || args$tests_post){
   pol_issues <- setdiff(pol_issues_temp, 89)
 
   db <- db %>%
+    select(-all_of(general))
     filter(topic %in% pol_issues)
 
   write.csv(db, file="data_prod/var/general_TS_clean.csv")
@@ -431,12 +432,12 @@ for (top in pol_issues) {
   covs <- names(girf$irf)
   for (covariate in covs) {
       new_rows <- data.frame(
-        topic= rep(top, length(covs)), 
+        topic= rep(as.character(top), length(covs)), 
         cov = rep(covariate, length(covs)),
         out = covs,
         pe = girf$irf[[covariate]][row_number,],
         lwr = girf$Lower[[covariate]][row_number,],
-        upr = girf$Upper[[covariate]][row_number,],
+        upr = girf$Upper[[covariate]][row_number,]
       )
     irf_data <- rbind(irf_data, new_rows)
   }
@@ -445,7 +446,7 @@ for (top in pol_issues) {
 irf_plot <- irf_data
 agenda_type <- data.frame(
   var = variables,
-  type = c("pol", "pol", "pol", "pol", "pub", "pub", "pub", "pub", "pub", "pub", "media")
+  type = c("pol", "pol", "pol", "pol", "pub", "pub", "pub", "pub", "pub", "media")
 )
 cov_agenda_type <- agenda_type %>%
   rename(cov = var, cov_agenda_type = type)
@@ -466,7 +467,7 @@ irf_plot <- irf_plot %>%
 
 # - merging to the dataset a human readable name for the topics
 
-irf_plot <- left_join(irf_plot, pa2our)
+irf_plot <- left_join(irf_plot, pa2our, by = c("topic" = "issue_num"))
 
 print(head(irf_plot))
 irf_plot$cov <- recode(irf_plot$cov,
@@ -528,27 +529,30 @@ print(head(irf_plot))
 
 plot_db <- irf_plot %>%
   arrange(out, cov, pe) %>%
-  mutate(label = factor(label, levels = unique(label))) %>%
-  filter(sign(lwr) == sign(upr))
+  filter(sign(lwr) == sign(upr)) %>%
+  group_by(topic, out) %>%
+  slice_max(order_by = abs(pe), n = 3, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(label = factor(label, levels = unique(label)))
+
 print(head(plot_db))
 
 # - sort by the issues in which Democratic supporters are more likely to lead 
 #   the attention of Democrats in Congress
 
-path_img <- "data_prod/figures/bertopic/figure4.png"
+path_img <- "data_prod/figures/figure4.png"
 
 colors_dict <- c(
-"LR in\nCongress" = "blue4",
-  "Majority in\nCongress" = "orange",
-  "NUPES in\nCongress" = "chartreuse4",
-  "RN in\nCongress" = "lightsalmon3",
+"LR in\nCongress" = "blue",
+  "Majority in\nCongress" = "darkorange1",
+  "NUPES in\nCongress" = "red",
+  "RN in\nCongress" = "gray19",
   "LR\nSupporters" = "cyan3",
-  "Majority\nSupporters" = "darkorange1",
-  "NUPES\nSupporters"= "seagreen1",
-  "RN\nSupporters" = "brown4",
-  "Attentive\nPublic" = "red", 
-  "General\nPublic"= "darkgrey",
-  "Media" = "darkorchid3"
+  "Majority\nSupporters" = "gold",
+  "NUPES\nSupporters"= "orchid1",
+  "RN\nSupporters" = "gray68",
+  "Attentive\nPublic" = "darkorchid3", 
+  "Media" = "green4"
 )
 
 # PLOT -- FIGURE 4
@@ -562,7 +566,7 @@ p <- ggplot(plot_db %>%
   facet_wrap(~out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  ylab(paste("\nThe effect of a 10 percentage point increase in attention", args$number_irf, "days ago by the covariate group, measured in percentage point change")) +
+  ylab(paste("\nThe effect of a standard error impulse", args$number_irf, "days ago by the covariate group, measured in standard error change")) +
   scale_color_manual("", values = colors_dict) +
   theme(
     panel.background = element_blank(),

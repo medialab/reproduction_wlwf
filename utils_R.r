@@ -22,7 +22,7 @@ auto.portmanteau.test <- function(x, q=2.4, correction = c("none", "bonferroni",
     resids <- resid(x)
     endog <- names(x$varresult)
     result <- data.frame(matrix(NA, nrow=0, ncol=3))
-    colnames(result) <- c("Variable", "AQ_Statistic", "pvalue")
+    colnames(result) <- c("Variable", "AQ_Statistic", "pvalue") # Peut être à edit 
     for (var in endog){ #Compute test for each variables of the VAR process
         resid <- resids[, var]
         mean_resid <- mean(resid)
@@ -405,6 +405,32 @@ panel_lag <- function(x, k) {
   res
 }
 
+panel_forward_lag <- function(x, k) {
+  res <-
+    rbind(as.matrix(x[(1 + 1):nrow(x),-1]), matrix(NA, 1, ncol(x) - 1), deparse.level = 1)
+  colnames(res) <- colnames(x)[-1]
+
+  if (k > 1) {
+    for (l in 2:k) {
+      res <-
+        cbind(res, rbind(as.matrix(x[(1 + l):nrow(x),-1]), matrix(NA, l, ncol(x) - 1)))
+    }
+  }
+
+  #if (k > 1){
+  res[rep(is.na(x[,-1]), k)] <- NA # multiple lags
+  #}
+
+  # only necessary if single variable with multiple lags
+  if (ncol(x) == 2)
+    colnames(res) <- rep(colnames(res)[1], ncol(res))
+
+  colnames(res) <-
+    paste0("forwardlag", rep(1:k, each = ncol(x) - 1), "_", colnames(res))
+  rownames(res) <- NULL
+  res
+}
+
 demean <- function(x) {
   x - mean(x, na.rm = TRUE)
 }
@@ -416,9 +442,12 @@ panel_demean <- function(x, transformation) {
   res
 }
 
-WITHIN_TRANSFO <- function(dependent_vars, lags, data, panel_identifier){
+within_transfo <- function(dependent_vars, lags, exog_vars, data, panel_identifier){
   data <- droplevels(data)
   required_vars <- c(dependent_vars)
+  if(!(is.null(exog_vars))){
+    required_vars <- c(required_vars, exog_vars)
+  }
   if (is.numeric(panel_identifier)) {
     Set_Vars <-
       data[, c(colnames(data)[panel_identifier], required_vars)]
@@ -428,12 +457,15 @@ WITHIN_TRANSFO <- function(dependent_vars, lags, data, panel_identifier){
   }
   
   nof_dependent_vars <- length(dependent_vars)
-  nof_exog_vars <- 0
+  if(missing(exog_vars)) {
+    nof_exog_vars <- 0
+  } else {
+    nof_exog_vars <- length(exog_vars)
+  }
   categories <- sort(unique(Set_Vars[, 1]))
   periods <- sort(unique(Set_Vars[, 2]))
   nof_categories <- length(categories)
   nof_periods <- length(periods)
-  lags <- abs(as.integer(lags))
   
   name_category <- names(Set_Vars)[1]
   name_period <- names(Set_Vars)[2]
@@ -453,6 +485,21 @@ WITHIN_TRANSFO <- function(dependent_vars, lags, data, panel_identifier){
                         SIMPLIFY = FALSE
                       )
                     )) 
+  
+  #Consider exog vars 
+  if (!(is.null(exog_vars))) {
+  Set_Vars <- cbind(Set_Vars,
+                    do.call(
+                      rbind,
+                      mapply(
+                        function(i)
+                          panel_forward_lag(Set_Vars[Set_Vars$category == categories[i],
+                                                     c("period", exog_vars)], lags),
+                        1:length(categories),
+                        SIMPLIFY = FALSE
+                      )
+                    ))
+  }
   #Demeaning
   Set_Vars <- cbind(Set_Vars,
                     do.call(
@@ -468,19 +515,27 @@ WITHIN_TRANSFO <- function(dependent_vars, lags, data, panel_identifier){
   return(Set_Vars)
 }
 
-PVARselect <- function(data, dependent_vars, lag.max, panel_identifier){ 
+PVARselect <- function(data, dependent_vars, lag.max=10, panel_identifier=c(1,2), exogen=NULL){ 
   lag <- abs(as.integer(lag.max + 1))
+  detint <- length(exogen)
   K <- length(dependent_vars)
-  max_NotUsed <- K*(lag) + 2
+  nvar <- K + detint
+  max_NotUsed <- nvar*(lag) + 2
   data <- as.data.frame(data)
-  demeaned_data <- WITHIN_TRANSFO(variables, lag.max, data, panel_identifier)
-  cols_to_exclude <- names(demeaned_data)[1:max_NotUsed]
-  demeaned_data <- demeaned_data[, -(1:max_NotUsed)]
+  demeaned_data <- within_transfo(dependent_vars, lag.max, exogen, data, panel_identifier)
+  sample <- nrow(demeaned_data)
+  demeaned_data <- demeaned_data[, -(1:max_NotUsed)] #Remove not demeaned cols 
   yendog <- as.matrix(demeaned_data[, 1:K])
-  ylagged <- as.matrix(demeaned_data[, -(1:K)])
-  sample <- nrow(ylagged)
-  rhs <- NULL
-  detint <- 0
+  max_col_exog <- K + 1 + detint 
+  rhs <-  as.matrix(demeaned_data[, (K + 1):max_col_exog])
+  if(is.null(exogen)){
+    ylagged <- as.matrix(demeaned_data[, (K + 1):(ncol(demeaned_data))])
+    rhs <- NULL
+  } else {
+    max_col_exog <- K + detint
+    rhs <- as.matrix(demeaned_data[, (K + 1):max_col_exog])
+    ylagged <- as.matrix(demeaned_data[, (max_col_exog + 1):(ncol(demeaned_data) - lag.max*detint)])
+  }
   idx <- seq(K, K * lag.max, K)
   criteria <- matrix(NA, nrow = 4, ncol = lag.max)
   rownames(criteria) <- c("AIC(n)", "HQ(n)", "SC(n)", "FPE(n)")
@@ -492,11 +547,11 @@ PVARselect <- function(data, dependent_vars, lag.max, panel_identifier){
     resids <- lm.fit(x = ys.lagged, y = yendog)$residuals
     sigma.det <- det(crossprod(resids)/sample)
     criteria[1, i] <- log(sigma.det) + (2/sample) * (i * 
-                                                       K^2 + K * detint)
+                                                       K^2 + K*detint)
     criteria[2, i] <- log(sigma.det) + (2 * log(log(sample))/sample) * 
-      (i * K^2 + K * detint)
+      (i * K^2 + K*detint)
     criteria[3, i] <- log(sigma.det) + (log(sample)/sample) * 
-      (i * K^2 + K * detint)
+      (i * K^2 + K*detint)
     criteria[4, i] <- ((sample + nstar)/(sample - nstar))^K * 
       sigma.det
   }
@@ -504,82 +559,126 @@ PVARselect <- function(data, dependent_vars, lag.max, panel_identifier){
   return(list(selection = order, criteria = criteria))
 }
 
-PVAR_PAC_TEST <- function(model, q=2.4){
+panel_portmanteau_test <- function(model, q=2.4, d=NULL,alpha = 0.05, exog=FALSE){
     category_indices <- levels(model$Set_Vars$category)
     num_periods <- length(levels(PVAR_model$Set_Vars$period))
     lags <- model$lags
-    obs <- num_periods-lags
-    i <- 1 
     endog <- model$dependent_vars
-    ncol_table <- length(endog) + 1
-    table_test <- data.frame(matrix(NA, nrow=0, ncol=ncol_table))
-    colnames(table_test) <- c("Topic", endog)
-    dem_endog <- colnames(model$residuals)
+    #Test if we have exogenous variables because if it's the case, the number of observations differ because of forward_lags
+    num_col_transfo <- ncol(model$Set_Vars)
+    exceptednoexog <- 2 + (lags +1)*length(endog)*2 #Excepted number of columns in model$Set_Vars if there's no exogenous variables (we have 2 (panel_ids) + (no lagged values + lagged values) ((1 + lag)*nb_endog) + demeaned values (all variablex except panel_id*2))
+    if (exceptednoexog == num_col_transfo){
+      obs <- num_periods - lags
+    } else {
+      obs <- num_periods - lags*2 #Because forwards lags remove the last observations 
+    }
+    if (is.null(d)){
+      d <- round(obs/12, 0)
+    }
+    i <- 1
+    details_results <- data.frame(matrix(NA, nrow=0, ncol=4))
+    colnames(details_results) <- c("Category", "Var", "pvalbeforeadj", "H0")
     for (idx in category_indices){
         start <- (i-1)*obs + 1
         end <- i*obs
         resids <- model$residuals[start:end,]
-        pval_list <- c()
-        for (var in dem_endog){
-            resid <- resids[, var]
-            mean_resid <- mean(resid)
-            list_gamma <- c()
-            list_theta<- c()
-            list_forpi <- c()
-            for (j in 1:(obs-1)){
-                sum_j <-0
-                sum_j2 <-0
-                for (t in (j+1):obs){
-                    sum_j <- (resid[t] - mean_resid) * (resid[t-j] - mean_resid) + sum_j
-                    sum_j2 <- (resid[t] - mean_resid)^2 * (resid[t-j] - mean_resid)^2 + sum_j2
-                }
-                gamma_j <- (1/(obs-j) * sum_j)^2
-                theta_j <- 1/(obs-j) * sum_j2
-
-                list_gamma <- c(list_gamma, gamma_j)
-                list_theta <- c(list_theta, theta_j)
-                list_forpi <- abs(gamma_j/theta_j) *sqrt(obs)
+        result <- data.frame(matrix(NA, nrow=0, ncol=2))
+        colnames(result) <- c("Variable", "pvalue")
+        for (var in endog){
+          demean_var <- paste0('demeaned_', var)
+          resid <- resids[, demean_var]
+          mean_resid <- mean(resid)
+          list_gamma <- c()
+          list_theta<- c()
+          list_forpi <- c()
+          for (j in 1:d){ #Loop to calculate gamma_j and theta_j for each j in 1:d
+              sum_j <-0
+              sum_j2 <-0
+              for (t in (j+1):obs){
+                  sum_j <- (resid[t] - mean_resid) * (resid[t-j] - mean_resid) + sum_j
+                  sum_j2 <- (resid[t] - mean_resid)^2 * (resid[t-j] - mean_resid)^2 + sum_j2
+              }
+              gamma_j <- (1/(obs-j) * sum_j)^2
+              theta_j <- 1/(obs-j) * sum_j2
+              forpi_j <- sqrt(abs(gamma_j/theta_j)) * sqrt(obs) 
+  
+              list_gamma <- c(list_gamma, gamma_j)
+              list_theta <- c(list_theta, theta_j)
+              list_forpi <- c(list_forpi, forpi_j)
             }
-            sum_forQ <- 0
-            list_p <- c()
-            list_pi <- c()
-            for (h in 1:(obs-1)){
-                if(max(list_forpi) > sqrt(q*log(obs))){
-                    pi_h <- 2*h
-                } else {
-                    pi_h <- h*log(obs)
-                }
-                list_pi <- c(list_pi, pi_h)
-            }
-            for (p in 1:(obs-1)){
-                sum_forQ <- 0
-                for (j in 1:p){
-                    sum_forQ <- sum_forQ + list_gamma[j]/list_theta[j]
-                }
-                test_stat <- obs*sum_forQ
-                Lp <- test_stat - list_pi[p]
-                for (h in 1:(obs-1)){
-                    Lh <- test_stat - list_pi[h]
-                    if (Lp>=Lh){
-                        list_p <- c(list_p, p)
-                    }
-                }
-            }
-            p <- min(list_p)
-            sum_forQ <- 0
-            for (j in 1:p){
-                sum_forQ <- sum_forQ + list_gamma[j]/list_theta[j]
-            }
-            test_stat <- obs*sum_forQ
-            p_value <- 1 - pchisq(test_stat, df=1)
-            p_value <- round(p_value, 5)
-            pval_list <- c(pval_list, p_value)
+        #Calculate Lp to define tilde(p)
+        list_p <- c()
+        for (h in 1:d){
+          if(max(list_forpi) > sqrt(q*log(obs))){
+              penalty <- 2*h
+          } else {
+              penalty <- h*log(obs)
+          }
+          sum_H <- 0 
+          for (j in 1:h){
+             sum_H <- sum_H + list_gamma[j]/list_theta[j]
+          }
+          Lh <- obs*sum_H - penalty
+          list_p <- c(list_p, Lh) 
         }
-        new_row <- c(category_indices[i], pval_list)
-        table_test <- rbind(table_test, new_row)
-        i <- i+1
-    }
-    return(table_test)
+        max_val <- max(list_p)
+        indices_max <- which(list_p == max_val)
+        p <- min(indices_max) 
+        #Calculate AQ stat and p-value
+        sum_forQ <- 0 
+        for (j in 1:p){
+            sum_forQ <- sum_forQ + list_gamma[j]/list_theta[j]
+        }
+        test_stat <- obs*sum_forQ    
+        p_value <- 1 - pchisq(test_stat, df=1) #because AQ --> Chi2(1) so we can calculate p-value like this.   
+        new_row <- data.frame(
+          Variable = var,
+          pvalue = p_value 
+        )
+        result <- rbind(result, new_row)
+      }
+      #Holm's procedure
+      p_values_sorted <- sort(result$pvalue)
+      idx_order <- order(result$pvalue)
+      var_sorted <- result$Variable[idx_order]
+      K <- length(endog)
+      rank_H <- 1
+      list_padj <- c()
+      for (pval in p_values_sorted){
+        padj <- pval*K
+        if (padj > alpha){
+          accepted <- var_sorted[rank_H:length(endog)]
+          rejected <- setdiff(var_sorted, accepted)
+          H0 <- ifelse(var_sorted %in% accepted, "accepted", "rejected")
+          result2 <- data.frame(
+            Category = rep(idx, length(endog)),
+            Var = var_sorted,
+            pvalbeforeadj = p_values_sorted,
+            H0 = H0
+          )
+            break
+          } else {
+              if (rank_H == length(endog)){
+                result2 <- data.frame(
+                Category = rep(idx, length(endog)),
+                Var = result$Variable,
+                pvalbeforeadj = result$pvalue,
+                H0 = "rejected"
+                )
+              }
+            }
+          K <- K- 1
+          rank_H <- rank_H + 1
+      }
+      details_results <- rbind(details_results, result2)
+      i <- i+1
+    } 
+    colnames(details_results) <-  c("Category", "Var", "pvalbeforeadj", "H0")
+    table_test <- details_results %>%
+          group_by(Category) %>%
+          summarise(nb_accepted = sum(H0 == "accepted"))
+    table_test <- as.data.frame(table_test)
+    return(list(summary = table_test, details = details_results))
 }
 
 jb_multi <- function (x, obs, K, obj.name) {
@@ -623,7 +722,7 @@ jb_multi <- function (x, obs, K, obj.name) {
     return(result)
 }
 
-PVAR_normality.test <-function(model){
+panel_normality_test <-function(model){
     obj.name <- deparse(substitute(x))
     K <- ncol(model$residuals)
     obs <- nrow(model$residuals)

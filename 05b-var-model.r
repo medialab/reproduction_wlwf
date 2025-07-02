@@ -33,116 +33,126 @@ parser$add_argument("--number_irf", help="Choose a int who will represent the nu
 
 args <- parser$parse_args()
 
-if (!(args$estimate)){
-  if (!file.exists("data_prod/var/bertopic/Pvar_model-MAIN.Rdata") ||
-  !file.exists("data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")) {
-    stop("No var and irf files were found. Please run the --estimate option")
-  }
-}
-
-if (args$estimate){
-  count_msg <- 0
-  variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media')
+if (args$estimate || args$tests){
+  variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'media')
   print("Files recuperation and preprocessing")
   if (args$retweets){
-    db <- read_csv("data_prod/var/bertopic/general_TS_RT.csv", show_col_types = FALSE) #Change Name when retweets will be available
+    db <- read_csv("data_prod/var/general_TS_RT.csv", show_col_types = FALSE) #Change Name when retweets will be available
   }
   else(
-    db <- read_csv("data_prod/var/bertopic/general_TS.csv", show_col_types = FALSE)
+    db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
   )
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
   pol_issues_temp <- setdiff(c(0:91), throw_topic)
-  db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
+  db <- db %>% 
+    select(-general)
+  GTS <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
         group_by(date, topic) %>%                                  
         summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")
-  exclude_issues <- c(52, 71, 79, 85, 86, 89, 0, 11, 20, 28, 39, 47, 75) #Exclusion du topic merged + des topics avec au moins une série constante + ceux posant des soucis d'autocorrélation
-  pol_issues <- setdiff(pol_issues_temp, exclude_issues)  
+  exclude_issues <- c(52, 71, 79, 85, 86, 89) #Exclusion du topic merged + des topics avec au moins une série constante + ceux posant des soucis d'autocorrélation
+  pol_issues <- setdiff(pol_issues_temp, exclude_issues) 
+  db <- GTS %>%
+    filter(topic %in% pol_issues) 
+}
 
-  if (args$tests){
-    pol_issues_temp <- setdiff(pol_issues_temp, c(89))
-    db_bf <- db %>% filter(topic %in% pol_issues_temp)
-  }
-  db <- db %>%
-    filter(topic %in% pol_issues)
+if(args$tests){
+  pol_issues_temp <- setdiff(pol_issues_temp, 89)
+  db_bf <- GTS %>% filter(topic %in% pol_issues_temp)
+  cat("Proportion of remaining data linked to modeling filter \n")
+  tot <- db_bf %>% select(-topic) %>% 
+    summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)))
+  remain <- db %>% select(-topic) %>% 
+    summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)))
+  print(tot)
+  print(remain)
+  prop <- remain / tot
+  print(prop) 
+}
 
-  if (args$tests){
-    cat("Proportion of remaining data linked to modeling filter \n")
-    tot <- db_bf %>% select(-topic) %>% 
-      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)))
-    remain <- db %>% select(-topic) %>% 
-      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)))
-    print(tot)
-    print(remain)
-    prop <- remain / tot
-    print(prop) 
-  }
-
+if (args$estimate || args$tests){
   for (v in variables){
     db[[v]] <- log(1 + db[[v]])
   }
+  
+  #Differentiation 
+  db <- db %>%
+    group_by(topic) %>%            
+    arrange(date) %>%            
+    mutate(across(variables, 
+                   ~ . - lag(.),   
+                   .names = "diff_{col}")) %>%
+    ungroup() %>%
+    select(-all_of(variables))%>%
+    arrange(topic, date)
+  
+  db <- na.exclude(db)
+  colnames(db) <- c("date", "topic", variables)
+}
 
-  print("VAR Estimation")
+if (args$tests){
+  cat("Selection criteria optimized for the following lags number : \n")
+  print(PVARselect(db, variables, 20, panel_identifier=c("topic", "date"))$selection)
+}
+
+if(args$estimate){
+  print("PVAR Estimation")
   db <- as.data.frame(db)
-
   db$topic <- as.character(db$topic)
   db$date <- as.factor(db$date)
   db$topic <- as.factor(db$topic)
-
-
-  if (args$tests) {
-    cat("Selection criteria optimized for the following lags number : \n")
-    print(PVARselect(db, variables, 20, panel_identifier=c("topic", "date"))$selection)
-  }
-  lags <- 7
+  lags <- 14
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
-  if (args$tests_post){
-    stab <- max(panelvar::stability(PVAR_model)$Modulus)
-    if(stab>=1){
-      cat(paste("Stability problem, max Modul = ", stab, "\n"))
-    } else {
-      cat("PVAR Process is stable \n")
-    }
-    print(PVAR_normality.test(PVAR_model)$jb.mul$JB)
-    AC_Test <- PVAR_PAC_TEST(PVAR_model)
-    AC_Test$PB <- apply(AC_Test[, -1], 1, function(row) {
-    cols <- names(AC_Test)[-1][which(row < 0.05)]
-    if (length(cols) == 0) {
-      return("Aucun")
-    } else {
-      return(paste(cols, collapse = ", "))
-    }
-    })
-  colnames(AC_Test) <- c("Topic", variables, "PB")
-  write.csv(AC_Test, file="data_prod/var/bertopic/AC_tests.csv", row.names = FALSE)
-  }
-  print("Non-Cumulative IRF preparation")
-  irf_NC_BS <- panelvar::bootstrap_irf(PVAR_model, typeof_irf="GIRF", n.ahead = 30, nof_Nstar_draws=500, mc.cores = 50)
+  save(PVAR_model, file = "data_prod/var/Pvar_model-MAIN.Rdata")
+  #print("Calculate boostrapped GIRF")
+  #irf_NC_BS <- panelvar::bootstrap_irf(PVAR_model, typeof_irf="GIRF", n.ahead = 30, nof_Nstar_draws=500, mc.cores = 50)
+  #print("Create data according to vars package (including cumulation)")
+  #for (v in variables){
+    #irf_NC_BS$Lower[[v]] <- apply(irf_NC_BS$Lower[[v]], 2, cumsum)
+    #irf_NC_BS$Upper[[v]] <- apply(irf_NC_BS$Upper[[v]], 2, cumsum)
+  #}
 
-  print("Create data according to vars package (including cumulation)")
-  for (v in variables){
-    irf_NC_BS$Lower[[v]] <- apply(irf_NC_BS$Lower[[v]], 2, cumsum)
-    irf_NC_BS$Upper[[v]] <- apply(irf_NC_BS$Upper[[v]], 2, cumsum)
-  }
-
-  var_irfs <- list(
-    Lower      = irf_NC_BS$Lower,
-    Upper      = irf_NC_BS$Upper,
-    response   = variables,
-    impulse    = variables,         
-    cumulative = TRUE,           
-    runs       = 500,
-    ci         = 0.95,
-    boot       = TRUE,
-    model      = "pvarfeols"           
-  )
-
-  save(PVAR_model, file = "data_prod/var/bertopic/Pvar_model-MAIN.Rdata")
-  save(var_irfs, file = "data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")
-
-} else {
-  load("data_prod/var/bertopic/Pvar_irfs-MAIN.Rdata")
+  #var_irfs <- list(
+   # Lower      = irf_NC_BS$Lower,
+    #Upper      = irf_NC_BS$Upper,
+    #response   = variables,
+    #impulse    = variables,         
+    #cumulative = TRUE,           
+    #runs       = 500,
+    #ci         = 0.95,
+    #boot       = TRUE,
+    #model      = "pvarfeols"           
+  #)
+  #save(var_irfs, file = "data_prod/var/Pvar_irfs-MAIN.Rdata")
 }
 
+if (args$tests_post){
+  if (!file.exists("data_prod/var/Pvar_model-MAIN.Rdata")){
+    stop("Please run --estimate option before posterior checks.")
+  }
+  load("data_prod/var/Pvar_model-MAIN.Rdata")
+  lags <- PVAR_model$lags
+  stab <- max(panelvar::stability(PVAR_model)$Modulus)
+  if(stab>=1){
+    cat(paste("Stability problem, max Modul = ", stab, "\n"))
+  } else {
+    cat("PVAR Process is stable \n")
+  }
+  cat("Autocorrelation tests \n")
+  PTTest <- panel_portmanteau_test(PVAR_model)
+  print(PTTest$summary)
+  write.csv(PTTest$summary, paste0("data_prod/var/summary_AC_", lags, ".csv"), row.names=FALSE)
+  write.csv(PTTest$details, paste0("data_prod/var/details_AC_", lags, ".csv"), row.names=FALSE)
+  cat("Normality test \n")
+  print(panel_normality_test(PVAR_model)$jb.mul$JB)
+}
+
+stop()
+
+if(!file.exists("data_prod/var/Pvar_irfs-MAIN.Rdata")){
+  stop("Please estimate the model before creating figures")
+}
+
+load("data_prod/var/Pvar_irfs-MAIN.Rdata")
 var_irfs <- var_irfs
 variables <- names(var_irfs$Lower)
 elements_to_pull <- c("Upper", "Lower")
