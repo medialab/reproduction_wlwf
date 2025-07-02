@@ -20,7 +20,7 @@ from utils import (
     load_docs_embeddings,
     vectorizer,
     write_bertopic_TS,
-    write_representative_docs,
+    write_ids_and_representative_docs,
     SBERT_NAME,
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
@@ -214,7 +214,7 @@ if "congress" in group_list:
     repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
 
     # Write representative docs for one public in one file
-    write_representative_docs(
+    write_ids_and_representative_docs(
         repr_docs_ids,
         party_day_counts,
         "congress",
@@ -282,7 +282,7 @@ if group_list & set(choices):
         repr_docs_ids = extract_representative_docs(docs, topics, topic_model)
 
         # Write representative docs for one public in one file
-        write_representative_docs(
+        write_ids_and_representative_docs(
             repr_docs_ids,
             party_day_counts,
             group,

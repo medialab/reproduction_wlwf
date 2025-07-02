@@ -569,6 +569,7 @@ def generate_threads(
     text_pos = reader.headers.text
     id_pos = reader.headers.id
     rt_pos = reader.headers.retweeted_id
+    rt_count_pos = reader.headers.retweet_count
     user_pos = reader.headers.user_id
     to_user_pos = reader.headers.to_userid
     to_id_pos = reader.headers.to_tweetid
@@ -638,6 +639,7 @@ def generate_threads(
                         "local_time": row[local_time_pos],
                         "text": doc,
                         "user_screen_name": row[screen_name_pos],
+                        "retweet_count": row[rt_count_pos],
                     }
                 yield doc
     if not compressed:
@@ -814,7 +816,7 @@ def extract_representative_docs(docs, topics, topic_model):
     return repr_docs_ids
 
 
-def write_representative_docs(
+def write_ids_and_representative_docs(
     repr_docs_ids, party_day_counts, public, path, small, small_size
 ):
     doc_topic_pairs = []
@@ -832,8 +834,13 @@ def write_representative_docs(
             f"representative_docs_{public}.csv",
         ),
         "w",
-    ) as f:
-        writer = csv.writer(f)
+    ) as f_representative_docs, open(
+        os.path.join(
+            path, "data_prod", "dashboard", "bertopic", f"ids_topics_{public}.csv"
+        ),
+        "w",
+    ) as f_ids:
+        writer = csv.writer(f_representative_docs)
         writer.writerow(
             [
                 "id",
@@ -842,6 +849,14 @@ def write_representative_docs(
                 "user_screen_name",
                 "topic",
                 "party",
+            ]
+        )
+
+        writer_ids = csv.writer(f_ids)
+        writer_ids.writerow(
+            [
+                "id",
+                "topic",
             ]
         )
 
@@ -883,6 +898,10 @@ def write_representative_docs(
                 if doc_topic_pairs_index >= len(doc_topic_pairs):
                     return
                 doc_id, topic = doc_topic_pairs[doc_topic_pairs_index]
+
+                if int(doc["retweet_count"]) > 0:
+                    writer_ids.writerow([doc["id"], topic])
+
                 if doc_index == doc_id:
                     writer.writerow(
                         [
