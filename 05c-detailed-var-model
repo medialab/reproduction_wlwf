@@ -1,4 +1,3 @@
-library(car)
 library(tidyverse)
 library(tidyr)
 library(stats)
@@ -14,6 +13,7 @@ library(lubridate)
 library(urca)
 source("utils_R.r")
 library(dplyr)
+
 parser <- ArgumentParser()
 
 parser$add_argument("--estimate", action = "store_true",
@@ -43,7 +43,7 @@ if (args$estimate || args$tests || args$tests_post){
   pol_issues <- setdiff(pol_issues_temp, 89)
 
   db <- db %>%
-    select(-all_of(general))
+    dplyr::select(-general) %>%
     filter(topic %in% pol_issues)
 
   write.csv(db, file="data_prod/var/general_TS_clean.csv")
@@ -468,8 +468,6 @@ irf_plot <- irf_plot %>%
 # - merging to the dataset a human readable name for the topics
 
 irf_plot <- left_join(irf_plot, pa2our, by = c("topic" = "issue_num"))
-
-print(head(irf_plot))
 irf_plot$cov <- recode(irf_plot$cov,
                     `lr` = "LR in\nCongress",
                     `majority` = "Majority in\nCongress",
@@ -480,7 +478,7 @@ irf_plot$cov <- recode(irf_plot$cov,
                     `nupes_supp` = "NUPES\nSupporters",
                     `rn_supp` = "RN\nSupporters",
                     `attentive` = "Attentive\nPublic",
-                    `general` = "General\nPublic",
+                    #`general` = "General\nPublic",
                     `media` = "Media")
 
 irf_plot$out <- recode(irf_plot$out,
@@ -493,7 +491,7 @@ irf_plot$out <- recode(irf_plot$out,
                     `nupes_supp` = "NUPES\nSupporters",
                     `rn_supp` = "RN\nSupporters",
                     `attentive` = "Attentive\nPublic",
-                    `general` = "General\nPublic",
+                    #`general` = "General\nPublic",
                     `media` = "Media")
 
 # - reordering the covariate and outcome categories
@@ -508,7 +506,7 @@ irf_plot$cov <- factor(irf_plot$cov,
                                       "NUPES\nSupporters",
                                       "RN\nSupporters",
                                       "Attentive\nPublic",
-                                      "General\nPublic",
+                                      #"General\nPublic",
                                       "Media")))
 
 irf_plot$out <- factor(irf_plot$out,
@@ -521,21 +519,16 @@ irf_plot$out <- factor(irf_plot$out,
                                 "NUPES\nSupporters",
                                 "RN\nSupporters",
                                 "Attentive\nPublic",
-                                "General\nPublic", 
+                                #"General\nPublic", 
                                 "Media"))
-
-
-print(head(irf_plot))
 
 plot_db <- irf_plot %>%
   arrange(out, cov, pe) %>%
   filter(sign(lwr) == sign(upr)) %>%
   group_by(topic, out) %>%
-  slice_max(order_by = abs(pe), n = 3, with_ties = FALSE) %>%
+  slice_max(order_by = abs(pe), n = 2, with_ties = FALSE) %>%
   ungroup() %>%
   mutate(label = factor(label, levels = unique(label)))
-
-print(head(plot_db))
 
 # - sort by the issues in which Democratic supporters are more likely to lead 
 #   the attention of Democrats in Congress
@@ -561,7 +554,7 @@ png(path_img, width = 1600, height = 1400)
 p <- ggplot(plot_db %>% 
          mutate(pe = (pe * 100)/10, lwr = (lwr * 100)/10, upr = (upr * 100)/10),
        aes(x = label, y = pe, ymin = lwr, ymax = upr)) +
-  geom_pointrange(aes(col = cov), alpha = 0.4, size = 0.7) +
+  geom_pointrange(aes(col = cov), alpha = 0.4, size = 0.5) +
   geom_hline(yintercept = 0, color = "red") +
   facet_wrap(~out, nrow = 1) +
   coord_flip() +
