@@ -36,11 +36,12 @@ if (args$estimate || args$tests || args$tests_post){
   #Put our main databse generated thanks to script 05a 
   db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
-  pol_issues_temp <- setdiff(c(0:91), throw_topic)
+  pol_issues_temp <- setdiff(c(0:92), throw_topic)
   db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
+      mutate(topic = ifelse(topic == 92, 90, topic)) %>%
       group_by(date, topic) %>%                                  
       summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- setdiff(pol_issues_temp, 89)
+  pol_issues <- setdiff(pol_issues_temp, c(89, 92))
 
   db <- db %>%
     dplyr::select(-general) %>%
@@ -738,7 +739,7 @@ p <- ggplot(plot_db,
   facet_wrap(~ out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  scale_y_continuous("\n21-day Responses (One standard error shock)",
+  scale_y_continuous("\n21-day Responses (one standard error shock of Δimpulse)",
                      limits = c(0, 0.3), expand = c(0,0)) +
   theme(
     panel.spacing = unit(2, "lines"),
@@ -788,7 +789,7 @@ p <- ggplot(plot_db,
     labels = levels(plot_db$polgroup_f)
   ) +
   coord_flip() +
-  ylab("\n21-day cumulative effect of one standard error shock") +
+  ylab("\n21-day cumulative effect of one standard error shock in day 0") +
   scale_color_manual("", values = c("gray70", "gray30")) +
   theme(
     legend.position = "bottom",
@@ -824,7 +825,7 @@ p <- ggplot(plot_db,
   coord_flip() +
   geom_vline(xintercept = 15) +
   xlab("") +
-  scale_y_continuous("\nThe 21-day effect of a one standard error shock in day 0",
+  scale_y_continuous("\nThe 21-day cumulative effect of a one standard error shock in day 0",
                      expand = c(0,0.001)) +
   theme(
     panel.spacing = unit(1.5, "lines"),

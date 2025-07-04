@@ -20,7 +20,7 @@ from utils import (
 
 
 def run_xan_command(topic_model):
-    command = f"xan cat rows /store/medialex/reproduction_wlwf/data_prod/dashboard/{topic_model}/data/*.csv | xan drop prop | xan groupby date,topic 'values(nb_tweets)' | xan sort -s topic,date"
+    command = f"xan cat rows data_prod/dashboard/bertopic/data/*.csv | xan drop prop | xan groupby date,topic 'values(nb_tweets)' | xan sort -s topic,date"
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     return result.stdout
 
@@ -62,7 +62,7 @@ reader_G = casanova.reader("data_prod/dashboard/bertopic/data/bertopic_ts_1.csv"
 groups = list(dict.fromkeys(list(reader_G.cells('party'))))
 
 df = split_val(parse_csv_data(run_xan_command("bertopic")), groups)
-output_file = f"data_prod/var/bertopic/general_TS.csv"
+output_file = f"data_prod/var/general_TS.csv"
 with open(output_file, "w", newline="") as f:
     writer = csv.DictWriter(f, fieldnames=df[0].keys())
     writer.writeheader()
