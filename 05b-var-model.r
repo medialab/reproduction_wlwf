@@ -54,12 +54,6 @@ if (args$estimate || args$tests){
   #pol_issues <- c(11, 12, 18, 27, 30, 31, 32, 33, 36, 43, 46, 49, 55, 62, 66, 67, 7, 72, 77, 84, 88, 9)
   db <- GTS %>%
     filter(topic %in% pol_issues) 
-
-  db <- as.data.frame(db)
-  db$topic <- as.factor(db$topic)
-  db$date <- as.factor(db$date)
-  pvar <- pvargmm(variables, 1, data = db, panel_identifier=c("topic", "date"), steps = "twostep", collapse=TRUE)
-  stop()
 }
 
 if(args$tests){

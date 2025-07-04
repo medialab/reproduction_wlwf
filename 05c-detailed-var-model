@@ -25,7 +25,7 @@ parser$add_argument("--tests", action = "store_true",
 parser$add_argument("--tests_post", action = "store_true",
                     help = "Compute check tests after estimation with optimal parameters")
 
-parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=15)
+parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=21)
 
 
 args <- parser$parse_args()
@@ -462,116 +462,382 @@ irf_plot <- left_join(irf_plot, cov_agenda_type)
 irf_plot <- left_join(irf_plot, out_agenda_type)
 
 irf_plot <- irf_plot %>%
-  filter(cov_agenda_type != out_agenda_type | cov_agenda_type == "pol") %>%
+  arrange(out, cov, topic) %>%
   filter(cov != out)
 
-# - merging to the dataset a human readable name for the topics
-
 irf_plot <- left_join(irf_plot, pa2our, by = c("topic" = "issue_num"))
-irf_plot$cov <- recode(irf_plot$cov,
-                    `lr` = "LR in\nCongress",
-                    `majority` = "Majority in\nCongress",
-                    `nupes` = "NUPES in\nCongress",
-                    `rn` = "RN in\nCongress",
-                    `lr_supp` = "LR\nSupporters",
-                    `majority_supp` = "Majority\nSupporters",
-                    `nupes_supp` = "NUPES\nSupporters",
-                    `rn_supp` = "RN\nSupporters",
-                    `attentive` = "Attentive\nPublic",
-                    #`general` = "General\nPublic",
-                    `media` = "Media")
 
-irf_plot$out <- recode(irf_plot$out,
-                    `lr` = "LR in\nCongress",
-                    `majority` = "Majority in\nCongress",
-                    `nupes` = "NUPES in\nCongress",
-                    `rn` = "RN in\nCongress",
-                    `lr_supp` = "LR\nSupporters",
-                    `majority_supp` = "Majority\nSupporters",
-                    `nupes_supp` = "NUPES\nSupporters",
-                    `rn_supp` = "RN\nSupporters",
-                    `attentive` = "Attentive\nPublic",
-                    #`general` = "General\nPublic",
-                    `media` = "Media")
+write.csv(irf_plot, file="data_prod/var/irf_data.csv", row.names = FALSE)
 
-# - reordering the covariate and outcome categories
-
-irf_plot$cov <- factor(irf_plot$cov,
-                      levels = rev(c("LR in\nCongress",
-                                      "Majority in\nCongress",
-                                      "NUPES in\nCongress",
-                                      "RN in\nCongress",
-                                      "LR\nSupporters",
-                                      "Majority\nSupporters",
-                                      "NUPES\nSupporters",
-                                      "RN\nSupporters",
-                                      "Attentive\nPublic",
-                                      #"General\nPublic",
-                                      "Media")))
-
-irf_plot$out <- factor(irf_plot$out,
-                    levels = c("LR in\nCongress",
-                                "Majority in\nCongress",
-                                "NUPES in\nCongress",
-                                "RN in\nCongress",
-                                "LR\nSupporters",
-                                "Majority\nSupporters",
-                                "NUPES\nSupporters",
-                                "RN\nSupporters",
-                                "Attentive\nPublic",
-                                #"General\nPublic", 
-                                "Media"))
-
-plot_db <- irf_plot %>%
-  arrange(out, cov, pe) %>%
+irf_data <- irf_plot #Cov (origine impulse) : ligne , Out (reçoit impulse) : colonne 
+n_topic <- length(unique(irf_data$topic))
+variables <- c('lr', 'majority', 'nupes', 'rn',
+               'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp',
+               'attentive', 'media')
+readable_variables <- c("Députés LR", 
+                        "Députés Majorité",
+                        "Députés NUPES",
+                        "Députés RN",
+                        "Supporters LR",
+                        "Supporters Majorité",
+                        "Supporters NUPES",
+                        "Supporters RN",
+                        "Public Attentif",
+                        "Média")
+filt_irf <- irf_data %>% 
   filter(sign(lwr) == sign(upr)) %>%
-  group_by(topic, out) %>%
-  slice_max(order_by = abs(pe), n = 2, with_ties = FALSE) %>%
-  ungroup() %>%
-  mutate(label = factor(label, levels = unique(label)))
+  filter(pe > 0) %>%
+  mutate(
+    cov = recode(cov,
+                 `lr` = "Députés LR",
+                 `majority` = "Députés Majorité",
+                 `nupes` = "Députés NUPES",
+                 `rn` ="Députés RN",
+                 `lr_supp` = "Supporters LR",
+                 `majority_supp` = "Supporters Majorité",
+                 `nupes_supp` =   "Supporters NUPES",
+                 `rn_supp` =  "Supporters RN",
+                 `attentive` = "Public Attentif",
+                 `media` = "Média"
+    ),
+    out = recode(out,
+                 `lr` = "Députés LR",
+                 `majority` = "Députés Majorité",
+                 `nupes` = "Députés NUPES",
+                 `rn` ="Députés RN",
+                 `lr_supp` = "Supporters LR",
+                 `majority_supp` = "Supporters Majorité",
+                 `nupes_supp` =   "Supporters NUPES",
+                 `rn_supp` =  "Supporters RN",
+                 `attentive` = "Public Attentif",
+                 `media` = "Média"
+    )
+  )
 
-# - sort by the issues in which Democratic supporters are more likely to lead 
-#   the attention of Democrats in Congress
+#Tables 
+#Top themes by LF pairs 
+all_top3 <- data.frame(matrix(NA, nrow=0, ncol=5))
+for(covar in readable_variables){
+  for (outvar in readable_variables){
+    if (covar == outvar){
+      next
+    }
+    top3 <- filt_irf %>% 
+      filter(cov == covar) %>%
+      filter (out == outvar) %>%
+      arrange(desc(pe)) %>%              # Trier par pe décroissant
+      dplyr::select(cov, out, pe, label) %>%    # Garder uniquement les colonnes voulues
+      slice_head(n = 3) %>%
+      mutate(rank=row_number())
+    all_top3 <- rbind(all_top3, top3)
+  }
+}
 
-path_img <- "data_prod/figures/figure4.png"
+colnames(all_top3) <- c("cov", "out", "pe", "label", "rank")
+
+write.csv(all_top3, file="data_prod/var/irf-analysis/full_top3.csv", row.names=FALSE)
+
+#Top 3 influences by topic
+top3_topic <- filt_irf %>%
+        group_by(topic, cov, label) %>%
+        summarise(sum_pe = sum(pe, na.rm = TRUE),
+      .groups='drop') %>%
+    group_by(topic) %>%
+    slice_max(order_by = sum_pe, n = 3, with_ties = TRUE)  %>% 
+    ungroup()
+
+top3_topic$rank <- rep(1:3, n_topic)
+
+topics_leaders <- top3_topic %>%
+      count(cov, rank) %>%
+    tidyr::pivot_wider(
+      names_from = cov,
+      values_from = n,
+      values_fill = 0  # remplit les NA par 0
+    )
+
+write.csv(topics_leaders, file="data_prod/var/irf-analysis/leader_bytopic_top3.csv", row.names=FALSE)
+
+#Top 3 leading topics by group
+top3_topics_group <- filt_irf %>%
+          group_by(cov, topic, label) %>%
+          summarise(sum_pe = sum(pe, na.rm= TRUE), .groups='drop') %>%
+          group_by(cov) %>%
+          slice_max(order_by = sum_pe, n = 3, with_ties = TRUE) %>%
+          ungroup()
+
+top3_topics_group$rank <- rep(1:3, length(variables))
+
+groups_leaders <- top3_topics_group %>%
+             dplyr::select(cov, rank, label) %>%
+                tidyr::pivot_wider(
+                  names_from = cov,
+                  values_from = label
+                )
+
+write.csv(groups_leaders, file="data_prod/var/irf-analysis/topiclead_bygroup_top3.csv", row.names=FALSE)
+#Plots : number leader, follower
+
+#Matrix lead follow
+matrix_LF <- filt_irf %>%
+    count(cov, out) %>%
+    complete(cov = readable_variables, out = readable_variables, fill = list(n = 0))  %>%
+    mutate(
+      cov = factor(cov, levels = readable_variables),
+      out = factor(out, levels = readable_variables)
+    )
+
+png("data_prod/var/irf-analysis/number_leading_relations_pairs.png",width = 800, height = 600)
+p <- ggplot(matrix_LF, aes(x = out, y = cov, fill = n)) +
+  geom_tile(color = "white", linewidth = 0.3) +
+  geom_text(aes(label = n), color = "black", size = 3) + 
+  scale_fill_gradient(low = "#efffff", high = "#FF0000") +
+  theme_minimal(base_size = 14) +
+  labs(title = "Number of topic with positive influence",
+       x = "outcome", y = "origin", fill = "Occurrences") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid = element_blank(),
+        plot.title = element_text(face = "bold", hjust = 0.5))
+  print(p)
+  dev.off()
+
+
+matrix_LF <- filt_irf %>%
+  group_by(cov, out) %>%
+  summarise(pe_sum = round(sum(pe, na.rm = TRUE), 3), .groups = "drop") %>%
+  complete(cov = readable_variables, out = readable_variables, fill = list(pe_sum = 0)) %>%
+  mutate(
+    cov = factor(cov, levels = readable_variables),
+    out = factor(out, levels = readable_variables)
+  )
+
+png("data_prod/var/irf-analysis/total_GIRF_relations_pairs.png",width = 800, height = 600)
+p <- ggplot(matrix_LF, aes(x = out, y = cov, fill = pe_sum)) +
+  geom_tile(color = "white", linewidth = 0.3) +
+  geom_text(aes(label = pe_sum), color = "black", size = 3) + 
+  scale_fill_gradient(low = "#efffff", high = "#FF0000") +
+  theme_minimal(base_size = 14) +
+  labs(title = "Cumulative impulse by pair",
+       x = "outcome", y = "origin", fill = "Occurrences") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid = element_blank(),
+        plot.title = element_text(face = "bold", hjust = 0.5))
+print(p)
+dev.off()
+
+#Figure 4 Barbera
+plot_db <- irf_data  %>%
+          mutate(
+            cov = recode(cov,
+                         `lr` = "Députés LR",
+                         `majority` = "Députés Majorité",
+                         `nupes` = "Députés NUPES",
+                         `rn` ="Députés RN",
+                         `lr_supp` = "Supporters LR",
+                         `majority_supp` = "Supporters Majorité",
+                         `nupes_supp` =   "Supporters NUPES",
+                         `rn_supp` =  "Supporters RN",
+                         `attentive` = "Public Attentif",
+                         `media` = "Média"
+            ),
+            out = recode(out,
+                         `lr` = "Députés LR",
+                         `majority` = "Députés Majorité",
+                         `nupes` = "Députés NUPES",
+                         `rn` ="Députés RN",
+                         `lr_supp` = "Supporters LR",
+                         `majority_supp` = "Supporters Majorité",
+                         `nupes_supp` =   "Supporters NUPES",
+                         `rn_supp` =  "Supporters RN",
+                         `attentive` = "Public Attentif",
+                         `media` = "Média"
+            )
+          ) %>%
+          mutate (
+            cov = factor(cov, levels=readable_variables),
+            out = factor(out, levels=readable_variables)
+          ) %>%
+          filter(cov_agenda_type != out_agenda_type | cov_agenda_type == "pol") %>%
+          filter(sign(lwr) == sign(upr)) %>%
+          group_by(topic, out) %>%
+          slice_max(order_by = abs(pe), n = 2, with_ties = TRUE) %>%
+          ungroup() %>%
+          mutate(label = factor(label, levels = unique(label)))
 
 colors_dict <- c(
-"LR in\nCongress" = "blue",
-  "Majority in\nCongress" = "darkorange1",
-  "NUPES in\nCongress" = "red",
-  "RN in\nCongress" = "gray19",
-  "LR\nSupporters" = "cyan3",
-  "Majority\nSupporters" = "gold",
-  "NUPES\nSupporters"= "orchid1",
-  "RN\nSupporters" = "gray68",
-  "Attentive\nPublic" = "darkorchid3", 
-  "Media" = "green4"
+  "Députés LR" = "blue",
+  "Députés Majorité" = "darkorange1",
+  "Députés NUPES" = "red",
+  "Députés RN" = "gray19",
+  "Supporters LR" = "cyan3",
+  "Supporters Majorité" = "gold",
+  "Supporters NUPES"= "orchid1",
+  "Supporters RN" = "gray68",
+  "Public Attentif"= "darkorchid3", 
+  "Média" = "green4"
 )
-
-# PLOT -- FIGURE 4
-#===============================================================================
-png(path_img, width = 1600, height = 1400)
-p <- ggplot(plot_db %>% 
-         mutate(pe = (pe * 100)/10, lwr = (lwr * 100)/10, upr = (upr * 100)/10),
+png("data_prod/var/irf-analysis/figure4.png", width = 1600, height = 1400)       
+p <- ggplot(plot_db,
        aes(x = label, y = pe, ymin = lwr, ymax = upr)) +
   geom_pointrange(aes(col = cov), alpha = 0.4, size = 0.5) +
   geom_hline(yintercept = 0, color = "red") +
   facet_wrap(~out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  ylab(paste("\nThe effect of a standard error impulse", args$number_irf, "days ago by the covariate group, measured in standard error change")) +
+  ylab(paste("\nThe effect of a standard error impulse", "21", "days ago by the covariate group, measured in standard error change")) +
   scale_color_manual("", values = colors_dict) +
   theme(
+    panel.spacing = unit(1.25, "lines"),
     panel.background = element_blank(),
     panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
-    axis.text.x = element_text(size = 16),
+    axis.text.x = element_text(size = 10, angle=45),
     axis.text.y = element_text(size = 16),
-    strip.text = element_text(size = 16),
+    strip.text = element_text(size = 10),
     panel.border = element_rect(colour = "black", fill = FALSE),
     strip.background = element_rect(colour = "black"),
     axis.title = element_text(size = 14),
     legend.text = element_text(size = 14, margin = margin(t = 20), vjust = 5)
   )
+print(p)
+dev.off()
 
+#Start prepare aggregated figures
+plot_db2 <- filt_irf %>%
+          group_by(cov, out, cov_agenda_type, out_agenda_type) %>%
+          summarise(
+            lwr_sum = sum(lwr, na.rm = TRUE),
+            pe_sum = sum(pe, na.rm = TRUE),
+            upr_sum = sum(upr, na.rm = TRUE),
+            .groups = "drop"
+          )  %>%
+          mutate(
+            lwr_mean = lwr_sum / n_topic,
+            pe_mean = pe_sum / n_topic, 
+            upr_mean = upr_sum / n_topic
+          ) %>%
+          dplyr::select(-all_of(c("lwr_sum", "pe_sum", "upr_sum")))  %>%   
+          mutate(
+            cov = factor(cov, levels = readable_variables),
+            out = factor(out, levels = readable_variables)
+          )  %>%
+          rename(
+            lwr = lwr_mean,
+            pe = pe_mean,
+            upr = upr_mean
+          ) 
+
+#Figure : Influence entre députés 
+plot_db <- plot_db2 %>%
+            filter(cov_agenda_type == 'pol' & out_agenda_type=='pol')
+
+png("data_prod/var/irf-analysis/girf_between_deputes.png",width = 480, height = 480)
+p <- ggplot(plot_db,
+       aes(x = cov, y = pe, ymin = lwr, ymax = upr)) +
+  geom_segment(aes(x = cov, xend = cov, y = lwr, yend = upr), 
+               size = 2.5) +
+  facet_wrap(~ out, nrow = 1) +
+  coord_flip() +
+  xlab("") +
+  scale_y_continuous("\n21-day Responses (One standard error shock)",
+                     limits = c(0, 0.3), expand = c(0,0)) +
+  theme(
+    panel.spacing = unit(2, "lines"),
+    legend.position = "bottom",
+    panel.background = element_blank(),
+    panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
+    axis.text = element_text(size = 15),
+    axis.text.y = element_text(hjust=0),
+    strip.text = element_text(size = 15),
+    panel.border = element_rect(colour = "black", fill = FALSE),
+    strip.background = element_rect(colour = "black"),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 16)
+  )
+print(p)
+dev.off()    
+
+#Figure 3 Barbera
+plot_db <- plot_db2 %>%
+            filter(cov_agenda_type != "media", out_agenda_type != "media") %>%
+            filter(cov_agenda_type != out_agenda_type) %>%
+            mutate(
+              polgroup = ifelse(cov_agenda_type == "pol", as.character(cov), as.character(out)),
+              pubgroup = ifelse(cov_agenda_type == "pub", as.character(cov), as.character(out)),
+              var1 = cov,
+              var2 = out,
+              direction = ifelse(cov_agenda_type == "pol" & out_agenda_type == "pub", "députés→public", 
+                                 ifelse(cov_agenda_type == "pub" & out_agenda_type == "pol", "public→députés", NA))
+            ) %>%
+            dplyr::select(polgroup, pubgroup, direction, pe, lwr, upr)%>%
+              mutate(
+                polgroup_f = factor(polgroup),
+                polgroup_num = as.numeric(polgroup_f) + ifelse(direction == "députés→public", -0.15, 0.15)
+              )
+
+
+png("data_prod/var/irf-analysis/figure3.png",width = 800, height = 800)
+p <- ggplot(plot_db,
+       aes(x = polgroup_num, y = pe, ymin = lwr, ymax = upr, col = direction)) +
+  geom_segment(aes(xend = polgroup_num, y = lwr, yend = upr),
+               size = 4, alpha = 1) +  # retirer position_dodge ici
+  geom_hline(yintercept = 0, color = "red") +
+  facet_wrap(~ pubgroup, nrow = 1) +
+  scale_x_continuous(
+    name = "",
+    breaks = unique(as.numeric(plot_db$polgroup_f)),
+    labels = levels(plot_db$polgroup_f)
+  ) +
+  coord_flip() +
+  ylab("\n21-day cumulative effect of one standard error shock") +
+  scale_color_manual("", values = c("gray70", "gray30")) +
+  theme(
+    legend.position = "bottom",
+    panel.background = element_blank(),
+    panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
+    axis.text = element_text(size = 12),
+    strip.text = element_text(size = 12),
+    panel.border = element_rect(colour = "black", fill = FALSE),
+    strip.background = element_rect(fill = "gray80", color = "black"),
+    axis.title = element_text(size = 16),
+    legend.text = element_text(size = 16),
+    axis.text.y = element_text(hjust=0)
+  )
+
+print(p)
+dev.off()
+#Figure 6 Barbera
+plot_db <- plot_db2 %>%
+          filter(cov_agenda_type == 'media' | out_agenda_type == 'media') %>%
+          mutate(data_type = ifelse(cov_agenda_type == "media", "média→groupe", 
+                                    ifelse(out_agenda_type == "media", "groupe→média", NA))) %>%
+          mutate(y = ifelse(cov_agenda_type == 'media', as.character(out), as.character(cov)))
+
+
+png("data_prod/var/irf-analysis/figure6.png",width = 800, height = 800)
+p <- ggplot(plot_db,
+       aes(x = y, y = pe, ymin = lwr, ymax = upr)) +
+  geom_segment(aes(x = y, xend = y, y = lwr, yend = upr), 
+               size = 4, alpha = 0.6) +
+  #geom_segment(alpha = 0.8, size = 0.5) +
+  geom_hline(yintercept = 0, color = "black") +
+  facet_grid(~data_type) +
+  coord_flip() +
+  geom_vline(xintercept = 15) +
+  xlab("") +
+  scale_y_continuous("\nThe 21-day effect of a one standard error shock in day 0",
+                     expand = c(0,0.001)) +
+  theme(
+    panel.spacing = unit(1.5, "lines"),
+    legend.position = "bottom",
+    panel.background = element_blank(),
+    panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
+    axis.text = element_text(size = 16),
+    axis.text.y = element_text(hjust=0),
+    strip.text = element_text(size = 16),
+    panel.border = element_rect(colour = "black", fill = FALSE),
+    strip.background = element_rect(colour = "black"),
+    axis.title = element_text(size = 14),
+    legend.text = element_text(size = 16)
+  )
 print(p)
 dev.off()
