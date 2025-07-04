@@ -954,7 +954,7 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
         ) as f:
             writer = csv.writer(f)
             if group_type == "congress":
-                writer.writerow(["date", "party", "topic", "prop"])
+                writer.writerow(["date", "party", "topic", "prop", "nb_tweets"])
             if group_type == "supporter" or group_type == "congress":
                 for doc_count, party, day in party_day_counts:
                     writer.writerow(
@@ -963,6 +963,7 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             f"{party}_supp" if group_type == "supporter" else party,
                             topic,
                             round(topics_info[topic][party][day] / (doc_count), 5),
+                            topics_info[topic][party][day] 
                         ]
                     )
             else:
@@ -973,5 +974,6 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             group_type,
                             topic,
                             round(topics_info[topic][day] / (doc_count), 5),
+                            topics_info[topic][day] 
                         ]
                     )
