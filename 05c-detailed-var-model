@@ -25,7 +25,7 @@ parser$add_argument("--tests", action = "store_true",
 parser$add_argument("--tests_post", action = "store_true",
                     help = "Compute check tests after estimation with optimal parameters")
 
-parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=21)
+parser$add_argument("--number_irf", help="Choose a int who will represent the number of days in IRF calculation", type="integer", default=40)
 
 
 args <- parser$parse_args()
@@ -36,14 +36,14 @@ if (args$estimate || args$tests || args$tests_post){
   #Put our main databse generated thanks to script 05a 
   db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
-  pol_issues_temp <- setdiff(c(0:92), throw_topic)
+  pol_issues_temp <- setdiff(c(0:91), throw_topic)
   db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
       group_by(date, topic) %>%                                  
       summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
   pol_issues <- setdiff(pol_issues_temp, 89)
 
   db <- db %>%
-    dplyr::select(-general) %>%
+    #dplyr::select(-general) %>%
     filter(topic %in% pol_issues)
 
   write.csv(db, file="data_prod/var/general_TS_clean.csv")
@@ -276,7 +276,9 @@ if (args$tests){
     topic_num <- as.character(topic_num)
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     db_topic <- db_topic[, variables, drop = FALSE]
-    db_topic <- as.data.frame(diff(as.matrix(db_topic), differences = 1))
+    db_topic <- diff(as.matrix(db_topic), differences = 1)
+    db_topic <- scale(as.matrix(db_topic))
+    db_topic <- as.data.frame(db_topic)
     print(paste("Currently testing topic", topic_num))
     #Selection criteria
     AIC_and_co <- VARselect(db_topic, lag.max = 20, season = NULL)
@@ -316,7 +318,7 @@ if (args$estimate){
   infos_topic <- read_csv(path_infos_topic, show_col_types=FALSE)
   infos_topic <- as.data.frame(infos_topic)
   db$topic <- as.character(db$topic)
-  exclude_issues <- c(52, 71, 79, 85, 86) #Constants are excluded or they cause problems
+  exclude_issues <- c(52, 71, 79, 85, 86, 88) #Constants are excluded or they cause problems
   list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   for (topic_num in list_topic_iter){
     print(paste("Model calculated", topic_num))
@@ -327,14 +329,13 @@ if (args$estimate){
     lag_number <- as.integer(max(values_lag, na.rm = TRUE))
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     db_topic <- db_topic[, variables, drop = FALSE]
-    db_topic <- as.data.frame(diff(as.matrix(db_topic), differences = 1))
+    db_topic <- diff(as.matrix(db_topic), differences = 1)
+    db_topic <- scale(as.matrix(db_topic))
+    db_topic <- as.data.frame(db_topic)
     var_model <- VAR(db_topic, p=lag_number, type="const")
     save(var_model, file = paste0("data_prod/var/issue-level/var_model_", topic_num, ".Rdata"))
-    if(!(topic_num == "88")){
-      var_irfs_cum <- irf.varest.edit(var_model,n.ahead = 30, irf_type = "generalized", cumulative = TRUE, boot = TRUE, ci = 0.95, runs = 500) #Calculate cumulative GIRF 
-      save(var_irfs_cum, file = paste0("data_prod/var/issue-level/var_girf_topic_", topic_num, ".Rdata"))
-    }
- 
+    var_irfs_cum <- irf.varest.edit(var_model,n.ahead = 60, irf_type = "generalized", cumulative = TRUE, boot = TRUE, ci = 0.95, runs = 500) #Calculate cumulative GIRF 
+    save(var_irfs_cum, file = paste0("data_prod/var/issue-level/var_girf_topic_", topic_num, ".Rdata"))
   }
 }
 
@@ -344,6 +345,9 @@ if(args$tests_post){
   exclude_issues <- c(52, 71, 79, 85, 86, 88) #Constants are excluded or they cause problems
   list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   for (topic_num in list_topic_iter){
+    if(!(topic_num == "88")){
+      next
+    }
     print(paste("Posterior tests for topic", topic_num))
     var_path <- paste0("data_prod/var/issue-level/var_model_", topic_num, ".Rdata")
     if (!(file.exists(var_path))){
@@ -730,7 +734,9 @@ plot_db2 <- filt_irf %>%
 plot_db <- plot_db2 %>%
             filter(cov_agenda_type == 'pol' & out_agenda_type=='pol')
 
-png("data_prod/var/irf-analysis/girf_between_deputes.png",width = 480, height = 480)
+plot_db$cov <- factor(plot_db$cov,
+                      levels = rev(readable_variables[1:4]))
+png("data_prod/var/irf-analysis/girf_between_deputes.png",width = 800, height = 800)
 p <- ggplot(plot_db,
        aes(x = cov, y = pe, ymin = lwr, ymax = upr)) +
   geom_segment(aes(x = cov, xend = cov, y = lwr, yend = upr), 
