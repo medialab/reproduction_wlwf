@@ -38,10 +38,9 @@ if (args$estimate || args$tests || args$tests_post){
   throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
   pol_issues_temp <- setdiff(c(0:92), throw_topic)
   db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
-      mutate(topic = ifelse(topic == 92, 90, topic)) %>%
       group_by(date, topic) %>%                                  
       summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- setdiff(pol_issues_temp, c(89, 92))
+  pol_issues <- setdiff(pol_issues_temp, 89)
 
   db <- db %>%
     dplyr::select(-general) %>%

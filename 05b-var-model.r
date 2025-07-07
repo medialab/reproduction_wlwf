@@ -47,10 +47,9 @@ if (args$estimate || args$tests){
   db <- db %>% 
     select(-general)
   GTS <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
-        mutate(topic = ifelse(topic == 92, 90, topic)) %>%
         group_by(date, topic) %>%                                  
         summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")
-  exclude_issues <- c(52, 71, 79, 85, 86, 89, 92) #Exclusion du topic merged + des topics avec au moins une série constante + ceux posant des soucis d'autocorrélation
+  exclude_issues <- c(52, 71, 79, 85, 86, 89) #Exclusion du topic merged + des topics avec au moins une série constante + ceux posant des soucis d'autocorrélation
   pol_issues <- setdiff(pol_issues_temp, exclude_issues) 
   #pol_issues <- c(11, 12, 18, 27, 30, 31, 32, 33, 36, 43, 46, 49, 55, 62, 66, 67, 7, 72, 77, 84, 88, 9)
   db <- GTS %>%
@@ -58,7 +57,7 @@ if (args$estimate || args$tests){
 }
 
 if(args$tests){
-  pol_issues_temp <- setdiff(pol_issues_temp, c(89, 92))
+  pol_issues_temp <- setdiff(pol_issues_temp, 89)
   db_bf <- GTS %>% filter(topic %in% pol_issues_temp)
   cat("Proportion of remaining data linked to modeling filter \n")
   tot <- db_bf %>% select(-topic) %>% 
