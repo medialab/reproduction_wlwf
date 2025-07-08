@@ -409,7 +409,7 @@ pol_issues <- setdiff(c(0:91), throw_topic)
 exclude_issues <- c(52, 71, 79, 85, 86, 88) #Because constant and unstable VAR processes. 
 pol_issues <- setdiff(pol_issues, exclude_issues)
 last_topic <- tail(pol_issues, 1)
-last_top_path <- paste0("data_prod/var/", args$topic_model, "/issue-level/var_girf_topic_", last_topic, ".Rdata")
+last_top_path <- paste0("data_prod/var/issue-level/var_girf_topic_", last_topic, ".Rdata")
 if (!file.exists(last_top_path)){
   stop(paste("Tous les GIRFS n'ont pas été estimés, veuillez recommencer avec l'option --estimate"))
 }
@@ -490,7 +490,6 @@ readable_variables <- c("Députés LR",
                         "Média")
 filt_irf <- irf_data %>% 
   filter(sign(lwr) == sign(upr)) %>%
-  filter(pe > 0) %>%
   mutate(
     cov = recode(cov,
                  `lr` = "Députés LR",
@@ -529,7 +528,7 @@ for(covar in readable_variables){
     top3 <- filt_irf %>% 
       filter(cov == covar) %>%
       filter (out == outvar) %>%
-      arrange(desc(pe)) %>%              # Trier par pe décroissant
+      arrange(desc(abs(pe))) %>%              # Trier par pe décroissant
       dplyr::select(cov, out, pe, label) %>%    # Garder uniquement les colonnes voulues
       slice_head(n = 3) %>%
       mutate(rank=row_number())
@@ -597,7 +596,7 @@ p <- ggplot(matrix_LF, aes(x = out, y = cov, fill = n)) +
   geom_text(aes(label = n), color = "black", size = 3) + 
   scale_fill_gradient(low = "#efffff", high = "#FF0000") +
   theme_minimal(base_size = 14) +
-  labs(title = "Number of topic with positive influence",
+  labs(title = "Number of topic with significative influence",
        x = "outcome", y = "origin", fill = "Occurrences") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         panel.grid = element_blank(),
@@ -688,7 +687,7 @@ p <- ggplot(plot_db,
   facet_wrap(~out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  ylab(paste("\nThe effect of a standard error impulse", "21", "days ago by the covariate group, measured in standard error change")) +
+  ylab(paste("\nThe effect of a standard error impulse", args$number_irf, "days ago by the covariate group, measured in standard error change")) +
   scale_color_manual("", values = colors_dict) +
   theme(
     panel.spacing = unit(1.25, "lines"),
@@ -744,7 +743,7 @@ p <- ggplot(plot_db,
   facet_wrap(~ out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  scale_y_continuous("\n21-day Responses (one standard error shock of Δimpulse)",
+  scale_y_continuous(paste0("\n", args$number_irf,"-day Responses (one standard error shock of Δimpulse)"),
                      limits = c(0, 0.3), expand = c(0,0)) +
   theme(
     panel.spacing = unit(2, "lines"),
@@ -781,7 +780,7 @@ plot_db <- plot_db2 %>%
               )
 
 
-png("data_prod/var/irf-analysis/figure3.png",width = 800, height = 800)
+png("data_prod/var/irf-analysis/figure3.png",width = 1000, height = 1000)
 p <- ggplot(plot_db,
        aes(x = polgroup_num, y = pe, ymin = lwr, ymax = upr, col = direction)) +
   geom_segment(aes(xend = polgroup_num, y = lwr, yend = upr),
@@ -794,19 +793,22 @@ p <- ggplot(plot_db,
     labels = levels(plot_db$polgroup_f)
   ) +
   coord_flip() +
-  ylab("\n21-day cumulative effect of one standard error shock in day 0") +
+  ylab(paste0("\n", args$number_irf,"-day cumulative effect of one standard error shock in day 0")) +
   scale_color_manual("", values = c("gray70", "gray30")) +
   theme(
+    panel.spacing = unit(1.1, "lines"),
     legend.position = "bottom",
     panel.background = element_blank(),
     panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
     axis.text = element_text(size = 12),
+    axis.text.x = element_text(size = 8, angle=45),
     strip.text = element_text(size = 12),
     panel.border = element_rect(colour = "black", fill = FALSE),
     strip.background = element_rect(fill = "gray80", color = "black"),
     axis.title = element_text(size = 16),
     legend.text = element_text(size = 16),
-    axis.text.y = element_text(hjust=0)
+    axis.text.y = element_text(hjust=0),
+    plot.margin = margin(t = 10, r = 40, b = 10, l = 10)  
   )
 
 print(p)
@@ -830,14 +832,14 @@ p <- ggplot(plot_db,
   coord_flip() +
   geom_vline(xintercept = 15) +
   xlab("") +
-  scale_y_continuous("\nThe 21-day cumulative effect of a one standard error shock in day 0",
+  scale_y_continuous(paste0("\nThe ", args$number_irf, "-day cumulative effect of a one standard error shock in day 0"),
                      expand = c(0,0.001)) +
   theme(
     panel.spacing = unit(1.5, "lines"),
     legend.position = "bottom",
     panel.background = element_blank(),
     panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
-    axis.text = element_text(size = 16),
+    axis.text = element_text(size = 10),
     axis.text.y = element_text(hjust=0),
     strip.text = element_text(size = 16),
     panel.border = element_rect(colour = "black", fill = FALSE),
