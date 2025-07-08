@@ -85,7 +85,7 @@ plot_fig4  <- function(df, checked_actors, top_rank, variables, readable_variabl
     facet_wrap(~out, nrow = 1) +
     coord_flip() +
     xlab("") +
-    ylab(paste("\nThe effect of a standard error impulse 40 days ago by the covariate group, measured in standard error change")) +
+    ylab(paste("\nThe effect of a standard error impulse 40 days ago by the covariate group, measured in std(Δimpulse)")) +
     scale_color_manual("", values = colors_dict) +
     theme(
     panel.spacing = unit(1.25, "lines"),

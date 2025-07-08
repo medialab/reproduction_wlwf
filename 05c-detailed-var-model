@@ -687,7 +687,7 @@ p <- ggplot(plot_db,
   facet_wrap(~out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  ylab(paste("\nThe effect of a standard error impulse", args$number_irf, "days ago by the covariate group, measured in standard error change")) +
+  ylab(paste("\nThe effect of a standard error impulse", args$number_irf, "days ago by the covariate group, measured in std(Δresponse)")) +
   scale_color_manual("", values = colors_dict) +
   theme(
     panel.spacing = unit(1.25, "lines"),
@@ -743,7 +743,7 @@ p <- ggplot(plot_db,
   facet_wrap(~ out, nrow = 1) +
   coord_flip() +
   xlab("") +
-  scale_y_continuous(paste0("\n", args$number_irf,"-day Responses (one standard error shock of Δimpulse)"),
+  scale_y_continuous(paste0("\n", args$number_irf,"-day Responses (in std(Δresponse)) of a one standard error shock of std(Δimpulse)"),
                      limits = c(0, 0.3), expand = c(0,0)) +
   theme(
     panel.spacing = unit(2, "lines"),
@@ -832,7 +832,7 @@ p <- ggplot(plot_db,
   coord_flip() +
   geom_vline(xintercept = 15) +
   xlab("") +
-  scale_y_continuous(paste0("\nThe ", args$number_irf, "-day cumulative effect of a one standard error shock in day 0"),
+  scale_y_continuous(paste0("\nThe ", args$number_irf, "-day cumulative effect of a one standard error shock of std(Δimpulse) in day 0"),
                      expand = c(0,0.001)) +
   theme(
     panel.spacing = unit(1.5, "lines"),
