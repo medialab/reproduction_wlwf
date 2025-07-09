@@ -51,7 +51,7 @@ if (args$estimate || args$tests){
         summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop")
   exclude_issues <- c(52, 71, 79, 85, 86, 89) #Exclusion du topic merged + des topics avec au moins une série constante + ceux posant des soucis d'autocorrélation
   pol_issues <- setdiff(pol_issues_temp, exclude_issues) 
-  #pol_issues <- c(11, 12, 19, 20, 27, 28, 30, 31, 32, 33, 43, 46, 49, 53, 55, 6, 62, 66, 7, 72, 74, 77, 8, 84, 88, 90)
+  #pol_issues <- c(11, 12, 18, 19, 27, 29, 30, 31, 32, 33, 34, 37, 46, 49, 53, 55, 62, 63, 66, 7, 72, 74, 75, 77, 8, 82, 83, 84, 88, 90)
   db <- GTS %>%
     filter(topic %in% pol_issues) 
 }
@@ -87,7 +87,7 @@ if(args$estimate){
   db$topic <- as.character(db$topic)
   db$date <- as.factor(db$date)
   db$topic <- as.factor(db$topic)
-  lags <- 2
+  lags <- 16
   PVAR_model<- pvarfeols(variables, lags = lags, data = db, panel_identifier=c("topic", "date"))
   save(PVAR_model, file = "data_prod/var/Pvar_model-MAIN.Rdata")
   #print("Calculate boostrapped GIRF")
