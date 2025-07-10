@@ -11,13 +11,27 @@ from utils import (
     SBERT_NAME,
 )
 
+sbert_name_string = SBERT_NAME.replace("/", "_")
+
+def get_paths(root, public):
+    input_path = os.path.join(root, "data_source", public)
+    embeddings_path = os.path.join(
+        root,
+        "data_prod",
+        "embeddings",
+        public,
+        "{}.npz".format(sbert_name_string),
+    )
+    return input_path, embeddings_path
+
+input_path, embeddings_path = get_paths("/store/medialex/reproduction_wlwf", "congress")
 model_path = "data_prod/topics/bert-model"
 party_day_counts=[]
 
 docs, max_index, embeddings = load_docs_embeddings(
-            "/store/medialex/reproduction_wlwf/data_source/congress",
-            count_nb_files("/store/medialex/reproduction_wlwf/data_source/congress"),
-            "/store/medialex/reproduction_wlwf/data_prod/embeddings/congress",
+            input_path,
+            count_nb_files(input_path),
+            embeddings_path,
             DEFAULT_SAVE_SIZE,
             party_day_counts=party_day_counts,
             apply_unidecode=True,
