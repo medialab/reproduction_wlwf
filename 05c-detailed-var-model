@@ -735,7 +735,7 @@ plot_db <- plot_db2 %>%
 
 plot_db$cov <- factor(plot_db$cov,
                       levels = rev(readable_variables[1:4]))
-png("data_prod/var/irf-analysis/girf_between_deputes.png",width = 800, height = 800)
+png("data_prod/var/irf-analysis/girf_between_deputes.png",width = 1000, height = 800)
 p <- ggplot(plot_db,
        aes(x = cov, y = pe, ymin = lwr, ymax = upr)) +
   geom_segment(aes(x = cov, xend = cov, y = lwr, yend = upr), 
