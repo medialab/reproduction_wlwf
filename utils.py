@@ -976,36 +976,50 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                         ]
                     )
 
-def map_party_lda(file):
+def map_party_lda(data):
     party_map = {
     "dep. lr": "lr",
     "dep. majo.": "majority",
     "dep. nupes": "nupes",
     "dep. rn": "rn",
     "medias": "media",
-    "sup. lr" : "lr_supp",
-    "sup. majo." : "majority_supp",
-    "sup. nupes" : "nupes_supp",
+    "sup. lr": "lr_supp",
+    "sup. majo.": "majority_supp",
+    "sup. nupes": "nupes_supp",
     "sup. rn" : "rn_supp",
+    "pub. attentif": "attentive",
+    "pub. general": "general"
     }
+
+    party_column = np.array([party_map.get(affil, "Other") for affil in data['actor']])
+    new_dtype = data.dtype.descr + [('party', 'U30')] 
+    new_data = np.empty(data.shape, dtype=new_dtype)
+    for name in data.dtype.names:
+        new_data[name] = data[name]
+    new_data['party'] = party_column
+    return new_data 
+
+
 def write_general_TS(model,  nb_dates, value_int):
     if model == 'lda' and value_int =="nb_tweets":
         raise ValueError("No nb_tweets available for lda")
+    if value_int != 'prop' and value_int != 'nb_tweets':
+        raise ValueError("Please, choose an existing value measure : prop or nb_tweets")
+    if model != "lda":
+        model = 'bertopic'
     input_path = os.path.join(args.origin_path, "data_prod", "dashboard", model, "data")
     files_TS =list(iter_on_files(input_path, count_nb_files(input_path))[1]) 
-    reader = casanova.reader(files_TS[0])
     if model == 'lda:
-        remap_dict = {
-        "Democrat": "lr",
-        "Republican": "R",
-        "Independent": "I"
-    }
-
+        file0 = map_party_lda(files_TS[0])
+    else:
+        file0 = files_TS[0]
+    reader = casanova.reader(file0)
     group_types = list(dict.fromkeys(list(reader.cells('party'))))
     print(group_types)
     index_attentive = group_types.index('attentive')
     index_media = group_types.index('media')
     if model == 'lda':
+        first_line = "date,actor,topic,prop,party"
         index_lrsup = group_types.index('lr_supp')
         index_majsup = group_types.index('majority_supp')
         index_nupessup = group_types.index('nupes_supp')
@@ -1029,17 +1043,21 @@ def write_general_TS(model,  nb_dates, value_int):
             'media': index_media,
             'lr_supp': index_supp
         }
+        first_line = "date,party,topic,prop,nb_tweets"
         if value_int == 'prop':
             filenamegen = "general_TS_prop.csv"
         else :
             filenamegen = "general_TS.csv"
     sorted_items = sorted(index_dict.items(), key=lambda x: x[1])
+
     
     with open(os.path.join(args.origin_path, "data_prod", "var", filenamegen), 'w') as f: 
         fieldnames = ['date', 'topic', 'lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'media']
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for file in files_TS:
+            if model == 'lda':
+                file = map_party_lda(file)
             with open(file, 'r') as file_reader:
                     reader = csv.DictReader(file_reader)
 
@@ -1049,36 +1067,42 @@ def write_general_TS(model,  nb_dates, value_int):
                     for row in rows:
                         if iter_dates==nb_dates:
                             break 
-                        if row == ["date, party, topic, prop, nb_tweets"]:
+                        if row == first_line:
                             continue
-                        if sorted_items['index_media'] < sorted_items['index_supp']:
-                            index_media = (4 + sorted_items['media']) * nb_dates - 1
-                        else:
-                            index_media = (8 + sorted_items['media'] -1 ) * nb_dates - 1
-                        if sorted_items['index_attentive'] < sorted_items['index_supp']:
-                            index_attentive = (4 + sorted_items['attentive']) * nb_dates - 1
-                        else:
-                            index_attentive = (8 + sorted_items['attentive'] -1 ) * nb_dates - 1
-                        
                         if model == 'lda':
+                            ind_lrs = (4 + sorted_items['lr_supp']) * nb_dates - 1
+                            ind_majs = (4 + sorted_items['majority_supp']) * nb_dates - 1
+                            ind_nupess = (4 + sorted_items['nupes_supp']) * nb_dates - 1
+                            ind_rns = (4 + sorted_items['rn_supp']) * nb_dates - 1
+                            index_attentive = (4 + sorted_items['attentive']) * nb_dates - 1
+                            index_media = (4 + sorted_items['media']) * nb_dates - 1
 
                         else: 
-                        ind_lrs = (4 + sorted_items['index_supp']) * nb_dates - 1
-                        ind_majs = ind_lrs +1
-                        ind_nupess = ind_lrs +2
-                        ind_rns = ind_lrs +3
+                            ind_lrs = (4 + sorted_items['index_supp']) * nb_dates - 1
+                            ind_majs = ind_lrs +1
+                            ind_nupess = ind_lrs +2
+                            ind_rns = ind_lrs +3
+                            if sorted_items['index_media'] < sorted_items['index_supp']:
+                                index_media = (4 + sorted_items['media']) * nb_dates - 1
+                            else:
+                                index_media = (8 + sorted_items['media'] -1 ) * nb_dates - 1
+                            if sorted_items['index_attentive'] < sorted_items['index_supp']:
+                                index_attentive = (4 + sorted_items['attentive']) * nb_dates - 1
+                            else:
+                                index_attentive = (8 + sorted_items['attentive'] -1 ) * nb_dates - 1
+
                         writer.writerow({
                                 'date': dates[iter_dates],  
                                 'topic': row['topic'],
-                                'lr': rows[iter_dates]['nb_tweets'],
-                                'majority': rows[iter_dates + 1]['nb_tweets'],
-                                'nupes': rows[iter_dates + 2]['nb_tweets'],
-                                'rn': rows[iter_dates + 3]['nb_tweets'],
-                                'lr_supp': rows[ind_lrs]['nb_tweets'],
-                                'majority_supp': rows[ind_majs]['nb_tweets'],
-                                'nupes_supp': rows[ind_nupess]['nb_tweets'],
-                                'rn_supp': rows[ind_rns]['nb_tweets'],
-                                'attentive': rows[iter_dates + index_attentive * nb_dates]['nb_tweets'],
-                                'media': rows[iter_dates + index_media * nb_dates]['nb_tweets'],
+                                'lr': rows[iter_dates][value_int],
+                                'majority': rows[iter_dates + 1][value_int],
+                                'nupes': rows[iter_dates + 2][value_int],
+                                'rn': rows[iter_dates + 3][value_int],
+                                'lr_supp': rows[ind_lrs][value_int],
+                                'majority_supp': rows[ind_majs][value_int],
+                                'nupes_supp': rows[ind_nupess][value_int],
+                                'rn_supp': rows[ind_rns][value_int],
+                                'attentive': rows[iter_dates + index_attentive * nb_dates][value_int],
+                                'media': rows[iter_dates + index_media * nb_dates][value_int],
                             })
                         iter_dates += 1
