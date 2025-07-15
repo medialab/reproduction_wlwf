@@ -123,10 +123,10 @@ try:
         party_day_counts=party_day_counts,
         apply_unidecode=True,
         small=False,
-        small_size=NB_DOCS_SMALL_INFER
+        small_size=NB_DOCS_SMALL_TRAIN
     )
 
-    topics_pred = topic_model.fit_transform(docs, embeddings)
+    topics_pred, probs = topic_model.fit_transform(docs, embeddings)
     #Random sample for congress
     write_sample_BERTOPIC("congress", topics_pred, docs, n_tweets_congress, reduced=False)
     #write_sample_BERTOPIC("congress", topic_pred_r, docs, n_tweets_congress, reduced=True)
@@ -145,12 +145,12 @@ try:
             party_day_counts=None,
             apply_unidecode=True,
             small=False,
-            small_size=NB_DOCS_SMALL_INFER,
+            small_size=NB_DOCS_SMALL_TRAIN,
         )
 
         print("Make topics prediction")
 
-        topic_pred = topic_model.transform(docs, embeddings)
+        topic_pred, probs = topic_model.transform(docs, embeddings)
         #topic_pred_r, probs = topic_model_r.transform(docs, embeddings)
 
         print("Writing")
