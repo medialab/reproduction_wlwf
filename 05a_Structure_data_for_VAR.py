@@ -70,8 +70,7 @@ with open(output_file, "w", newline="") as f:
 
 #raise(ValueError("STOP : We stop here but we want to keep previous version to avoid xan"))
 
-input_path = os.path.join(args.origin_path, "data_prod", "dashboard", "bertopic", "data")
-files_TS =list(iter_on_files(input_path, count_nb_files(input_path))[1]) 
+
 
 def list_dates(start_date: str, end_date: str):
     start = datetime.strptime(start_date, "%Y-%m-%d")
@@ -84,24 +83,6 @@ def list_dates(start_date: str, end_date: str):
 dates = list_dates("2022-06-20", "2023-03-14")
 nb_dates = len(dates)
 
-reader = casanova.reader(files_TS[0])
-group_types = list(dict.fromkeys(list(reader.cells('party'))))
-print(group_types)
-index_attentive = group_types.index('attentive')
-index_media = group_types.index('media')
-index_supp = group_types.index('lr_supp')
-
-index_dict = {
-    'attentive': index_attentive,
-    'media': index_media,
-    'lr_supp': index_supp
-}
-
-print(index_dict)
-
-sorted_items = sorted(index_dict.items(), key=lambda x: x[1])
-
-print(sorted_items)
 
 with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "general_TS.csv"), 'w') as f: 
     fieldnames = ['date', 'topic', 'lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'media']
@@ -123,7 +104,12 @@ with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "
                 if sorted_items['index_media'] < sorted_items['index_supp']:
                     index_media = (4 + sorted_items['media']) * nb_dates - 1
                 else:
-                    index_media = (8 + )
+                    index_media = (8 + sorted_items['media'] -1 ) * nb_dates - 1
+                if sorted_items['index_attentive'] < sorted_items['index_supp']:
+                    index_attentive = (4 + sorted_items['attentive']) * nb_dates - 1
+                else:
+                    index_attentive = (8 + sorted_items['attentive'] -1 ) * nb_dates - 1
+                
                 
                 ind_lrs = (4 + sorted_items['index_supp']) * nb_dates - 1
                 ind_majs = ind_lrs +1
