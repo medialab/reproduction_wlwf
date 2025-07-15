@@ -976,12 +976,31 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                         ]
                     )
 
+def map_party_lda(file):
+    party_map = {
+    "dep. lr": "lr",
+    "dep. majo.": "majority",
+    "dep. nupes": "nupes",
+    "dep. rn": "rn",
+    "medias": "media",
+    "sup. lr" : "lr_supp",
+    "sup. majo." : "majority_supp",
+    "sup. nupes" : "nupes_supp",
+    "sup. rn" : "rn_supp",
+    }
 def write_general_TS(model,  nb_dates, value_int):
     if model == 'lda' and value_int =="nb_tweets":
         raise ValueError("No nb_tweets available for lda")
     input_path = os.path.join(args.origin_path, "data_prod", "dashboard", model, "data")
     files_TS =list(iter_on_files(input_path, count_nb_files(input_path))[1]) 
     reader = casanova.reader(files_TS[0])
+    if model == 'lda:
+        remap_dict = {
+        "Democrat": "lr",
+        "Republican": "R",
+        "Independent": "I"
+    }
+
     group_types = list(dict.fromkeys(list(reader.cells('party'))))
     print(group_types)
     index_attentive = group_types.index('attentive')
