@@ -1,4 +1,3 @@
-xan map '"general"' id data_prod/topics/bert-sample/sample_general.csv -o data_prod/topics/bert-sample/sample_general_concat.csv
 xan map '"supporter"' id data_prod/topics/bert-sample/sample_supporter.csv -o data_prod/topics/bert-sample/sample_supporter_concat.csv
 xan map '"media"' id data_prod/topics/bert-sample/sample_media.csv -o data_prod/topics/bert-sample/sample_media_concat.csv
 xan map '"attentive"' id data_prod/topics/bert-sample/sample_attentive.csv -o data_prod/topics/bert-sample/sample_attentive_concat.csv

@@ -52,7 +52,7 @@ ui <- fluidPage(
                                    "majority", "lr", "nupes", "rn", 
                                    "media", 
                                    "majority_supp", "lr_supp", "nupes_supp", "rn_supp", 
-                                   "attentive", "general"), 
+                                   "attentive"), 
                        selected = c("majority", "lr", "nupes", "rn"),
                        inline = TRUE
     )
@@ -108,8 +108,7 @@ plot_ts  <- function(df, checked_actors, selected_topic){
                                   "lr_supp" = "darkblue", 
                                   "nupes_supp" = "darkred", 
                                   "rn_supp" = "purple4", 
-                                  "attentive" = "forestgreen", 
-                                  "general" = "lightgrey"
+                                  "attentive" = "forestgreen"
                                   )) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
     labs(color = "",

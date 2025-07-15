@@ -492,7 +492,7 @@ for (i in 1:nrow(rs)){
 
 rep_docs_congress <- rs
 
-save(rep_docs_congress, file="data_prod/dashboard/bertopic/reduced/representative_docs_congress.rdata")
+save(rep_docs_congress, file="data_prod/dashboard/bertopic/representative_docs_congress.rdata")
 
 #
 # > Medias ----
@@ -575,7 +575,8 @@ save(media_rs, file="data_prod/dashboard/lda/media-rs-tweets.rdata")
 
 #### >> for BERTOPIC ----
 
-rs <- read_csv("data_prod/dashboard/bertopic/reduced/representative_docs_media.csv")
+rs <- read_csv("data_prod/dashboard/bertopic/representative_docs_media.csv")
+rs <- rs 
 
 rs$embed <- NA
 for (i in 1:nrow(rs)){

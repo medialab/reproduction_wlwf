@@ -45,6 +45,7 @@ save(congress_rs_sample, file="data_prod/dashboard/bertopic/congress-rs-sample-t
 
 #For predict
 rs <- read_csv("data_prod/topics/bert-sample/sample_predict_ID.csv")
+rs <- rs %>% filter(id != "general")
 rs$embed <- NA
 for (i in 1:nrow(rs)){
 
@@ -52,7 +53,7 @@ for (i in 1:nrow(rs)){
     dt = NA, "")
 
 }
-predict_rs_sample <- rs
+predict_rs_sample <- rs %>% filter()
 
 print(head(predict_rs_sample,10))
 save(predict_rs_sample, file="data_prod/dashboard/bertopic/predict-rs-sample-tweets.rdata")
