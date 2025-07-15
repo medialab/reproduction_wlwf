@@ -68,44 +68,43 @@ with open(output_file, "w", newline="") as f:
     writer.writeheader()
     writer.writerows(df)
 
-raise(ValueError("STOP : We stop here but we want to keep previous version to avoid xan"))
+#raise(ValueError("STOP : We stop here but we want to keep previous version to avoid xan"))
 
-input_path = os.path.join(args.origin_path, "data_prod", "dashboard", str(args.topic_model), "data")
+input_path = os.path.join(args.origin_path, "data_prod", "dashboard", "bertopic", "data")
 files_TS =list(iter_on_files(input_path, count_nb_files(input_path))[1]) 
 
-def count_dates(start_date, end_date):
-    if isinstance(start_date, str):
-        start_date = datetime.strptime(start_date, "%Y-%m-%d")
-    if isinstance(end_date, str):
-        end_date = datetime.strptime(end_date, "%Y-%m-%d")
-    return (end_date - start_date).days + 1
+def list_dates(start_date: str, end_date: str):
+    start = datetime.strptime(start_date, "%Y-%m-%d")
+    end = datetime.strptime(end_date, "%Y-%m-%d")
+    delta = (end - start).days
 
-nb_dates = count_dates('2022-06-20', '2023-03-14')
+    return [(start + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(delta + 1)]
+
+# Exemple d'utilisation :
+dates = list_dates("2022-06-20", "2023-03-14")
+nb_dates = len(dates)
+
 reader = casanova.reader(files_TS[0])
-if args.topic_model=='bertopic':
-    group_types = list(dict.fromkeys(list(reader.cells('party'))))
-    index_attentive = group_types.index('attentive')
-    index_general = group_types.index('general')
-    index_media = group_types.index('media')
-    index_lrsupp = group_types.index('lr_supp')
-    index_majsupp = group_types.index('majority_supp')
-    index_nupessupp = group_types.index('nupes_supp')
-    index_rnsupp = group_types.index('rn_supp')
-else:
-    group_types = list(dict.fromkeys(list(reader.cells('actor'))))
-    index_attentive = group_types.index('pub. attentif')
-    index_general = group_types.index('pub. general')
-    index_media = group_types.index('medias')
-    index_lrsupp = group_types.index('sup. lr')
-    index_majsupp = group_types.index('sup. majo.')
-    index_nupessupp = group_types.index('sup. nupes')
-    index_rnsupp = group_types.index('sup. rn')
-
+group_types = list(dict.fromkeys(list(reader.cells('party'))))
 print(group_types)
-print((index_attentive, index_general, index_lrsupp))
+index_attentive = group_types.index('attentive')
+index_media = group_types.index('media')
+index_supp = group_types.index('lr_supp')
+
+index_dict = {
+    'attentive': index_attentive,
+    'media': index_media,
+    'lr_supp': index_supp
+}
+
+print(index_dict)
+
+sorted_items = sorted(index_dict.items(), key=lambda x: x[1])
+
+print(sorted_items)
 
 with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "general_TS.csv"), 'w') as f: 
-    fieldnames = ['date', 'topic', 'lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'general', 'media']
+    fieldnames = ['date', 'topic', 'lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'media']
     writer = csv.DictWriter(f, fieldnames=fieldnames)
     writer.writeheader()
 
@@ -118,30 +117,30 @@ with open(os.path.join(args.origin_path, "data_prod", "var", args.topic_model, "
 
             for row in rows:
                 if iter_dates==nb_dates:
-                    break
-                if args.topic_model == 'lda':
-                    ind_lrs = iter_dates + index_lrsupp * nb_dates
-                    ind_majs = iter_dates + index_majsupp * nb_dates
-                    ind_nupess = iter_dates + index_nupessupp * nb_dates
-                    ind_rns = iter_dates + index_rnsupp * nb_dates
+                    break 
+                if row == ["date, party, topic, prop, nb_tweets"]:
+                    continue
+                if sorted_items['index_media'] < sorted_items['index_supp']:
+                    index_media = (4 + sorted_items['media']) * nb_dates - 1
                 else:
-                    ind_lrs = 4*iter_dates + index_lrsupp * nb_dates
-                    ind_majs = ind_lrs +1
-                    ind_nupess = ind_lrs +2
-                    ind_rns = ind_lrs +3
+                    index_media = (8 + )
+                
+                ind_lrs = (4 + sorted_items['index_supp']) * nb_dates - 1
+                ind_majs = ind_lrs +1
+                ind_nupess = ind_lrs +2
+                ind_rns = ind_lrs +3
                 writer.writerow({
-                        'date': rows[iter_dates*4]['date'],  
+                        'date': dates[iter_dates],  
                         'topic': row['topic'],
-                        'lr': rows[iter_dates]['prop'],
-                        'majority': rows[iter_dates + 1]['prop'],
-                        'nupes': rows[iter_dates + 2]['prop'],
-                        'rn': rows[iter_dates + 3]['prop'],
-                        'lr_supp': rows[ind_lrs]['prop'],
-                        'majority_supp': rows[ind_majs]['prop'],
-                        'nupes_supp': rows[ind_nupess]['prop'],
-                        'rn_supp': rows[ind_rns]['prop'],
-                        'attentive': rows[iter_dates + index_attentive * nb_dates]['prop'],
-                        'general': rows[iter_dates + index_general * nb_dates]['prop'],
-                        'media': rows[iter_dates + index_media * nb_dates]['prop'],
+                        'lr': rows[iter_dates]['nb_tweets'],
+                        'majority': rows[iter_dates + 1]['nb_tweets'],
+                        'nupes': rows[iter_dates + 2]['nb_tweets'],
+                        'rn': rows[iter_dates + 3]['nb_tweets'],
+                        'lr_supp': rows[ind_lrs]['nb_tweets'],
+                        'majority_supp': rows[ind_majs]['nb_tweets'],
+                        'nupes_supp': rows[ind_nupess]['nb_tweets'],
+                        'rn_supp': rows[ind_rns]['nb_tweets'],
+                        'attentive': rows[iter_dates + index_attentive * nb_dates]['nb_tweets'],
+                        'media': rows[iter_dates + index_media * nb_dates]['nb_tweets'],
                     })
                 iter_dates += 1
