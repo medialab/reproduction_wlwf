@@ -57,7 +57,7 @@ dtm <- dtm[cs>0,]
 # MAIN: CONGRESS
 # ===============================================================================
 # running regular LDA
-lda.fit <- LDA(dtm, k=40, method="Gibbs",
+lda.fit <- LDA(dtm, k=70, method="Gibbs",
     	control=list(verbose=50L, iter=2000))
 
 save(lda.fit, file="data_prod/topics/lda_results-twokenizer.Rdata")
