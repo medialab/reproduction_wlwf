@@ -130,13 +130,13 @@ try:
     #Random sample for congress
     new_topics = topic_model.reduce_outliers(
         docs,  # type: ignore
-        topics,
+        topics_pred,
         probabilities=probs,  # type: ignore
         strategy="probabilities",
         threshold=0.001,
     )
     topic_model.update_topics(docs, topics=new_topics, vectorizer_model=vectorizer)
-    write_sample_BERTOPIC("congress", topics_pred, docs, n_tweets_congress, reduced=False)
+    write_sample_BERTOPIC("congress", new_topics, docs, n_tweets_congress, reduced=False)
     #write_sample_BERTOPIC("congress", topic_pred_r, docs, n_tweets_congress, reduced=True)
 
     #Create random sample for predict
