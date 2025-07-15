@@ -834,16 +834,8 @@ def write_ids_and_representative_docs(
             doc_topic_pairs.append((doc_id, min_topic + topic_enum))
     doc_topic_pairs = sorted(doc_topic_pairs)
 
-    if reduced:
-        open_path = os.path.join(
-            "data_prod",
-            "dashboard",
-            "bertopic",
-            "reduced",
-            f"representative_docs_{public}.csv",
-        )
-    else:
-        open_path = os.path.join(
+    with open(
+        os.path.join(
             path,
             "data_prod",
             "dashboard",
@@ -938,6 +930,7 @@ def write_ids_and_representative_docs(
                     return
 
                 doc_index += 1
+
 
 
 def count_topics_info(topics, party_day_counts, group_type):
