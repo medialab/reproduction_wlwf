@@ -49,7 +49,7 @@ def write_sample_BERTOPIC(group, topics, docs, n_tweets,reduced=False):
     else:
         open_path = f"data_prod/topics/bert-sample/sample_{group}.csv"
     existing_topics = np.unique(topics)
-    topics_max = max(existing_topics) + 1 
+    topics_max = int(max(existing_topics)) + 1 
     index_sample = []
     for topic in range(0, topics_max):
         index_topic = [i for i, val in enumerate(topics) if val == topic]
