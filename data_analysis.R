@@ -3,12 +3,15 @@ library(tidyverse)
 library(tidyr)
 library(ggplot2)
 library(reshape2)
+library(purrr)
+
 
 db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
 db_prop <- read_csv("data_prod/var/general_TS_prop.csv", show_col_types = FALSE)
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'media')
 throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
 pol_issues_temp <- setdiff(c(0:91), throw_topic)
+
 db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
   group_by(date, topic) %>%                                  
   summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
@@ -18,10 +21,7 @@ db_prop <- db_prop %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
   summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
 pol_issues <- setdiff(pol_issues_temp, 89)  
 
-db_prop <- db_prop %>%
-  filter(topic %in% pol_issues)
 
-#Figure 1
 readable_variables <- c("Députés LR", 
                         "Députés Majorité",
                         "Députés NUPES",
@@ -32,7 +32,103 @@ readable_variables <- c("Députés LR",
                         "Supporters RN",
                         "Public Attentif",
                         "Média")
+#Loss by semantic validity plot 
+pol_issues_bert <- c(pol_issues, c(1, 2, 16, 25, 41, 44, 45, 54, 61, 64, 73, 76, 91))
+db_prop_bert <- db_prop %>%
+              filter(topic %in% pol_issues_bert) %>%
+              dplyr::select(-topic) %>%
+              group_by(date) %>% 
+              summarise(across(where(is.numeric), sum, na.rm = TRUE)) %>%  # somme par date pour chaque colonne numérique
+              summarise(across(everything(), mean, na.rm = TRUE)) %>%  
+              select(-date) %>%
+              pivot_longer(everything(), names_to = "group", values_to = "prop_pol_issues_bert")
 
+
+db_prop <- db_prop %>%
+  filter(topic %in% pol_issues)   
+
+
+db_valid_bert <- db_prop %>%
+                dplyr::select(-topic) %>%
+                group_by(date) %>% 
+                summarise(across(where(is.numeric), sum, na.rm = TRUE)) %>%  # somme par date pour chaque colonne numérique
+                summarise(across(everything(), mean, na.rm = TRUE)) %>%  
+                select(-date) %>%
+                pivot_longer(everything(), names_to = "group", values_to = "prop_val_pol_issues_bert")
+
+
+db_prop_lda <- read_csv("data_prod/var/general_TS_LDA.csv", show_col_types = FALSE)
+pol_valid_lda <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 40, 42,
+44, 45, 50, 51, 52, 53, 55, 56, 59, 60, 63, 64, 65, 66, 70)
+pol_issues_lda <- c(pol_valid_lda, c(20, 11, 4, 6, 18, 22, 31, 35, 38, 39, 41,47, 69, 14, 43, 49, 54, 62, 67, 68))
+
+db_prop_lda_full <- db_prop_lda %>%
+          filter(topic %in% pol_issues_lda)  %>%
+          dplyr::select(-topic) %>%
+          group_by(date) %>% 
+          summarise(across(where(is.numeric), sum, na.rm = TRUE)) %>%  # somme par date pour chaque colonne numérique
+          summarise(across(everything(), mean, na.rm = TRUE)) %>%  
+          select(-date) %>%
+          pivot_longer(everything(), names_to = "group", values_to = "prop_pol_issues_lda")
+
+db_prop_lda_valid <- db_prop_lda %>%
+          filter(topic %in% pol_valid_lda)  %>%
+          dplyr::select(-topic) %>%
+          group_by(date) %>% 
+          summarise(across(where(is.numeric), sum, na.rm = TRUE)) %>%  # somme par date pour chaque colonne numérique
+          summarise(across(everything(), mean, na.rm = TRUE)) %>% 
+          select(-date) %>%
+          pivot_longer(everything(), names_to = "group", values_to = "prop_val_pol_issues_lda")
+
+var_order <- c("prop_pol_issues_bert", "prop_val_pol_issues_bert", "prop_pol_issues_lda", "prop_val_pol_issues_lda")
+
+label_map <- c(
+  "prop_pol_issues_bert" = "Sujets politiques BERTopic",
+  "prop_val_pol_issues_bert" = "Sujets politiques valides sémantiquement BERTopic",
+  "prop_pol_issues_lda" = "Sujets politiques LDA",
+  "prop_val_pol_issues_lda" = "Sujets politiques valides sémantiquement LDA"
+)
+
+label_var <- setNames(readable_variables, variables)
+
+
+custom_colors <-c(
+  "Sujets politiques BERTopic" = 'red',
+  "Sujets politiques valides sémantiquement BERTopic" = 'orchid',
+  "Sujets politiques LDA" = 'blue',
+  "Sujets politiques valides sémantiquement LDA" = 'cyan'
+)
+
+
+plot_db <- reduce(list(db_prop_bert, db_valid_bert, db_prop_lda_full, db_prop_lda_valid), left_join, by = "group") %>%
+    pivot_longer(
+      cols = -group,
+      names_to = "variable",
+      values_to = "value"
+    ) %>% 
+    mutate (
+      group = recode(group, !!!label_var)
+    ) %>%
+    mutate(
+    group = factor(group, levels = readable_variables),                         
+    variable = factor(label_map[variable], levels = label_map[var_order])  
+  )
+
+png("data_prod/figures/loss_plot.png", width=1500, height=1500)
+p <- ggplot(plot_db, aes(x = group, y = value, fill = variable)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = custom_colors, name = "Catégorie") +
+  labs(x = "Groupe", y = "Proportion restante", fill = "Variable") +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold")
+  )
+
+print(p)
+dev.off()
+stop()
+#Figure 1
 pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", show_col_types=FALSE)
 db_prop <- left_join(db_prop, pa2our, by = c("topic" = "Topic"))
 
@@ -88,6 +184,7 @@ p <- ggplot(out_db,
         panel.grid.major.y = element_line(color = "gray70", linetype = "dotted"))
 print(p)
 dev.off()
+
 #Correlation matrix
 exclude_issues <- c(52, 71, 79, 85, 86)
 pol_issues <- setdiff(pol_issues, exclude_issues)
