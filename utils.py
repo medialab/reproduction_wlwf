@@ -25,7 +25,7 @@ EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
-choices = ["congress", "media", "supporter", "attentive", "general"]
+choices = ["congress", "media", "supporter", "attentive"]
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 NB_DOCS_SMALL_TRAIN = 1000  # Choose a small number to have a fast computation
@@ -779,7 +779,7 @@ def load_docs_embeddings(
     write_files=False,
     small=False,
     small_size=NB_DOCS_SMALL_TRAIN,
-    resume_encoding=False,
+    resume_encoding=False
 ):
     docs = np.array(
         [
@@ -932,7 +932,6 @@ def write_ids_and_representative_docs(
                 doc_index += 1
 
 
-
 def count_topics_info(topics, party_day_counts, group_type):
     """
     party_day_count is a list with the following structure:
@@ -974,29 +973,17 @@ def count_topics_info(topics, party_day_counts, group_type):
     return topics_info
 
 
-def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_path, reduced=False):
+def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_path):
     for topic in tqdm(topics, desc="Write time series"):
-        if reduced:
-            open_path = os.path.join(
-                "data_prod",
-                "dashboard",
-                "bertopic",
-                "reduced",
-                "data",
-                f"bertopic_ts_{topic}.csv",
-            )
-        else:
-            open_path = os.path.join(
+        with open(
+            os.path.join(
                 origin_path,
                 "data_prod",
                 "dashboard",
                 "bertopic",
                 "data",
                 f"bertopic_ts_{topic}.csv",
-            )
-
-        with open(
-            open_path,
+            ),
             "w" if group_type == "congress" else "a",
         ) as f:
             writer = csv.writer(f)
