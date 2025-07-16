@@ -1,9 +1,9 @@
 from umap import UMAP
 import os
 import numpy as np
+import gc
 
 from utils import (
-    choices,
     count_nb_files,
     load_docs_embeddings,
     format_npz_output,
@@ -15,7 +15,7 @@ from utils import (
 
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-
+choices = ["congress", "media"]
 def get_paths(root, public):
     input_path = os.path.join(root, "data_source", public)
     embeddings_path = os.path.join(
@@ -47,6 +47,9 @@ for group in choices:
     print(new_embeddings.shape)
     embeddings = np.vstack((embeddings, new_embeddings))
     sizes[group] = len(docs)
+    del docs 
+    del new_embeddings
+
 print("Run UMAP")
 reduced_mat = umap_model.fit_transform(embeddings)
 

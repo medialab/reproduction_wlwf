@@ -4,19 +4,12 @@ import json
 import hdbscan
 from hdbscan import HDBSCAN
 from bertopic import BERTopic
-from bertopic._utils import MyLogger
-from bertopic._bertopic import TopicMapper
-import bertopic._save_utils as save_utils
-from bertopic.cluster._utils import is_supported_hdbscan
-from bertopic.backend._utils import select_backend
 from bertopic.dimensionality import BaseDimensionalityReduction
 import numpy as np
 import random
 import csv
 import torch
 import gc
-from typing import List, Tuple, Union, Mapping, Any, Callable, Iterable
-import pandas as pd 
 
 from utils import (
     choices,
@@ -32,9 +25,9 @@ from utils import (
     DEFAULT_SAVE_SIZE,
     RANDOM_SEED,
     NB_DOCS_SMALL_TRAIN,
+    NB_DOCS_SMALL_INFER
 )
 
-NB_DOCS_SMALL_INFER = 300000
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 sbert_name_string = SBERT_NAME.replace("/", "_")
 n_tweets_congress = 10
@@ -118,7 +111,7 @@ try:
         DEFAULT_SAVE_SIZE,
         party_day_counts=party_day_counts,
         apply_unidecode=True,
-        small=True,
+        small=False,
         small_size=NB_DOCS_SMALL_TRAIN
     )
 
@@ -142,7 +135,7 @@ try:
         party_day_counts,
         "congress",
         "/store/medialex/v2_data_reproduction_wlwf/",
-        True,
+        False,
         NB_DOCS_SMALL_TRAIN,
     )
 
@@ -151,15 +144,16 @@ try:
 
     for group in ["media", "attentive", "supporter"]:
         print(group)
+        party_day_counts = []
         input_path, embeddings_path = get_paths("/store/medialex/v2_data_reproduction_wlwf", group)
         docs, max_index, embeddings = load_docs_embeddings(
             input_path,
             count_nb_files(input_path),
             embeddings_path,
             DEFAULT_SAVE_SIZE,
-            party_day_counts=[],
+            party_day_counts=party_day_counts,
             apply_unidecode=True,
-            small=True,
+            small=False,
             small_size=NB_DOCS_SMALL_INFER,
         )
 
@@ -175,7 +169,7 @@ try:
             party_day_counts,
             group,
             "/store/medialex/v2_data_reproduction_wlwf/",
-            True,
+            False,
             NB_DOCS_SMALL_INFER,
         )
         write_sample_BERTOPIC(group, topics_pred, docs, n_tweets_per_pred, reduced=False)

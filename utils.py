@@ -818,7 +818,7 @@ def extract_representative_docs(docs, topics, topic_model):
         documents=documents_df,
         topics=topic_model.topic_representations_,
         nr_samples=500,
-        nr_repr_docs=10,
+        nr_repr_docs=1,
     )
 
     return repr_docs_ids
