@@ -726,13 +726,20 @@ def preprocess(
         print()
 
 
-def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False):
+def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False, UMAP=False):
     max_index = 0
-    embeddings = (
-        np.empty((save_size, EMB_DIMENSION))
-        if resume_encoding
-        else np.empty((nb_docs, EMB_DIMENSION))
-    )
+    if UMAP:
+        embeddings = (
+            np.empty((save_size, 5))
+            if resume_encoding
+            else np.empty((nb_docs, 5))
+        )
+    else:
+        embeddings = (
+            np.empty((save_size, EMB_DIMENSION))
+            if resume_encoding
+            else np.empty((nb_docs, EMB_DIMENSION))
+        )
 
     if small:
         # In the --small case, return only the first npz file
@@ -779,7 +786,8 @@ def load_docs_embeddings(
     write_files=False,
     small=False,
     small_size=NB_DOCS_SMALL_TRAIN,
-    resume_encoding=False
+    resume_encoding=False, 
+    UMAP = False,
 ):
     docs = np.array(
         [
@@ -802,6 +810,7 @@ def load_docs_embeddings(
         docs.shape[0],
         resume_encoding,
         small,
+        UMAP
     )
 
     return docs, max_index, embeddings
@@ -818,7 +827,7 @@ def extract_representative_docs(docs, topics, topic_model):
         documents=documents_df,
         topics=topic_model.topic_representations_,
         nr_samples=500,
-        nr_repr_docs=1,
+        nr_repr_docs=10,
     )
 
     return repr_docs_ids

@@ -97,11 +97,13 @@ logger.configure("WARNING")
 def patched_hdbscan_delegator(model, func: str, embeddings: np.ndarray = None):
     # Approximate predict
     if func == "approximate_predict":
+        print("Start calculate approximate predict flat")
         if isinstance(model, hdbscan.HDBSCAN):
             predictions, probabilities = approximate_predict_flat(model, embeddings)
             return predictions, probabilities
 
     # All points membership
+    print("Start calculate APMembership flat")
     if func == "all_points_membership_vectors":
         if isinstance(model, hdbscan.HDBSCAN):
             return all_points_membership_vectors_flat(model)
@@ -115,6 +117,7 @@ class PatchedBERTopic(BERTopic): #On patche la classe pour créer des fonctions 
         y: np.ndarray = None,
     ) -> Tuple[pd.DataFrame, np.ndarray]:
         logger.info("Cluster - Start clustering the reduced embeddings")
+        print("Flatting HDBSCAN model")
         old_clusterer = self.hdbscan_model
         self.hdbscan_model = HDBSCAN_flat(
             X=umap_embeddings,
@@ -122,11 +125,14 @@ class PatchedBERTopic(BERTopic): #On patche la classe pour créer des fonctions 
             inplace=True,
             cluster_selection_epsilon=0.2
         )
+
+        print("Start fitting")
         try:
             self.hdbscan_model.fit(umap_embeddings, y=y)
         except TypeError:
             self.hdbscan_model.fit(umap_embeddings)
 
+        print("Attribute labels")
         try:
             labels = self.hdbscan_model.labels_
         except AttributeError:
@@ -136,6 +142,7 @@ class PatchedBERTopic(BERTopic): #On patche la classe pour créer des fonctions 
         super()._update_topic_size(documents)
 
         # Extract probabilities
+        print("Extract probabilities")
         probabilities = None
         if hasattr(self.hdbscan_model, "probabilities_"):
             probabilities = self.hdbscan_model.probabilities_
@@ -155,6 +162,8 @@ class PatchedBERTopic(BERTopic): #On patche la classe pour créer des fonctions 
         images: List[str] = None,
         y: Union[List[int], np.ndarray] = None,
     ) -> Tuple[List[int], Union[np.ndarray, None]]:
+
+        print("Take inputs")
     
         doc_ids = range(len(documents)) if documents is not None else range(len(images))
         documents = pd.DataFrame({"Document": documents, "ID": doc_ids, "Topic": None, "Image": images})
@@ -162,8 +171,12 @@ class PatchedBERTopic(BERTopic): #On patche la classe pour créer des fonctions 
             self.embedding_model, language=self.language, verbose=self.verbose
         )
 
+        print("UMAP step")
+
         # Reduce dimensionality and fit UMAP model
         umap_embeddings = super()._reduce_dimensionality(embeddings, y)
+
+        print("Call Clustering function")
 
         documents, probabilities = self._cluster_embeddings(umap_embeddings, documents, y=y)
 
@@ -174,10 +187,12 @@ class PatchedBERTopic(BERTopic): #On patche la classe pour créer des fonctions 
             documents = super()._reduce_topics(documents)
 
         # Save the top 3 most representative documents per topic
+        print("Save representative")
         super()._save_representative_docs(documents)
 
         # In the case of zero-shot topics, probability will come from cosine similarity,
         # and the HDBSCAN model will be removed
+        print("Map probabilities")
         self.probabilities_ = super()._map_probabilities(probabilities, original_topics=True)
         predictions = documents.Topic.to_list()
 
@@ -218,9 +233,9 @@ class PatchedBERTopic(BERTopic): #On patche la classe pour créer des fonctions 
 try:
     print("Train BERTOPIC")
     hdbscan_model = HDBSCAN(
-        min_cluster_size= 2,#100,
+        min_cluster_size= 100,
         cluster_selection_epsilon=0.2,
-        min_samples= 1, #30,
+        min_samples= 30,
         metric="euclidean",
         cluster_selection_method="eom",
         prediction_data=True,
@@ -285,7 +300,7 @@ try:
     #Create random sample for predict
     print("Loading predict info")
 
-    for group in ["media", "attentive", "supporter"]:
+    for group in ["media"]:#, "attentive", "supporter"]:
         print(group)
         party_day_counts = []
         input_path, embeddings_path = get_paths("/store/medialex/v2_data_reproduction_wlwf", group)

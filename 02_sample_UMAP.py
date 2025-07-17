@@ -12,7 +12,6 @@ import torch
 import gc
 
 from utils import (
-    choices,
     count_nb_files,
     count_topics_info,
     create_dir,
@@ -83,16 +82,16 @@ def write_sample_BERTOPIC(group, topics, docs, n_tweets,reduced=False):
 try:
     print("Train BERTOPIC")
     hdbscan_model = HDBSCAN(
-        min_cluster_size= 2,#100,
+        min_cluster_size= 100,
         cluster_selection_epsilon=0.2,
-        min_samples= 1, #30,
+        min_samples= 30,
         metric="euclidean",
         cluster_selection_method="eom",
         prediction_data=True,
     )
 
     umap_model = BaseDimensionalityReduction() #Empty model 
-    topic_model = PatchedBERTopic(
+    topic_model = BERTopic(
         vectorizer_model=vectorizer,
         hdbscan_model=hdbscan_model,
         umap_model=umap_model,
@@ -112,7 +111,8 @@ try:
         party_day_counts=party_day_counts,
         apply_unidecode=True,
         small=False,
-        small_size=NB_DOCS_SMALL_TRAIN
+        small_size=NB_DOCS_SMALL_TRAIN, 
+        UMAP = True
     )
 
     topics_pred, probs = topic_model.fit_transform(docs, embeddings)
@@ -139,10 +139,12 @@ try:
         NB_DOCS_SMALL_TRAIN,
     )
 
+    raise(ValueError("ONLY TRAIN"))
+
     #Create random sample for predict
     print("Loading predict info")
 
-    for group in ["media", "attentive", "supporter"]:
+    for group in ["media"]: #, "attentive", "supporter"]:
         print(group)
         party_day_counts = []
         input_path, embeddings_path = get_paths("/store/medialex/v2_data_reproduction_wlwf", group)
@@ -155,6 +157,7 @@ try:
             apply_unidecode=True,
             small=False,
             small_size=NB_DOCS_SMALL_INFER,
+            UMAP = True
         )
 
         print("Make topics prediction")
