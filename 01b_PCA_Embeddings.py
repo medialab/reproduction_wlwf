@@ -1,21 +1,21 @@
-from umap import UMAP
 import os
 import numpy as np
-import gc
+from sklearn.processing import StandardScaler
+from sklearn.decomposition import IncrementalPCA    
 
 from utils import (
+    choices,
     count_nb_files,
+    preprocess,
     load_docs_embeddings,
     format_npz_output,
     EMB_DIMENSION,
     SBERT_NAME,
-    DEFAULT_SAVE_SIZE,
-    RANDOM_SEED
+    DEFAULT_SAVE_SIZE
 )
 
 sbert_name_string = SBERT_NAME.replace("/", "_")
 
-choices = ["congress", "media"]
 def get_paths(root, public):
     input_path = os.path.join(root, "data_source", public)
     embeddings_path = os.path.join(
@@ -27,35 +27,48 @@ def get_paths(root, public):
     )
     return input_path, embeddings_path
 
-n_comp = 5 
-umap_model = UMAP(
-    n_neighbors=15,
-    n_components=n_comp,
-    min_dist=0.0,
-    metric="cosine",
-    low_memory=False,
-    random_state=RANDOM_SEED,
-)
-
 print("Load embeddings")
-embeddings = np.empty(shape = (0, EMB_DIMENSION))
 sizes = {}
+total_row = 0 
 for group in choices:
     print(group)
     input_path, embed_path = get_paths("/store/medialex/v2_data_reproduction_wlwf/", group)
-    docs, max_index, new_embeddings = load_docs_embeddings(input_path, count_nb_files(input_path), embed_path, DEFAULT_SAVE_SIZE, resume_encoding=False, small=False)
-    print(new_embeddings.shape)
-    embeddings = np.vstack((embeddings, new_embeddings))
-    sizes[group] = len(docs)
-    del docs 
-    del new_embeddings
+    docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
+    size = len(docs)
+    dict_size[group] = size
+    total_row += size
+    del size
+    del docs
+    del input_path
+    del embed_path
 
-print("Run UMAP")
-reduced_mat = umap_model.fit_transform(embeddings)
+total_matrix = np.empty(shape=(total_row, EMB_DIMENSION)) 
 
-start_index = 0 
+i=0
+for group in choices:
+    input_path, embed_path = get_paths("/store/medialex/v2_data_reproduction_wlwf/", group)
+    nb_docs = dict_size[group]
+    max_index, total_matrix[i:i+nb_docs] = load_embeddings(embed_path, DEFAULT_SAVE_SIZE, nb_docs)
+    i+=nb_docs
+    del max_index
+    del nb_docs
+    del input_path
+    del embed_path 
+
+
+print("Start STD")
+scaler = StandardScaler(copy=False)
+total_matrix.fit_transform()
+del scaler 
+
+print("Fit Incremental PCA")
+pca_model = IncrementalPCA(n_components = 5, batch_size = 500) 
+embed_groups = pca_model.fit_transform(total_matrix)
+del total_matrix 
+del pca_model 
 
 print("Start saving process")
+start_index = 0 
 for group in choices: 
     print(group)
     #Select submatrix by group
