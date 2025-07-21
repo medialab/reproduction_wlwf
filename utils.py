@@ -13,6 +13,7 @@ from transformers import CamembertTokenizer
 from fog.tokenizers.words import WordTokenizer
 from sklearn.feature_extraction.text import CountVectorizer
 from collections import defaultdict
+import random
 
 GROUPS = [
     "majority",
@@ -26,6 +27,7 @@ AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
 choices = ["congress", "media", "supporter", "attentive"]
+n_component = 50
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 NB_DOCS_SMALL_TRAIN = 1000  # Choose a small number to have a fast computation
@@ -726,13 +728,13 @@ def preprocess(
         print()
 
 
-def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False, UMAP=False):
+def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False, PCA=False, n_component=None):
     max_index = 0
-    if UMAP:
+    if PCA:
         embeddings = (
-            np.empty((save_size, 5))
+            np.empty((save_size, n_component))
             if resume_encoding
-            else np.empty((nb_docs, 5))
+            else np.empty((nb_docs, n_component))
         )
     else:
         embeddings = (
@@ -787,7 +789,8 @@ def load_docs_embeddings(
     small=False,
     small_size=NB_DOCS_SMALL_TRAIN,
     resume_encoding=False, 
-    UMAP = False,
+    PCA = False,
+    n_component=None
 ):
     docs = np.array(
         [
@@ -810,7 +813,8 @@ def load_docs_embeddings(
         docs.shape[0],
         resume_encoding,
         small,
-        UMAP
+        PCA,
+        n_component
     )
 
     return docs, max_index, embeddings
@@ -1020,3 +1024,36 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             topics_info[topic][day] 
                         ]
                     )
+
+def write_sample_BERTOPIC(root, group, topics, docs, n_tweets):
+    output_folder = create_dir(os.path.join(root, "data_prod", "topics", "bert-sample"))
+    open_path = os.path.join(output_folder, f"sample_{group}.csv")
+    existing_topics = np.unique(topics)
+    topics_max = int(max(existing_topics)) + 1 
+    index_sample = []
+    for topic in range(0, topics_max):
+        index_topic = [i for i, val in enumerate(topics) if val == topic]
+        if len(index_topic) < n_tweets:
+            sample = index_topic + [np.nan] * (n_tweets - len(index_topic))
+        else:
+            sample = random.sample(index_topic, n_tweets)
+        index_sample.append(sample)
+    index_sample_list = [value for topic_list in index_sample for value in topic_list]
+    list_docs = [docs[i] if not np.isnan(i) else np.nan for i in index_sample_list]
+    list_topic = [i for i in range(0, topics_max) for _ in range(n_tweets)]
+    print(len(index_sample_list))
+    print(len(list_docs))
+    print(len(list_topic))
+    with open(
+           open_path,
+            "w", 
+        ) as f:
+            writer = csv.writer(f)
+            writer.writerow(["tweet", "topic"])
+            for j in range(len(list_topic)):
+                writer.writerow(
+                        [
+                            list_docs[j],
+                            list_topic[j]
+                        ]
+                )
