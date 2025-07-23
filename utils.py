@@ -726,6 +726,35 @@ def preprocess(
         print()
 
 
+def get_embeddings_save_path(output_folder):
+    return os.path.join(output_folder, "{}.npz".format(sbert_name_string))
+
+
+def get_reducted_save_path(output_folder):
+    return os.path.join(output_folder, "umap.npz")
+
+
+def get_matrix_size(path, file):
+    return int(file[len(path) - 3 : -len(".npz")])
+
+
+def get_max_index(path):
+    max_index = 0
+    for file in glob.glob(path.replace(".npz", "_*")):
+        index = get_matrix_size(path, file)
+        if index > max_index:
+            max_index = index
+    return max_index
+
+
+def get_paths(root, public):
+    input_path = os.path.join(root, "data_source", public)
+    embeddings_path = get_embeddings_save_path(
+        os.path.join(root, "data_prod", "embeddings", public)
+    )
+    return input_path, embeddings_path
+
+
 def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False):
     max_index = 0
     embeddings = (
@@ -740,7 +769,7 @@ def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False
         return None, np.load(file)["embeddings"][:nb_docs]
 
     for file in glob.glob(path.replace(".npz", "_*")):
-        index = int(file[len(path) - 3 : -len(".npz")])
+        index = get_matrix_size(path, file)
         if index > max_index:
             max_index = index
 
@@ -752,13 +781,13 @@ def load_embeddings(path, save_size, nb_docs, resume_encoding=False, small=False
                     embeddings.shape[0] - (embeddings.shape[0] % save_size) :
                 ] = np.load(file)["embeddings"]
     if not resume_encoding:
-        print(
-            "Loaded {} previously encoded rows".format(np.any(embeddings, axis=1).sum())
-        )
+        print(f"Loaded {np.any(embeddings, axis=1).sum()} encoded rows from {path}")
     return max_index, embeddings
 
 
 camembert_tokenizer = CamembertTokenizer.from_pretrained(SBERT_NAME)
+
+sbert_name_string = SBERT_NAME.replace("/", "_")
 
 vectorizer = CountVectorizer(
     stop_words=STOP_WORDS_FR,
@@ -997,7 +1026,7 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             f"{party}_supp" if group_type == "supporter" else party,
                             topic,
                             round(topics_info[topic][party][day] / (doc_count), 5),
-                            topics_info[topic][party][day] 
+                            topics_info[topic][party][day],
                         ]
                     )
             else:
@@ -1008,6 +1037,6 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             group_type,
                             topic,
                             round(topics_info[topic][day] / (doc_count), 5),
-                            topics_info[topic][day] 
+                            topics_info[topic][day],
                         ]
                     )

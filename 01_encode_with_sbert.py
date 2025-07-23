@@ -25,6 +25,7 @@ from sentence_transformers import SentenceTransformer
 from utils import (
     choices,
     SBERT_NAME,
+    sbert_name_string,
     count_nb_files,
     preprocess,
     existing_dir_path,
@@ -32,6 +33,7 @@ from utils import (
     load_embeddings,
     DEFAULT_SAVE_SIZE,
     format_npz_output,
+    get_embeddings_save_path,
 )
 
 
@@ -55,14 +57,13 @@ parser.add_argument(
 
 args = parser.parse_args()
 embedding_model = SentenceTransformer(SBERT_NAME)
-sbert_name_string = SBERT_NAME.replace("/", "_")
 
 output_folder = create_dir(
-    os.path.join(args.origin_path, "data_prod", "embeddings", f"{args.public}")
+    os.path.join(args.origin_path, "data_prod", "embeddings", args.public)
 )
-SAVE_PATH = os.path.join(output_folder, "{}.npz".format(sbert_name_string))
+save_path = get_embeddings_save_path(output_folder)
 
-if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
+if os.path.isfile(format_npz_output(save_path, DEFAULT_SAVE_SIZE)):
     answer = input(
         """Files in the output folder already exist, do you want to resume from there?
           y resume from last file
@@ -73,7 +74,7 @@ if os.path.isfile(format_npz_output(SAVE_PATH, DEFAULT_SAVE_SIZE)):
     if answer == "n" or answer == "no":
         sys.exit(0)
 
-input_path = os.path.join(args.origin_path, "data_source", f"{args.public}")
+input_path = os.path.join(args.origin_path, "data_source", args.public)
 
 docs = [doc for doc in preprocess(input_path, count_nb_files(input_path))]
 
@@ -85,7 +86,7 @@ if len(docs) == 0:
 # Here, loading means checking what part of the data was already encoded,
 # hence the resume_encoding=True
 max_index, embeddings = load_embeddings(
-    SAVE_PATH, DEFAULT_SAVE_SIZE, len(docs), resume_encoding=True
+    save_path, DEFAULT_SAVE_SIZE, len(docs), resume_encoding=True
 )
 
 
@@ -96,7 +97,7 @@ for i in tqdm(
 ):
     if i % DEFAULT_SAVE_SIZE == 0 and i > max_index:
         np.savez_compressed(
-            format_npz_output(SAVE_PATH, i),
+            format_npz_output(save_path, i),
             embeddings=embeddings,
         )
 
@@ -110,6 +111,6 @@ for i in tqdm(
         )
 
 np.savez_compressed(
-    format_npz_output(SAVE_PATH, len(docs)),
+    format_npz_output(save_path, len(docs)),
     embeddings=embeddings[: i % DEFAULT_SAVE_SIZE + len(docs) % batch_size],
 )
