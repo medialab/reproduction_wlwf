@@ -1,6 +1,7 @@
 import os
 import argparse
 import numpy as np
+from ebbe import Timer
 
 from cuml.manifold import UMAP
 # from umap import UMAP
@@ -28,14 +29,6 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--public",
-    help=(
-        "List the political group you want to compute in the following format : group1,group2,group3. Choose group names in the following terms : congress, general, attentive, supporter, media"
-    ),
-    default=",".join(choices),
-)
-
-parser.add_argument(
     "--save-size",
     help="Size of saved files (in embeddings_folder) in number of vectors",
     type=int,
@@ -54,18 +47,10 @@ umap_model = UMAP(
 
 args = parser.parse_args()
 
-group_list = set(args.public.split(","))
-
-for public in group_list:
-    if public not in choices:
-        raise ValueError(
-            "You used an innacurate name of group in your group argument."
-            "Choose group names in the following terms : {}".format(choices)
-        )
-
 nb_docs_per_public = {}
 paths_per_public = {"text": {}, "embs": {}}
-for public in group_list:
+
+for public in choices:
     paths_per_public["text"][public], paths_per_public["embs"][public] = get_paths(
         args.origin_path, public
     )
@@ -75,7 +60,8 @@ for public in group_list:
 all_public_matrix = np.empty((sum(nb_docs_per_public.values()), EMB_DIMENSION))
 
 start_index = 0
-for public in group_list:
+for public in choices:
+    print(f"Load embeddings for public {public}")
     end_index, embeddings = load_embeddings(
         paths_per_public["embs"][public],
         args.save_size,
@@ -84,17 +70,23 @@ for public in group_list:
     all_public_matrix[start_index : start_index + end_index] = embeddings
     start_index += end_index
 
-print(f"Run dimensionality reduction with {umap_model}")
-reduced_matrix = umap_model.fit_transform(all_public_matrix)
+print(f"Run dimensionality reduction with {umap_model} on {all_public_matrix.shape[0]} rows")
+
+with Timer("Fit on 50% of data: "):
+    idx = np.random.randint(all_public_matrix.shape[0], size=int(0.5*all_public_matrix.shape[0]))
+    umap_model.fit(all_public_matrix[idx])
 
 start_index = 0
-for public in group_list:
+for public in choices:
+    end_index = nb_docs_per_public[public]
+
+    with Timer(f"Reduce dimensionality of {public} : "):
+        reduced_matrix = umap_model.transform(all_public_matrix[start_index : start_index + end_index])
     output_path = create_dir(
         os.path.join(args.origin_path, "data_prod", "reduced_embeddings", public)
     )
-    end_index = nb_docs_per_public[public]
     np.savez_compressed(
         os.path.join(output_path, "umap.npz"),
-        embeddings=reduced_matrix[start_index : start_index + end_index],
+        embeddings=reduced_matrix,
     )
     start_index += end_index
