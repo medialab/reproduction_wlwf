@@ -1,14 +1,6 @@
 import os
 import numpy as np
-from sklearn.preprocessing import StandardScaler
-import sklearn.decomposition._incremental_pca as ipca_module
-from sklearn.decomposition import IncrementalPCA
-from sklearn.utils import gen_batches
-import sklearn.utils
 import argparse
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-from figures_utils import draw_PCA_evolve
 
 from utils import (
     choices,
@@ -42,14 +34,6 @@ parser.add_argument(
     action="store_true",
 )
 
-parser.add_argument(
-    "--plot",
-    help=(
-        "Plot the singular value and the explained variance ratio according the each component index"
-    ),
-    action="store_true",
-)
-
 args = parser.parse_args()
 
 sbert_name_string = SBERT_NAME.replace("/", "_")
@@ -63,15 +47,6 @@ def get_embed_paths(root, public):
         "{}.npz".format(sbert_name_string),
     )
     return embeddings_path
-
-def gen_batches_with_tqdm(n, batch_size, min_batch_size=0):
-    return tqdm(
-        gen_batches(n, batch_size, min_batch_size=N_COMPONENT),
-        desc="Batching",
-        total= n // batch_size + 1
-    )
-
-ipca_module.gen_batches = gen_batches_with_tqdm
 
 print("Load embeddings")
 dict_size = {}
@@ -105,8 +80,6 @@ for group in choices:
     total_row += size 
     del size 
 
-
-
 total_matrix = np.empty(shape=(total_row, EMB_DIMENSION)) 
 print("Filling a matrix of dimensions :")
 print(total_matrix.shape)
@@ -122,20 +95,10 @@ for group in choices:
     del nb_docs
     del embed_path 
 
-
-print("Start STD")
-scaler = StandardScaler(copy=False)
-scaler.fit_transform(total_matrix)
-del scaler 
-
-print("Start IPCA")
+print("Start cuML-UMAP")
 pca_model = IncrementalPCA(n_components = N_COMPONENT, batch_size = 100_000) 
 reduced_mat = pca_model.fit_transform(total_matrix)
 del total_matrix 
-if args.plot:
-    draw_PCA_evolve(args.origin_path, pca_model)
-del pca_model 
-
 print("Start saving process")
 
 start_index = 0 

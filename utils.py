@@ -11,9 +11,12 @@ from tqdm import tqdm
 from unidecode import unidecode
 from transformers import CamembertTokenizer
 from fog.tokenizers.words import WordTokenizer
+import sklearn
 from sklearn.feature_extraction.text import CountVectorizer
 from collections import defaultdict
 import random
+
+print(os.path.abspath(sklearn.feature_extraction.text.__file__))
 
 GROUPS = [
     "majority",
@@ -27,7 +30,7 @@ AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
 choices = ["congress", "media", "supporter", "attentive"]
-n_component = 50
+N_COMPONENT = 5
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 NB_DOCS_SMALL_TRAIN = 1000  # Choose a small number to have a fast computation

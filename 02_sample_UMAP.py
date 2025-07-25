@@ -9,7 +9,6 @@ import csv
 import argparse
 import random
 from figures_utils import draw_topic_keywords
-from collections import Counter
 
 from utils import (
     count_nb_files,
@@ -27,7 +26,7 @@ from utils import (
     NB_DOCS_SMALL_TRAIN,
     NB_DOCS_SMALL_INFER, 
     write_sample_BERTOPIC,
-    n_component
+    N_COMPONENT
 )
 
 random.seed(RANDOM_SEED)
@@ -126,7 +125,7 @@ docs, max_index, embeddings = load_docs_embeddings(
     small=args.small,
     small_size=NB_DOCS_SMALL_TRAIN, 
     PCA = True, 
-    n_component=n_component
+    n_component=N_COMPONENT
 )
 
 print(
@@ -179,6 +178,8 @@ write_bertopic_TS(
 )
 
 topic_model.calculate_probabilities = False #Ne pas calculer quand on prédit, ce n'est pas utile. 
+
+raise ValueError("STOP AT TRAINING")
 #Create random sample for predict
 print("Loading predict info")
 
@@ -197,7 +198,7 @@ for group in ["media", "attentive", "supporter"]:
         small=args.small,
         small_size=NB_DOCS_SMALL_INFER,
         PCA = True, 
-        n_component=n_component
+        n_component=N_COMPONENT
     )
 
     print("Make topics prediction")
