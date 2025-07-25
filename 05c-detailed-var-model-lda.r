@@ -400,7 +400,7 @@ if(args$tests_post){
 } 
 pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 40, 42, 44, 45, 50, 51, 52, 53, 55, 56,
 59, 60, 63, 64, 65, 66, 70)
-pol_issues <- setdiff(pol_issues, c(55,60, 65, 40, 59, 59, 70)
+pol_issues <- setdiff(pol_issues, c(55,60, 65, 40, 59, 59, 70))
 last_topic <- tail(pol_issues, 1)
 last_top_path <- paste0("data_prod/var/lda/issue-level/var_girf_topic_", last_topic, ".Rdata")
 if (!file.exists(last_top_path)){
@@ -410,6 +410,7 @@ if (!file.exists(last_top_path)){
 print("Format IRF data in a human-friendly way")
 pa2our <- read_csv("data_prod/figures/translate_number_name/LDA_merged.csv", col_names=FALSE, show_col_types=FALSE)
 colnames(pa2our) <- c("issue_num", "label")
+pa2our$issue_num = as.character(pa2our$issue_num)
 
 #L'objet var_irf_cums contient dans $irf$lr les réponses générées par un impulse de lr 
 # - initializing an empty dataset where to put all IRF info by topic
