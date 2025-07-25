@@ -34,19 +34,21 @@ variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nup
 
 if (args$estimate || args$tests || args$tests_post){
   #Put our main databse generated thanks to script 05a 
-  db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
-  throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
-  pol_issues_temp <- setdiff(c(0:91), throw_topic)
-  db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
-      group_by(date, topic) %>%                                  
-      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- setdiff(pol_issues_temp, 89)
+  db <- read_csv("data_prod/var/general_TS_LDA.csv", show_col_types = FALSE)
+  pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 40, 42, 44, 45, 50, 51, 52, 53, 55, 56,
+59, 60, 63, 64, 65, 66, 70)
+  db <- db %>% 
+    mutate(topic = ifelse(topic == 55, 16, topic)) %>%
+    mutate(topic = ifelse(topic == 60, 51, topic)) %>%
+    mutate(topic = ifelse(topic %in% c(65, 40, 59, 59, 70), 27, topic)) %>%
+    group_by(date, topic) %>%                                  
+    summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
+  pol_issues <- setdiff(pol_issues, c(55,60, 65, 40, 59, 59, 70))
 
   db <- db %>%
-    #dplyr::select(-general) %>%
     filter(topic %in% pol_issues)
 
-  write.csv(db, file="data_prod/var/general_TS_clean.csv")
+  write.csv(db, file="data_prod/var/lda/general_TS_clean.csv")
 }
 
 if (args$tests){
@@ -60,7 +62,7 @@ if (args$tests){
   colnames(statio_by_group) <- c('Topic', variables)
   statio_by_group$Topic <- pol_issues 
   for (v in variables){
-    db[[v]] <- log(db[[v]] + 1)
+    db[[v]] <- log(db[[v]] / (1 - db[[v]]))
     for (topic_n in pol_issues) {
       status <- NA
       # Augmented Dickey-Fuller (ADF) test for stationarity
@@ -98,7 +100,7 @@ if (args$tests){
     mutate(n_OK = rowSums(across(everything(), ~ . == "OK")))
 
   statio_by_group <- merge(statio_by_group, titles, by="Topic", all.x = TRUE)
-  write.csv(statio_by_group, file="data_prod/var/issue-level/statio_details.csv",  row.names = FALSE)
+  write.csv(statio_by_group, file="data_prod/var/lda/issue-level/statio_details.csv",  row.names = FALSE)
   cat("Résultats de stationnarité sur les séries concaténées \n")
   results_df <- do.call(rbind, lapply(results_list, function(x) data.frame(t(unlist(x)), stringsAsFactors = FALSE)))
   colnames(results_df) <- c("topic", "variable", "p_value")
@@ -261,18 +263,15 @@ if (args$tests){
   pacf_exp <- transfo_acf(pacf_sum)
 
   #Afficher et enregistrer les résultats
-  write.csv(ACF_data, file=paste0("data_prod/var/issue-level/ACF_full.csv"))
-  write.csv(PACF_data, file=paste0("data_prod/var/issue-level/PACF_full.csv"))
-  write.csv(acf_exp, file=paste0("data_prod/var/issue-level/ACF_results.csv"))
-  write.csv(pacf_exp, file=paste0("data_prod/var/issue-level/PACF_results.csv"))
+  write.csv(ACF_data, file=paste0("data_prod/var/lda/issue-level/ACF_full.csv"))
+  write.csv(PACF_data, file=paste0("data_prod/var/lda/issue-level/PACF_full.csv"))
+  write.csv(acf_exp, file=paste0("data_prod/var/lda/issue-level/ACF_results.csv"))
+  write.csv(pacf_exp, file=paste0("data_prod/var/lda/issue-level/PACF_results.csv"))
   
-  plot_PACFS(ACF_data, "ACF")
-  plot_PACFS(PACF_data, "PACF")
+  #plot_PACFS(ACF_data, "ACF")
+  #plot_PACFS(PACF_data, "PACF")
 
   for (topic_num in pol_issues){
-    if (topic_num %in% c(52, 71, 79, 85, 86)){
-      next
-    } 
     topic_num <- as.character(topic_num)
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     db_topic <- db_topic[, variables, drop = FALSE]
@@ -305,12 +304,12 @@ if (args$tests){
     }
   }
 
-  path_info <- "data_prod/var/issue-level/infos_topics.csv"
+  path_info <- "data_prod/var/lda/issue-level/infos_topics.csv"
   write.csv(infos_topic, file=path_info, row.names = FALSE)
 }
 
 if (args$estimate){
-  path_infos_topic <- "data_prod/var/issue-level/infos_topics.csv"
+  path_infos_topic <- "data_prod/var/lda/issue-level/infos_topics.csv"
   if(!(file.exists(path_infos_topic))){
     stop("Please, run --tests before to estimate the model, the file to determine lags number in VAR process doesn't exist.")
   }
@@ -318,8 +317,7 @@ if (args$estimate){
   infos_topic <- read_csv(path_infos_topic, show_col_types=FALSE)
   infos_topic <- as.data.frame(infos_topic)
   db$topic <- as.character(db$topic)
-  exclude_issues <- c(52, 71, 79, 85, 86, 88) #Constants are excluded or they cause problems
-  list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
+  list_topic_iter = as.character(pol_issues)
   for (topic_num in list_topic_iter){
     print(paste("Model calculated", topic_num))
     #Choose lag number according to Schwarz criterion and avoid serial autocorrelation problem
@@ -333,23 +331,19 @@ if (args$estimate){
     db_topic <- scale(as.matrix(db_topic))
     db_topic <- as.data.frame(db_topic)
     var_model <- VAR(db_topic, p=lag_number, type="const")
-    save(var_model, file = paste0("data_prod/var/issue-level/var_model_", topic_num, ".Rdata"))
+    save(var_model, file = paste0("data_prod/var/lda/issue-level/var_model_", topic_num, ".Rdata"))
     var_irfs_cum <- irf.varest.edit(var_model,n.ahead = 60, irf_type = "generalized", cumulative = TRUE, boot = TRUE, ci = 0.95, runs = 500) #Calculate cumulative GIRF 
-    save(var_irfs_cum, file = paste0("data_prod/var/issue-level/var_girf_topic_", topic_num, ".Rdata"))
+    save(var_irfs_cum, file = paste0("data_prod/var/lda/issue-level/var_girf_topic_", topic_num, ".Rdata"))
   }
 }
 
 if(args$tests_post){
   infos_topic_post <- data.frame(matrix(NA, nrow=0, ncol=4))
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
-  exclude_issues <- c(52, 71, 79, 85, 86, 88) #Constants are excluded or they cause problems
-  list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
+  list_topic_iter = as.character(pol_issues)
   for (topic_num in list_topic_iter){
-    if(!(topic_num == "88")){
-      next
-    }
     print(paste("Posterior tests for topic", topic_num))
-    var_path <- paste0("data_prod/var/issue-level/var_model_", topic_num, ".Rdata")
+    var_path <- paste0("data_prod/var/lda/issue-level/var_model_", topic_num, ".Rdata")
     if (!(file.exists(var_path))){
       stop("run estimate option because the model weren't estimated")
     }
@@ -400,22 +394,21 @@ if(args$tests_post){
     infos_topic_post <- rbind(infos_topic_post, new_row)
   }
     
-  path_post <-  "data_prod/var/issue-level/post_checks.csv"
+  path_post <-  "data_prod/var/lda/issue-level/post_checks.csv"
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
   write.csv(infos_topic_post, file=path_post, row.names = FALSE)
 } 
-throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87, 89)
-pol_issues <- setdiff(c(0:91), throw_topic)
-exclude_issues <- c(52, 71, 79, 85, 86, 88) #Because constant and unstable VAR processes. 
-pol_issues <- setdiff(pol_issues, exclude_issues)
+pol_issues <- c(19, 2, 30, 34, 61, 16, 48, 1, 3, 5, 9, 13, 15, 17, 21, 25, 27, 29, 33, 36, 40, 42, 44, 45, 50, 51, 52, 53, 55, 56,
+59, 60, 63, 64, 65, 66, 70)
+pol_issues <- setdiff(pol_issues, c(55,60, 65, 40, 59, 59, 70)
 last_topic <- tail(pol_issues, 1)
-last_top_path <- paste0("data_prod/var/issue-level/var_girf_topic_", last_topic, ".Rdata")
+last_top_path <- paste0("data_prod/var/lda/issue-level/var_girf_topic_", last_topic, ".Rdata")
 if (!file.exists(last_top_path)){
   stop(paste("Tous les GIRFS n'ont pas été estimés, veuillez recommencer avec l'option --estimate"))
 }
 
 print("Format IRF data in a human-friendly way")
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", col_names=FALSE, show_col_types=FALSE)
+pa2our <- read_csv("data_prod/figures/translate_number_name/LDA_merged.csv", col_names=FALSE, show_col_types=FALSE)
 colnames(pa2our) <- c("issue_num", "label")
 
 #L'objet var_irf_cums contient dans $irf$lr les réponses générées par un impulse de lr 
@@ -429,7 +422,7 @@ row_number <- number_irf + 1
 for (top in pol_issues) {
   counter <- counter + 1
   print(paste0("[", counter, "/", total, "]"))
-  file_name <- paste0("data_prod/var/issue-level/var_girf_topic_", top, ".Rdata")
+  file_name <- paste0("data_prod/var/lda/issue-level/var_girf_topic_", top, ".Rdata")
   load(file_name) # object name: 'var_irfs_cum'
   girf <- var_irfs_cum 
   # - iterating through endogenous covariates and endogenous responses
@@ -471,7 +464,7 @@ irf_plot <- irf_plot %>%
 
 irf_plot <- left_join(irf_plot, pa2our, by = c("topic" = "issue_num"))
 
-write.csv(irf_plot, file="data_prod/var/irf_data.csv", row.names = FALSE)
+write.csv(irf_plot, file="data_prod/var/lda/irf_data.csv", row.names = FALSE)
 
 irf_data <- irf_plot #Cov (origine impulse) : ligne , Out (reçoit impulse) : colonne 
 n_topic <- length(unique(irf_data$topic))
@@ -538,7 +531,7 @@ for(covar in readable_variables){
 
 colnames(all_top3) <- c("cov", "out", "pe", "label", "rank")
 
-write.csv(all_top3, file="data_prod/var/irf-analysis/full_top3.csv", row.names=FALSE)
+write.csv(all_top3, file="data_prod/var/lda/irf-analysis/full_top3.csv", row.names=FALSE)
 
 #Top 3 influences by topic
 top3_topic <- filt_irf %>%
@@ -559,7 +552,7 @@ topics_leaders <- top3_topic %>%
       values_fill = 0  # remplit les NA par 0
     )
 
-write.csv(topics_leaders, file="data_prod/var/irf-analysis/leader_bytopic_top3.csv", row.names=FALSE)
+write.csv(topics_leaders, file="data_prod/var/lda/irf-analysis/leader_bytopic_top3.csv", row.names=FALSE)
 
 #Top 3 leading topics by group
 top3_topics_group <- filt_irf %>%
@@ -578,7 +571,7 @@ groups_leaders <- top3_topics_group %>%
                   values_from = label
                 )
 
-write.csv(groups_leaders, file="data_prod/var/irf-analysis/topiclead_bygroup_top3.csv", row.names=FALSE)
+write.csv(groups_leaders, file="data_prod/var/lda/irf-analysis/topiclead_bygroup_top3.csv", row.names=FALSE)
 #Plots : number leader, follower
 
 #Matrix lead follow
@@ -590,7 +583,7 @@ matrix_LF <- filt_irf %>%
       out = factor(out, levels = readable_variables)
     )
 
-png("data_prod/var/irf-analysis/number_leading_relations_pairs.png",width = 800, height = 600)
+png("data_prod/var/lda/irf-analysis/number_leading_relations_pairs.png",width = 800, height = 600)
 p <- ggplot(matrix_LF, aes(x = out, y = cov, fill = n)) +
   geom_tile(color = "white", linewidth = 0.3) +
   geom_text(aes(label = n), color = "black", size = 3) + 
@@ -614,7 +607,7 @@ matrix_LF <- filt_irf %>%
     out = factor(out, levels = readable_variables)
   )
 
-png("data_prod/var/irf-analysis/total_GIRF_relations_pairs.png",width = 800, height = 600)
+png("data_prod/var/lda/irf-analysis/total_GIRF_relations_pairs.png",width = 800, height = 600)
 p <- ggplot(matrix_LF, aes(x = out, y = cov, fill = pe_sum)) +
   geom_tile(color = "white", linewidth = 0.3) +
   geom_text(aes(label = pe_sum), color = "black", size = 3) + 
@@ -679,7 +672,7 @@ colors_dict <- c(
   "Public Attentif"= "darkorchid3", 
   "Média" = "green4"
 )
-png("data_prod/var/irf-analysis/figure4.png", width = 1600, height = 1400)       
+png("data_prod/var/lda/irf-analysis/figure4.png", width = 1600, height = 1400)       
 p <- ggplot(plot_db,
        aes(x = label, y = pe, ymin = lwr, ymax = upr)) +
   geom_pointrange(aes(col = cov), alpha = 0.4, size = 0.5) +
@@ -735,7 +728,7 @@ plot_db <- plot_db2 %>%
 
 plot_db$cov <- factor(plot_db$cov,
                       levels = rev(readable_variables[1:4]))
-png("data_prod/var/irf-analysis/girf_between_deputes.png",width = 1000, height = 800)
+png("data_prod/var/lda/irf-analysis/girf_between_deputes.png",width = 1000, height = 800)
 p <- ggplot(plot_db,
        aes(x = cov, y = pe, ymin = lwr, ymax = upr)) +
   geom_segment(aes(x = cov, xend = cov, y = lwr, yend = upr), 
@@ -780,7 +773,7 @@ plot_db <- plot_db2 %>%
               )
 
 
-png("data_prod/var/irf-analysis/figure3.png",width = 1000, height = 1000)
+png("data_prod/var/lda/irf-analysis/figure3.png",width = 1000, height = 1000)
 p <- ggplot(plot_db,
        aes(x = polgroup_num, y = pe, ymin = lwr, ymax = upr, col = direction)) +
   geom_segment(aes(xend = polgroup_num, y = lwr, yend = upr),
@@ -821,7 +814,7 @@ plot_db <- plot_db2 %>%
           mutate(y = ifelse(cov_agenda_type == 'media', as.character(out), as.character(cov)))
 
 
-png("data_prod/var/irf-analysis/figure6.png",width = 800, height = 800)
+png("data_prod/var/lda/irf-analysis/figure6.png",width = 800, height = 800)
 p <- ggplot(plot_db,
        aes(x = y, y = pe, ymin = lwr, ymax = upr)) +
   geom_segment(aes(x = y, xend = y, y = lwr, yend = upr), 
