@@ -30,7 +30,7 @@ AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
 choices = ["congress", "media", "supporter", "attentive"]
-N_COMPONENT = 5
+N_COMPONENT = 300
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 NB_DOCS_SMALL_TRAIN = 1000  # Choose a small number to have a fast computation

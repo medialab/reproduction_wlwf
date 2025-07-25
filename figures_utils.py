@@ -58,15 +58,17 @@ def draw_topic_keywords(topic, words, x, root=os.getcwd(), reduced=False):
 
 def draw_PCA_evolve(root, pca_model):
     component_numbers = list(range(1, len(pca_model.components_)+1))
+    cumulative_variance = np.cumsum(pca_model.explained_variance_ratio_)
     fig, ax = plt.subplots()
     ax.plot(component_numbers, pca_model.singular_values_, "b")
     ax.set_xlabel("Component index", fontsize=14)
     ax.set_ylabel("Singular_values", fontsize=14)
     ax2 = ax.twinx()
     ax2.plot(component_numbers, pca_model.explained_variance_ratio_, "r")
+    ax2.plot(component_numbers, cumulative_variance, "g", label="Variance expliquée cumulée")
     ax2.set_ylabel("Explained variance (ratio)", fontsize=14)
     lines = [ax.get_lines()[0], ax2.get_lines()[0]]
-    plt.legend(lines, ["Valeurs singulières", "Variance expliquée (ratio)"], loc="upper right")
+    plt.legend(lines, ["Valeurs singulières", "Variance expliquée (ratio)", "Variance expliquée cumulée (ratio)"], loc="upper right")
     path_save = os.path.join(root, "data_prod", "figures", "Explained_VAR_PCA_graph.jpg")
     plt.savefig(path_save)
     plt.close()

@@ -89,8 +89,8 @@ else:
     n_tweets_per_pred = 5
 
 hdbscan_model = HDBSCAN(
-    min_cluster_size=2 if args.small else 100,
-    cluster_selection_epsilon=0.2,
+    min_cluster_size=2 if args.small else 50,
+    cluster_selection_epsilon=0,
     min_samples=30,
     metric="euclidean",
     cluster_selection_method="eom",
