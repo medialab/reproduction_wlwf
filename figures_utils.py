@@ -65,7 +65,7 @@ def draw_PCA_evolve(root, pca_model):
     ax.set_ylabel("Singular_values", fontsize=14)
     ax2 = ax.twinx()
     ax2.plot(component_numbers, pca_model.explained_variance_ratio_, "r")
-    ax2.plot(component_numbers, cumulative_variance, "g", label="Variance expliquée cumulée")
+    ax2.plot(component_numbers, cumulative_variance, "g", label="Variance expliquée cumulée (ratio)")
     ax2.set_ylabel("Explained variance (ratio)", fontsize=14)
     lines = [ax.get_lines()[0], ax2.get_lines()[0]]
     plt.legend(lines, ["Valeurs singulières", "Variance expliquée (ratio)", "Variance expliquée cumulée (ratio)"], loc="upper right")
