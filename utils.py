@@ -25,7 +25,7 @@ EMB_DIMENSION = 1024  # Dimension of sentence-BERT embeddings
 AN_HASHTAGS_PATTERN = r"(#directAN|#assembl[ée]enationale|#assembl[ée]national)"  # Exclude hashtags linked to French National Assembly
 DEFAULT_SAVE_SIZE = 100_000
 RANDOM_SEED = 98347
-choices = ["congress", "media", "supporter", "attentive", "general"]
+choices = ["congress", "media", "supporter", "attentive"]
 
 # Nb docs used for tests. Should be smaller than DEFAULT_SAVE_SIZE.
 NB_DOCS_SMALL_TRAIN = 1000  # Choose a small number to have a fast computation
