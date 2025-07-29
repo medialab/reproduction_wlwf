@@ -4,11 +4,15 @@
 
 1. clone this repository
 
-2. install dependencies
+2. install dependencies (including cuML to run UMAP on GPU)
+
+Recommended python version: 3.12.4
 ```bash
 cd reproduction_wlwf
 pip install -r requirements.txt
+pip install --extra-index-url=https://pypi.nvidia.com "cudf-cu12==25.4.0" "dask-cudf-cu12==25.4.0" "c^Cl-cu12==25.4.0" "cugraph-cu12==25.4.0" "nx-cugraph-cu12==25.4.0" "cuxfilter-cu12==25.4.0" "cucim-cu12==25.4.0" "pylibraft-cu12==25.4.0" "raft-dask-cu12==25.4.0" "cuvs-cu12==25.4.0" "nx-cugraph-cu12==25.4.0"
 ```
+
 ## Format your data in the following trees
 These folders have to be put in a data_source folder in your actual repository.
 

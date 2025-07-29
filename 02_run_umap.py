@@ -1,6 +1,7 @@
 import os
 import argparse
 import numpy as np
+from tqdm import tqdm
 from ebbe import Timer
 
 from cuml.manifold import UMAP
@@ -35,9 +36,11 @@ parser.add_argument(
     default=DEFAULT_SAVE_SIZE,
 )
 
+n_components = 5
+
 umap_model = UMAP(
     n_neighbors=15,
-    n_components=5,
+    n_components=n_components,
     min_dist=0.0,
     metric="cosine",
     low_memory=False,
@@ -70,18 +73,23 @@ for public in choices:
     all_public_matrix[start_index : start_index + end_index] = embeddings
     start_index += end_index
 
-print(f"Run dimensionality reduction with {umap_model} on {all_public_matrix.shape[0]} rows")
+size = int(all_public_matrix.shape[0]/3)
+idx = np.random.choice(all_public_matrix.shape[0], size=size, replace=False)
+sample = all_public_matrix[idx, :]
+print(f"Run dimensionality reduction with {umap_model} on {size} rows")
 
-with Timer("Fit on 50% of data: "):
-    idx = np.random.randint(all_public_matrix.shape[0], size=int(0.5*all_public_matrix.shape[0]))
-    umap_model.fit(all_public_matrix[idx])
+with Timer(f"Ran dimensionality reduction on {size} rows in"):
+    umap_model.fit(sample)
 
+batch_size = 100_000
 start_index = 0
 for public in choices:
-    end_index = nb_docs_per_public[public]
-
-    with Timer(f"Reduce dimensionality of {public} : "):
-        reduced_matrix = umap_model.transform(all_public_matrix[start_index : start_index + end_index])
+    nb_rows_public = nb_docs_per_public[public]
+    reduced_matrix = np.empty((nb_rows_public, n_components))
+    for i in tqdm(range(0, nb_rows_public, batch_size)):
+        batch = all_public_matrix[start_index + i : min(start_index + i + batch_size, start_index + nb_rows_public)]
+        reduced_batch = umap_model.transform(batch)
+        reduced_matrix[i : min(i + batch_size, nb_rows_public)] = reduced_batch
     output_path = create_dir(
         os.path.join(args.origin_path, "data_prod", "reduced_embeddings", public)
     )
@@ -89,4 +97,4 @@ for public in choices:
         os.path.join(output_path, "umap.npz"),
         embeddings=reduced_matrix,
     )
-    start_index += end_index
+    start_index += nb_rows_public
