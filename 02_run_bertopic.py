@@ -86,8 +86,8 @@ if args.small:
 
 hdbscan_model = HDBSCAN(
     min_cluster_size=2 if args.small else 100,
-    cluster_selection_epsilon=0.2,
-    min_samples=30,
+    cluster_selection_epsilon=0.1,
+    min_samples=5,
     metric="euclidean",
     cluster_selection_method="eom",
     prediction_data=True,
@@ -118,7 +118,7 @@ else:
     print(
         "BERTopic model will be trained on congress data, then infered on other publics"
     )
-group_list = ["congress"] + [group_list]
+group_list = ["congress"] + group_list
 
 for group in group_list:
     input_path, embeddings_path = get_paths(args.origin_path, group)
@@ -188,7 +188,7 @@ for group in group_list:
     topics_info = count_topics_info(topics, party_day_counts, group)
 
     # Sort by day so that all resulting files have the same order
-    party_day_counts = sorted(party_day_counts, key=lambda x: x[2])
+    party_day_counts = sorted(party_day_counts, key=lambda x: x[-1])
 
     # Open one CSV file per topic for congress
     write_bertopic_TS(
