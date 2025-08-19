@@ -9,18 +9,16 @@ library(purrr)
 db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
 db_prop <- read_csv("data_prod/var/general_TS_prop.csv", show_col_types = FALSE)
 variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nupes_supp', 'rn_supp', 'attentive', 'media')
-throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
-pol_issues_temp <- setdiff(c(0:91), throw_topic)
+throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84, 39, 69, 79)
+pol_issues <- setdiff(c(0:85), throw_topic)
+#db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
+  #group_by(date, topic) %>%                                  
+  #summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
 
-db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
-  group_by(date, topic) %>%                                  
-  summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-
-db_prop <- db_prop %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
-  group_by(date, topic) %>%                                  
-  summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-pol_issues <- setdiff(pol_issues_temp, 89)  
-
+#db_prop <- db_prop %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
+  #group_by(date, topic) %>%                                  
+  #summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
+#Set a pol_issue temp if needed
 
 readable_variables <- c("Députés LR", 
                         "Députés Majorité",
@@ -32,8 +30,62 @@ readable_variables <- c("Députés LR",
                         "Supporters RN",
                         "Public Attentif",
                         "Média")
+
+label_var <- setNames(readable_variables, variables)
+
+#Outliers plot 
+db_outliers <- db_prop %>% 
+          filter(topic < 0) %>% 
+          dplyr::select(-c(topic,date)) 
+
+plot_outliers <- cbind(readable_variables, colMeans(db_outliers)) 
+
+colnames(plot_outliers) <- c("group", "mean_outliers")
+plot_outliers <- as.data.frame(plot_outliers)
+plot_outliers$mean_outliers <- as.numeric(plot_outliers$mean_outliers)
+
+plot_outliers <- plot_outliers %>% 
+                mutate(pct_outliers = mean_outliers * 100) %>% 
+                select(-mean_outliers)
+
+png("data_prod/figures/outliers_plot.png", width=1000, height=800)
+p <- ggplot(data = plot_outliers, aes(x = group, y=pct_outliers)) +
+  geom_col(fill = "darkblue", width = .7) +
+  scale_y_continuous(breaks = seq(0, 100, 10), limits = c(0,100)) +
+  xlab("Groupe") + 
+  ylab("Pourcentage moyen de tweets classés comme outlier")
+print(p)
+dev.off()
+
+#Nombre de tweets moyen par groupe 
+
+db_nbr <- db %>% 
+        filter (topic %in% pol_issues) %>%
+        dplyr::select(-topic) %>%
+        group_by(date) %>% 
+        summarise(across(where(is.numeric), sum, na.rm = TRUE)) %>% 
+        summarise(across(everything(), mean, na.rm = TRUE)) %>%  
+        select(-date) %>%
+        pivot_longer(everything(), names_to = "group", values_to = "nombre") %>% 
+        mutate (
+          group = recode(group, !!!label_var)
+        ) %>%
+        mutate(
+        group = factor(group, levels = readable_variables))
+
+write.csv(db_nbr, "nombre_tweets_moyen.csv")
+
+png("data_prod/figures/nb_tweets.png", width = 1200, height = 900)
+p <- ggplot(db_nbr, aes(x = group, y = nombre)) +
+    geom_col(fill = "darkgreen", width = 0.8) + 
+    scale_y_continuous(breaks = seq(0, 3000, 250), limits = c(0,3000)) +
+    xlab("Groupe") + 
+    ylab("Nombre moyen de tweets par jours inclus dans les VAR")
+print(p)
+dev.off()
+
 #Loss by semantic validity plot 
-pol_issues_bert <- c(pol_issues, c(1, 2, 16, 25, 41, 44, 45, 54, 61, 64, 73, 76, 91))
+pol_issues_bert <- c(pol_issues, c(26, 49, 80, 82))
 db_prop_bert <- db_prop %>%
               filter(topic %in% pol_issues_bert) %>%
               dplyr::select(-topic) %>%
@@ -89,9 +141,6 @@ label_map <- c(
   "prop_val_pol_issues_lda" = "Sujets politiques valides sémantiquement LDA"
 )
 
-label_var <- setNames(readable_variables, variables)
-
-
 custom_colors <-c(
   "Sujets politiques BERTopic" = 'red',
   "Sujets politiques valides sémantiquement BERTopic" = 'orchid',
@@ -127,9 +176,10 @@ p <- ggplot(plot_db, aes(x = group, y = value, fill = variable)) +
 
 print(p)
 dev.off()
-stop()
+
 #Figure 1
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", show_col_types=FALSE)
+pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_85.csv", col_names=FALSE, show_col_types=FALSE)
+colnames(pa2our) <- c("Topic", "Name")
 db_prop <- left_join(db_prop, pa2our, by = c("topic" = "Topic"))
 
 db_long <- db_prop %>%

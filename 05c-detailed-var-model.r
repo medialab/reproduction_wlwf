@@ -35,18 +35,22 @@ variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nup
 if (args$estimate || args$tests || args$tests_post){
   #Put our main databse generated thanks to script 05a 
   db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
-  throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
-  pol_issues_temp <- setdiff(c(0:91), throw_topic)
-  db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
-      group_by(date, topic) %>%                                  
-      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- setdiff(pol_issues_temp, 89)
+  throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84)
+  pol_issues_temp <- setdiff(c(0:85), throw_topic)
+  #db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
+      #group_by(date, topic) %>%                                  
+      #summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
+  pol_issues <- pol_issues_temp #setdiff(pol_issues_temp, 89)
 
   db <- db %>%
-    #dplyr::select(-general) %>%
     filter(topic %in% pol_issues)
 
   write.csv(db, file="data_prod/var/general_TS_clean.csv")
+
+  for (v in variables){
+    db[[v]] <- log(db[[v]] + 1)
+    db[[v]] <- scale(db[[v]], center=TRUE, scale=TRUE)[,1] 
+  }
 }
 
 if (args$tests){
@@ -60,7 +64,6 @@ if (args$tests){
   colnames(statio_by_group) <- c('Topic', variables)
   statio_by_group$Topic <- pol_issues 
   for (v in variables){
-    db[[v]] <- log(db[[v]] + 1)
     for (topic_n in pol_issues) {
       status <- NA
       # Augmented Dickey-Fuller (ADF) test for stationarity
@@ -89,11 +92,11 @@ if (args$tests){
       } else {
         status <- "CST"
       }
-      statio_by_group[statio_by_group$Topic == topic_n, v] <- status 
+    statio_by_group[statio_by_group$Topic == topic_n, v] <- status 
     } 
   }
-  titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", ,show_col_types=FALSE)
-
+  titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_85.csv", col_names = FALSE, show_col_types=FALSE)
+  colnames(titles) = c("Topic", "label")
   statio_by_group <- statio_by_group %>%
     mutate(n_OK = rowSums(across(everything(), ~ . == "OK")))
 
@@ -268,16 +271,17 @@ if (args$tests){
   
   plot_PACFS(ACF_data, "ACF")
   plot_PACFS(PACF_data, "PACF")
-
+  
+   #Présence de constantes
   for (topic_num in pol_issues){
-    if (topic_num %in% c(52, 71, 79, 85, 86)){
+    if (topic_num %in% list_const){
       next
     } 
     topic_num <- as.character(topic_num)
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     db_topic <- db_topic[, variables, drop = FALSE]
     db_topic <- diff(as.matrix(db_topic), differences = 1)
-    db_topic <- scale(as.matrix(db_topic))
+    #db_topic <- scale(as.matrix(db_topic))
     db_topic <- as.data.frame(db_topic)
     print(paste("Currently testing topic", topic_num))
     #Selection criteria
@@ -317,9 +321,9 @@ if (args$estimate){
   print("Estimation step")
   infos_topic <- read_csv(path_infos_topic, show_col_types=FALSE)
   infos_topic <- as.data.frame(infos_topic)
-  db$topic <- as.character(db$topic)
-  exclude_issues <- c(52, 71, 79, 85, 86, 88) #Constants are excluded or they cause problems
+  exclude_issues <- c(39, 69, 79) #Présence de constantes
   list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
+  db$topic <- as.character(db$topic)
   for (topic_num in list_topic_iter){
     print(paste("Model calculated", topic_num))
     #Choose lag number according to Schwarz criterion and avoid serial autocorrelation problem
@@ -330,7 +334,7 @@ if (args$estimate){
     db_topic <- db %>% filter(as.character(topic) == topic_num)
     db_topic <- db_topic[, variables, drop = FALSE]
     db_topic <- diff(as.matrix(db_topic), differences = 1)
-    db_topic <- scale(as.matrix(db_topic))
+    #db_topic <- scale(as.matrix(db_topic))
     db_topic <- as.data.frame(db_topic)
     var_model <- VAR(db_topic, p=lag_number, type="const")
     save(var_model, file = paste0("data_prod/var/issue-level/var_model_", topic_num, ".Rdata"))
@@ -340,10 +344,10 @@ if (args$estimate){
 }
 
 if(args$tests_post){
+  exclude_issues <- c(39, 69, 79) #Présence de constantes
+  list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   infos_topic_post <- data.frame(matrix(NA, nrow=0, ncol=4))
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
-  exclude_issues <- c(52, 71, 79, 85, 86, 88) #Constants are excluded or they cause problems
-  list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   for (topic_num in list_topic_iter){
     print(paste("Posterior tests for topic", topic_num))
     var_path <- paste0("data_prod/var/issue-level/var_model_", topic_num, ".Rdata")
@@ -378,7 +382,8 @@ if(args$tests_post){
 
     #Normality Test
     p_val_norm <- tryCatch({
-      normality.test(var_model)$jb.mul$JB$p.value[1]
+      res <- normality.test(var_model)$jb.mul$JB$p.value
+      res[1]
       }, error = function(e) {
       warning(paste("It wasn't possible to run normality test for topic", topic_num, ":", e$message))
       return(NA)  
@@ -401,10 +406,8 @@ if(args$tests_post){
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
   write.csv(infos_topic_post, file=path_post, row.names = FALSE)
 } 
-throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87, 89)
-pol_issues <- setdiff(c(0:91), throw_topic)
-exclude_issues <- c(52, 71, 79, 85, 86, 88) #Because constant and unstable VAR processes. 
-pol_issues <- setdiff(pol_issues, exclude_issues)
+throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84, 39, 69, 79)
+pol_issues <- setdiff(c(0:85), throw_topic)
 last_topic <- tail(pol_issues, 1)
 last_top_path <- paste0("data_prod/var/issue-level/var_girf_topic_", last_topic, ".Rdata")
 if (!file.exists(last_top_path)){
@@ -412,8 +415,9 @@ if (!file.exists(last_top_path)){
 }
 
 print("Format IRF data in a human-friendly way")
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv", col_names=FALSE, show_col_types=FALSE)
+pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_85.csv", col_names=FALSE, show_col_types=FALSE)
 colnames(pa2our) <- c("issue_num", "label")
+pa2our$issue_num = as.character(pa2our$issue_num)
 
 #L'objet var_irf_cums contient dans $irf$lr les réponses générées par un impulse de lr 
 # - initializing an empty dataset where to put all IRF info by topic
@@ -846,3 +850,87 @@ p <- ggplot(plot_db,
   )
 print(p)
 dev.off()
+
+#Checking figures 
+annot <- read_csv("annot.csv", show_col_types = FALSE)
+annot <- annot %>% 
+        filter(topic %in% pol_issues) %>%
+        dplyr::select(topic,semantic_validity_random)
+
+annot$topic <- as.character(annot$topic)
+
+irf_attentive <- irf_plot %>% 
+                filter(cov == "attentive") %>% 
+                mutate(val = case_when(
+                  sign(lwr) == sign(upr) ~ pe, 
+                  !(sign(lwr) == sign(upr)) ~ 0
+                )) %>%
+              dplyr::select(topic,val) %>%
+              group_by(topic) %>%
+              summarise(across(where(is.numeric), sum, na.rm = TRUE))
+
+plot_irf <- left_join(annot, irf_attentive, by="topic") %>%
+            arrange(semantic_validity_random)
+
+png("data_prod/var/check/semantic_girfval.png", width = 800, height = 800)
+p <- ggplot(plot_irf, aes(x=semantic_validity_random, y = val)) +
+    geom_point(size = 3, fill='darkblue') + 
+    geom_smooth(method = "lm")
+print(p)
+dev.off()
+
+db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
+throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84)
+pol_issues <- setdiff(c(0:85), throw_topic)
+
+db <- db %>%
+  filter(topic %in% pol_issues)
+
+db_size_top <- db %>% 
+              dplyr::select(-date) %>%
+              group_by(topic) %>%
+              summarise(across(where(is.numeric), sum, na.rm = TRUE)) %>%
+              ungroup() %>% 
+              mutate(total = rowSums(across(-topic)))
+
+db_size_top$topic = as.character(db_size_top$topic)
+plot_irf <- left_join(db_size_top, irf_attentive, by="topic") %>%
+            arrange(total)
+
+png("data_prod/var/check/sizetop_girfval.png", width = 800, height = 800)
+p <- ggplot(plot_irf, aes(x=total, y = val)) +
+    geom_point(size = 3, fill='darkblue') + 
+    geom_smooth(method = "lm")
+print(p)
+dev.off()
+
+for (v in variables){
+  db[[v]] <- log(db[[v]] + 1)
+  db[[v]] <- scale(db[[v]], center=TRUE, scale=TRUE)[,1] 
+}
+db_long <- db %>%
+          dplyr::select(all_of(variables)) %>%
+          pivot_longer(cols = everything(), names_to = "variable", values_to = "valeur") %>%
+          mutate(
+            variable = recode(variable,
+                         `lr` = "Députés LR",
+                         `majority` = "Députés Majorité",
+                         `nupes` = "Députés NUPES",
+                         `rn` ="Députés RN",
+                         `lr_supp` = "Supporters LR",
+                         `majority_supp` = "Supporters Majorité",
+                         `nupes_supp` =  "Supporters NUPES",
+                         `rn_supp` =  "Supporters RN",
+                         `attentive` = "Public Attentif",
+                         `media` = "Média"
+            ))
+
+png("data_prod/var/check/groups_FDR.png", width = 1200, height = 1200)
+p <- ggplot(db_long, aes(x = valeur, color=variable)) +
+  stat_ecdf(size = .5) +
+  scale_color_manual("", values = colors_dict) +
+  labs(x = "Valeur", y = "Fonction de répartition F(x)", color = "Variable") +
+  theme_minimal()
+print(p)
+dev.off()
+

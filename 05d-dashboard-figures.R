@@ -33,11 +33,10 @@ readable_variables <- c("Députés LR",
                         "Public Attentif",
                         "Média")
 
-throw_topic <- c(16, 44, 54, 61, 64, 73, 76, 91, 1, 2, 5, 25, 41, 45, 3, 21, 26, 35, 50, 51, 56, 57, 58, 60, 65, 69, 78, 80, 87)
-pol_issues_temp <- setdiff(c(0:91), throw_topic)
-exclude_issues <- c(52, 71, 79, 85, 86, 88, 89)
-pol_issues <- setdiff(pol_issues_temp, exclude_issues)
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_merged.csv")
+throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84, 39, 69, 79)
+pol_issues <- setdiff(c(0:85), throw_topic)
+pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_85.csv", show_col_types = FALSE, col_names = FALSE)
+colnames(pa2our) <- c("Topic", "Name")
 pa2our <- pa2our %>% filter (Topic %in% pol_issues)
 
 plot_fig4  <- function(df, checked_actors, top_rank, variables, readable_variables, colors_dict){
