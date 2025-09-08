@@ -35,8 +35,8 @@ variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nup
 if (args$estimate || args$tests || args$tests_post){
   #Put our main databse generated thanks to script 05a 
   db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
-  throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84)
-  pol_issues_temp <- setdiff(c(0:85), throw_topic)
+  throw_topic <- c(3, 27, 31, 38, 40, 46, 61, 63, 68, 78, 82, 85, 87, 94, 95, 0, 1, 4, 9, 19, 25, 29, 32,36,41,42,43,44,45,48,51,52,53,56,59,65,67,70,74,77,91,96,98,99)
+  pol_issues_temp <- setdiff(c(0:99), throw_topic)
   #db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
       #group_by(date, topic) %>%                                  
       #summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
@@ -95,7 +95,7 @@ if (args$tests){
     statio_by_group[statio_by_group$Topic == topic_n, v] <- status 
     } 
   }
-  titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_85.csv", col_names = FALSE, show_col_types=FALSE)
+  titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_99.csv", col_names = FALSE, show_col_types=FALSE)
   colnames(titles) = c("Topic", "label")
   statio_by_group <- statio_by_group %>%
     mutate(n_OK = rowSums(across(everything(), ~ . == "OK")))
@@ -321,7 +321,7 @@ if (args$estimate){
   print("Estimation step")
   infos_topic <- read_csv(path_infos_topic, show_col_types=FALSE)
   infos_topic <- as.data.frame(infos_topic)
-  exclude_issues <- c(39, 69, 79) #Présence de constantes
+  exclude_issues <- c(73,80,62) #Présence de constantes
   list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   db$topic <- as.character(db$topic)
   for (topic_num in list_topic_iter){
@@ -344,7 +344,7 @@ if (args$estimate){
 }
 
 if(args$tests_post){
-  exclude_issues <- c(39, 69, 79) #Présence de constantes
+  exclude_issues <-  c(73,80,62) #Présence de constantes
   list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   infos_topic_post <- data.frame(matrix(NA, nrow=0, ncol=4))
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
@@ -406,8 +406,8 @@ if(args$tests_post){
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
   write.csv(infos_topic_post, file=path_post, row.names = FALSE)
 } 
-throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84, 39, 69, 79)
-pol_issues <- setdiff(c(0:85), throw_topic)
+throw_topic <- c(3, 27, 31, 38, 40, 46, 61, 63, 68, 78, 82, 85, 87, 94, 95, 0, 1, 4, 9, 19, 25, 29, 32,36,41,42,43,44,45,48,51,52,53,56,59,65,67,70,74,77,91,96,98,99,73,80,62)
+pol_issues <- setdiff(c(0:99), throw_topic)
 last_topic <- tail(pol_issues, 1)
 last_top_path <- paste0("data_prod/var/issue-level/var_girf_topic_", last_topic, ".Rdata")
 if (!file.exists(last_top_path)){
@@ -415,7 +415,7 @@ if (!file.exists(last_top_path)){
 }
 
 print("Format IRF data in a human-friendly way")
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_85.csv", col_names=FALSE, show_col_types=FALSE)
+pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_99.csv", col_names=FALSE, show_col_types=FALSE)
 colnames(pa2our) <- c("issue_num", "label")
 pa2our$issue_num = as.character(pa2our$issue_num)
 
@@ -880,8 +880,8 @@ print(p)
 dev.off()
 
 db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
-throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84)
-pol_issues <- setdiff(c(0:85), throw_topic)
+throw_topic <- c(3, 27, 31, 38, 40, 46, 61, 63, 68, 78, 82, 85, 87, 94, 95, 0, 1, 4, 9, 19, 25, 29, 32,36,41,42,43,44,45,48,51,52,53,56,59,65,67,70,74,77,91,96,98,99)
+pol_issues <- setdiff(c(0:99), throw_topic)
 
 db <- db %>%
   filter(topic %in% pol_issues)

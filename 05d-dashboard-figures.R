@@ -33,9 +33,9 @@ readable_variables <- c("Députés LR",
                         "Public Attentif",
                         "Média")
 
-throw_topic <- c(4, 17, 21, 25, 43, 50, 51, 54, 66, 70, 73, 75, 8, 16, 18, 19, 26, 38, 42, 49, 71, 80, 82, 84, 39, 69, 79)
-pol_issues <- setdiff(c(0:85), throw_topic)
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_85.csv", show_col_types = FALSE, col_names = FALSE)
+throw_topic <- c(3, 27, 31, 38, 40, 46, 61, 63, 68, 78, 82, 85, 87, 94, 95, 0, 1, 4, 9, 19, 25, 29, 32,36,41,42,43,44,45,48,51,52,53,56,59,65,67,70,74,77,91,96,98,99)
+pol_issues <- setdiff(c(0:99), throw_topic)
+pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_99.csv", show_col_types = FALSE, col_names = FALSE)
 colnames(pa2our) <- c("Topic", "Name")
 pa2our <- pa2our %>% filter (Topic %in% pol_issues)
 
