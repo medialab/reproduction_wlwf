@@ -48,6 +48,8 @@ umap_model = UMAP(
     random_state=RANDOM_SEED,
 )
 
+rng = np.random.default_rng(seed=RANDOM_SEED)
+
 args = parser.parse_args()
 
 nb_docs_per_public = {}
@@ -74,7 +76,7 @@ for public in choices:
     start_index += end_index
 
 size = int(all_public_matrix.shape[0]/3)
-idx = np.random.choice(all_public_matrix.shape[0], size=size, replace=False)
+idx = rng.choice(all_public_matrix.shape[0], size=size, replace=False)
 sample = all_public_matrix[idx, :]
 print(f"Run dimensionality reduction with {umap_model} on {size} rows")
 
