@@ -1,10 +1,11 @@
 library(shiny)
-library(ggplot2)
 library(ggthemes)
 library(readr)
 library(tidyverse)
 library(dplyr)
-
+library(remotes)
+install_version("ggplot2", version = "3.5.2")
+library(ggplot2)
 
 colors_dict <- c(
   "Députés LR" = "blue",
@@ -33,11 +34,9 @@ readable_variables <- c("Députés LR",
                         "Public Attentif",
                         "Média")
 
-throw_topic <- c(3, 27, 31, 38, 40, 46, 61, 63, 68, 78, 82, 85, 87, 94, 95, 0, 1, 4, 9, 19, 25, 29, 32,36,41,42,43,44,45,48,51,52,53,56,59,65,67,70,74,77,91,96,98,99)
-pol_issues <- setdiff(c(0:99), throw_topic)
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_99.csv", show_col_types = FALSE, col_names = FALSE)
+pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_LABEL.csv", show_col_types = FALSE, col_names = TRUE)
 colnames(pa2our) <- c("Topic", "Name")
-pa2our <- pa2our %>% filter (Topic %in% pol_issues)
+pol_issues <- setdiff(unique(pa2our$Topic), c(60,50,82,68))
 
 plot_fig4  <- function(df, checked_actors, top_rank, variables, readable_variables, colors_dict){
     plot_db <- df |> 
@@ -99,7 +98,7 @@ plot_fig4  <- function(df, checked_actors, top_rank, variables, readable_variabl
     panel.grid.major = element_line(colour = "gray90", linetype = "solid"),
     axis.text.x = element_text(size = 10, angle=45),
     axis.text.y = element_text(size = 16),
-    strip.text = element_text(size = 10),
+    strip.text = element_text(size = 8),
     panel.border = element_rect(colour = "black", fill = FALSE),
     strip.background = element_rect(colour = "black"),
     axis.title = element_text(size = 14),
@@ -271,19 +270,23 @@ plot_figmedia<- function(df, pa2our, pol_theme, variables, readable_variables){
   filter(cov_agenda_type == 'media' | out_agenda_type == 'media') %>%
   mutate(data_type = ifelse(cov_agenda_type == "media", "média→groupe", 
                             ifelse(out_agenda_type == "media", "groupe→média", NA))) %>%
+  filter(!is.na(data_type))  %>%  
   mutate(y = ifelse(cov_agenda_type == 'media', as.character(out), as.character(cov)))
+
+  plot_db$data_type <- factor(plot_db$data_type, levels = c("média→groupe", "groupe→média"))
+  plot_db$y <- factor(plot_db$y, levels = rev(c("Députés LR", "Députés Majorité", "Députés NUPES", "Députés RN", "Supporters LR", "Supporters Majorité",
+  "Supporters NUPES", "Supporters RN", "Public Attentif")))
 
   ggplot(plot_db,
        aes(x = y, y = pe, ymin = lwr, ymax = upr)) +
   geom_segment(aes(x = y, xend = y, y = lwr, yend = upr), 
                size = 4, alpha = 0.6) +
-  #geom_segment(alpha = 0.8, size = 0.5) +
   geom_hline(yintercept = 0, color = "red") +
   facet_grid(~data_type) +
   coord_flip() +
   geom_vline(xintercept = 15) +
   xlab("") +
-  scale_y_continuous(paste0("\nThe 40-day cumulative effect of a one standard error shock of std(Δimpulse) in day 0"),
+  scale_y_continuous("\nThe 40-day cumulative effect of a one standard error shock of std(Δimpulse) in day 0",
                      expand = c(0,0.001)) +
   theme(
     panel.spacing = unit(1.5, "lines"),
@@ -357,7 +360,7 @@ server <- function(input, output, session) {
   })
 
   top3_df <- reactive({
-    file_name <- "data_prod/var/irf-analysis/full_top3.csv"
+    file_name <- "data_prod/var/irf-analysis/full_top5.csv"
     read_csv(file_name)
   })
 

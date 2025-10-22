@@ -9,6 +9,10 @@ data_prod
 # CSV files
 *.csv
 
+#Outputs
+*.png 
+*.Rdata
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

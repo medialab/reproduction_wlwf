@@ -35,12 +35,16 @@ variables <- c('lr', 'majority', 'nupes', 'rn', 'lr_supp', 'majority_supp', 'nup
 if (args$estimate || args$tests || args$tests_post){
   #Put our main databse generated thanks to script 05a 
   db <- read_csv("data_prod/var/general_TS.csv", show_col_types = FALSE)
-  throw_topic <-  c(13,21,22,23,29,40,43,44,52,53,57,65,70,73,75,76,89,94,96,117,0,1,2,3,4,14,17,25,28,35,37,50,51,54,63,67,68,69,71,74,77,79,80,82,83,86,87,90,98,104,105,106,112,116,59)
-  pol_issues_temp <- setdiff(c(0:118), throw_topic)
-  #db <- db %>% mutate(topic = ifelse(topic == 89, 74, topic)) %>%
-      #group_by(date, topic) %>%                                  
-      #summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
-  pol_issues <- pol_issues_temp #setdiff(pol_issues_temp, 89)
+  titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_LABEL.csv", col_names = TRUE, show_col_types=FALSE)
+  colnames(titles) = c("Topic", "label")
+  pol_issues <- unique(titles$Topic)
+  db <- db %>% mutate(topic = ifelse(topic == 82, 0, topic)) %>%
+      mutate(topic = ifelse(topic == 50, 5, topic)) %>%
+      mutate(topic = ifelse(topic == 60, 40, topic)) %>%
+      group_by(date, topic) %>%                                  
+      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE)), .groups = "drop") 
+  remove_merged <- c(82,50,60)
+  pol_issues <- setdiff(pol_issues, remove_merged)
 
   db <- db %>%
     filter(topic %in% pol_issues)
@@ -95,8 +99,6 @@ if (args$tests){
     statio_by_group[statio_by_group$Topic == topic_n, v] <- status 
     } 
   }
-  titles <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_LABEL.csv", col_names = FALSE, show_col_types=FALSE)
-  colnames(titles) = c("Topic", "label")
   statio_by_group <- statio_by_group %>%
     mutate(n_OK = rowSums(across(everything(), ~ . == "OK")))
 
@@ -321,7 +323,7 @@ if (args$estimate){
   print("Estimation step")
   infos_topic <- read_csv(path_infos_topic, show_col_types=FALSE)
   infos_topic <- as.data.frame(infos_topic)
-  exclude_issues <- c(38,110) #Présence de constantes
+  exclude_issues <- c(68) #Présence de constantes
   list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   db$topic <- as.character(db$topic)
   for (topic_num in list_topic_iter){
@@ -344,7 +346,7 @@ if (args$estimate){
 }
 
 if(args$tests_post){
-  exclude_issues <- c(38,110) #Présence de constantes ou pbs
+  exclude_issues <- c(68) #Présence de constantes ou pbs
   list_topic_iter = as.character(setdiff(pol_issues, exclude_issues))
   infos_topic_post <- data.frame(matrix(NA, nrow=0, ncol=4))
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
@@ -405,18 +407,18 @@ if(args$tests_post){
   path_post <-  "data_prod/var/issue-level/post_checks.csv"
   colnames(infos_topic_post) <- c("Topic", "Max_Modul", "Serial_AC", "Norm.")
   write.csv(infos_topic_post, file=path_post, row.names = FALSE)
-} 
-throw_topic <-  c(13,21,22,23,29,40,43,44,52,53,57,65,70,73,75,76,89,94,96,117,0,1,2,3,4,14,17,25,28,35,37,50,51,54,63,67,68,69,71,74,77,79,80,82,83,86,87,90,98,104,105,106,112,116,59,38,110)
-pol_issues <- setdiff(c(0:118), throw_topic)
+}
+
+print("Format IRF data in a human-friendly way")
+pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_LABEL.csv", col_names=TRUE, show_col_types=FALSE)
+colnames(pa2our) <- c("issue_num", "label")
+pol_issues <- setdiff(unique(pa2our$issue_num), c(60,50,82,68))
+
 last_topic <- tail(pol_issues, 1)
 last_top_path <- paste0("data_prod/var/issue-level/var_girf_topic_", last_topic, ".Rdata")
 if (!file.exists(last_top_path)){
   stop(paste("Tous les GIRFS n'ont pas été estimés, veuillez recommencer avec l'option --estimate"))
 }
-
-print("Format IRF data in a human-friendly way")
-pa2our <- read_csv("data_prod/figures/translate_number_name/BERTOPIC_LABEL.csv", col_names=FALSE, show_col_types=FALSE)
-colnames(pa2our) <- c("issue_num", "label")
 pa2our$issue_num = as.character(pa2our$issue_num)
 
 #L'objet var_irf_cums contient dans $irf$lr les réponses générées par un impulse de lr 
@@ -531,7 +533,7 @@ for(covar in readable_variables){
       filter (out == outvar) %>%
       arrange(desc(abs(pe))) %>%              # Trier par pe décroissant
       dplyr::select(cov, out, pe, label) %>%    # Garder uniquement les colonnes voulues
-      slice_head(n = 3) %>%
+      slice_head(n = 5) %>%
       mutate(rank=row_number())
     all_top3 <- rbind(all_top3, top3)
   }
@@ -539,20 +541,20 @@ for(covar in readable_variables){
 
 colnames(all_top3) <- c("cov", "out", "pe", "label", "rank")
 
-write.csv(all_top3, file="data_prod/var/irf-analysis/full_top3.csv", row.names=FALSE)
+write.csv(all_top3, file="data_prod/var/irf-analysis/full_top5.csv", row.names=FALSE)
 
-#Top 3 influences by topic
+#Top 5 influences by topic
 top3_topic <- filt_irf %>%
         group_by(topic, cov, label) %>%
         summarise(sum_pe = sum(pe, na.rm = TRUE),
       .groups='drop') %>%
     group_by(topic) %>%
-    slice_max(order_by = sum_pe, n = 3, with_ties = FALSE)  %>% 
+    slice_max(order_by = sum_pe, n = 5, with_ties = FALSE)  %>% 
     ungroup()
 
 print(paste("Dimensions : ", as.character(dim(top3_topic))))
 
-top3_topic$rank <- rep(1:3, n_topic)
+top3_topic$rank <- rep(1:5, n_topic)
 
 topics_leaders <- top3_topic %>%
       count(cov, rank) %>%
@@ -562,17 +564,17 @@ topics_leaders <- top3_topic %>%
       values_fill = 0  # remplit les NA par 0
     )
 
-write.csv(topics_leaders, file="data_prod/var/irf-analysis/leader_bytopic_top3.csv", row.names=FALSE)
+write.csv(topics_leaders, file="data_prod/var/irf-analysis/leader_bytopic_top5.csv", row.names=FALSE)
 
-#Top 3 leading topics by group
+#Top 5 leading topics by group
 top3_topics_group <- filt_irf %>%
           group_by(cov, topic, label) %>%
           summarise(sum_pe = sum(pe, na.rm= TRUE), .groups='drop') %>%
           group_by(cov) %>%
-          slice_max(order_by = sum_pe, n = 3, with_ties = FALSE) %>%
+          slice_max(order_by = sum_pe, n = 5, with_ties = FALSE) %>%
           ungroup()
 
-top3_topics_group$rank <- rep(1:3, length(variables))
+top3_topics_group$rank <- rep(1:5, length(variables))
 
 groups_leaders <- top3_topics_group %>%
              dplyr::select(cov, rank, label) %>%
@@ -581,7 +583,7 @@ groups_leaders <- top3_topics_group %>%
                   values_from = label
                 )
 
-write.csv(groups_leaders, file="data_prod/var/irf-analysis/topiclead_bygroup_top3.csv", row.names=FALSE)
+write.csv(groups_leaders, file="data_prod/var/irf-analysis/topiclead_bygroup_top5.csv", row.names=FALSE)
 #Plots : number leader, follower
 
 #Matrix lead follow
