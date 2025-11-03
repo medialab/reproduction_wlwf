@@ -40,7 +40,7 @@ pol_issues <- setdiff(unique(pa2our$Topic), c(60,50,82,68))
 
 plot_fig4  <- function(df, checked_actors, top_rank, variables, readable_variables, colors_dict){
     plot_db <- df |> 
-        filter(cov_agenda_type != out_agenda_type | cov_agenda_type == "pol") |>
+        #filter(cov_agenda_type != out_agenda_type | cov_agenda_type == "pol") |>
         filter(sign(lwr) == sign(upr)) |>
         group_by(topic, out) |>
         slice_max(order_by = abs(pe), n = top_rank, with_ties = TRUE) |>   
