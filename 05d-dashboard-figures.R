@@ -3,8 +3,8 @@ library(ggthemes)
 library(readr)
 library(tidyverse)
 library(dplyr)
-library(remotes)
-install_version("ggplot2", version = "3.5.2")
+#library(remotes)
+#install_version("ggplot2", version = "3.5.2")
 library(ggplot2)
 
 colors_dict <- c(
@@ -40,8 +40,13 @@ pol_issues <- setdiff(unique(pa2our$Topic), c(60,50,82,68))
 
 plot_fig4  <- function(df, checked_actors, top_rank, variables, readable_variables, colors_dict){
     plot_db <- df |> 
-        filter(cov %in% checked_actors) |>
-         mutate(
+        filter(cov_agenda_type != out_agenda_type | cov_agenda_type == "pol") |>
+        filter(sign(lwr) == sign(upr)) |>
+        group_by(topic, out) |>
+        slice_max(order_by = abs(pe), n = top_rank, with_ties = TRUE) |>   
+        ungroup() |>
+        filter(cov %in% checked_actors) |>   
+        mutate(
             cov = recode(cov,
                          `lr` = "Députés LR",
                          `majority` = "Députés Majorité",
@@ -70,13 +75,8 @@ plot_fig4  <- function(df, checked_actors, top_rank, variables, readable_variabl
           mutate (
             cov = factor(cov, levels=readable_variables),
             out = factor(out, levels=readable_variables)
-          ) |>
-          filter(cov_agenda_type != out_agenda_type | cov_agenda_type == "pol") |>
-          filter(sign(lwr) == sign(upr)) |>
-          group_by(topic, out) |>
-          slice_max(order_by = abs(pe), n = top_rank, with_ties = TRUE) |>
-          ungroup() |>
-          mutate(label = factor(label, levels = unique(label)))
+          ) |>    
+          mutate(label = factor(label, levels = unique(label))) 
     missing_colors <- setdiff(levels(plot_db$cov), names(colors_dict))
     if(length(missing_colors) > 0) {
         warning("Valeurs dans 'cov' sans couleur définie : ", paste(missing_colors, collapse = ", "))
