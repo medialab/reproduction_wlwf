@@ -457,12 +457,16 @@ def create_dir(string):
     # If a parent directory in the path does not exist, FileNotFoundError is raised.
     except FileExistsError:
         os.makedirs(string, exist_ok=True)
-        return string
     except FileNotFoundError as e:
         print("The following path does not exist:")
-        print(e)
+        print(e.split(":")[1])
         make_dirs = input("Do you want to create it? y/n\n")
-        raise
+        while make_dirs != "y" and make_dirs != "n":
+            make_dirs = "Please answer with y or n\n"
+        if make_dirs == "y":
+            os.makedirs(string, exist_ok=True)
+        elif make_dirs == "n":
+            raise
 
     return string
 
