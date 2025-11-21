@@ -577,12 +577,13 @@ def generate_threads(
     text_pos = reader.headers.text
     id_pos = reader.headers.id
     rt_pos = reader.headers.retweeted_id
-    rt_count_pos = reader.headers.retweet_count
     user_pos = reader.headers.user_id
     to_user_pos = reader.headers.to_userid
     to_id_pos = reader.headers.to_tweetid
-    local_time_pos = reader.headers.local_time
-    screen_name_pos = reader.headers.user_screen_name
+    if metadata:
+        rt_count_pos = reader.headers.retweet_count
+        local_time_pos = reader.headers.local_time
+        screen_name_pos = reader.headers.user_screen_name
 
     for row in reader:
         counters["counter_all"] += 1
