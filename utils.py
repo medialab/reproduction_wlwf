@@ -458,8 +458,7 @@ def create_dir(string):
     except FileExistsError:
         os.makedirs(string, exist_ok=True)
     except FileNotFoundError as e:
-        print("The following path does not exist:")
-        print(e.split(":")[1])
+        print(f"The following path does not exist: {e.filename}")
         make_dirs = input("Do you want to create it? y/n\n")
         while make_dirs != "y" and make_dirs != "n":
             make_dirs = "Please answer with y or n\n"
