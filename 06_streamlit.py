@@ -5,6 +5,7 @@ import os
 import argparse
 import requests
 import random
+import plotly.express as px
 
 from utils import existing_dir_path
 
@@ -120,7 +121,32 @@ def render_tweets(df, height=1200):
     components.html(html, height=height, scrolling=True, width=700)
 
 
-selected_topic = st.selectbox(
-    "Choisir le topic à afficher", sorted(df.topic.astype(int).unique(), reverse=True)
-)
+with st.sidebar:
+    selected_topic = st.selectbox(
+        "Choisir le topic à afficher",
+        sorted(df.topic.astype(int).unique(), reverse=True),
+    )
+    st.image(
+        os.path.join(input_path, "img", f"bertopic_{selected_topic}.png"),
+        caption=f"Mots représentatifs du topic {selected_topic}",
+    )
+with st.container():
+    ts_data = pd.read_csv(
+        os.path.join(input_path, "data", f"bertopic_ts_{selected_topic}.csv")
+    )
+    ts_data["date"] = pd.to_datetime(ts_data["date"])
+    # st.line_chart(ts_data, x="date", y="prop", color="party")
+
+    fig = px.line(ts_data, x="date", y="prop", color="party")
+    fig.update_layout(
+        legend=dict(orientation="h", yanchor="bottom", y=-0.35, xanchor="center", x=0.5)
+    )
+
+    st.plotly_chart(
+        fig,
+        theme="streamlit",
+        use_container_width=True,
+        config={"displayModeBar": False},
+    )
+
 render_tweets(df[df.topic == selected_topic].sort_values("text_length"), height=1200)
