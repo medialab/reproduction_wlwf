@@ -10,12 +10,12 @@ import plotly.express as px
 from utils import existing_dir_path
 
 color_palette = {
-    "majority": "#ffd16a",
+    "ensemble": "#ffd16a",
     "lr": "#0068C9",
     "nupes": "#ff2b2b",
     "rn": "#6d3fc0",
     "media": "#29b09d",
-    "majority_supp": "#ff8700",
+    "ensemble_supp": "#ff8700",
     "lr_supp": "#83c9ff",
     "nupes_supp": "#ffabab",
     "rn_supp": "mediumpurple",
@@ -23,8 +23,8 @@ color_palette = {
 }
 
 public_types = {
-    "députés": ["majority", "lr", "nupes", "rn"],
-    "supporters": ["majority_supp", "lr_supp", "nupes_supp", "rn_supp"],
+    "députés": ["ensemble", "lr", "nupes", "rn"],
+    "supporters": ["ensemble_supp", "lr_supp", "nupes_supp", "rn_supp"],
     "médias": ["media"],
     "public attentif": ["attentive"],
 }

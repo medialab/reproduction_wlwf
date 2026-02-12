@@ -7,7 +7,7 @@ echo "public,mean,median" > descriptive_stats_per_day.csv
 
 # congress
 
-for group in majority rn lr nupes ;
+for group in ensemble rn lr nupes ;
 do
     echo "congress $group"
     xan parallel groupby user_id 'count() as tweet_count' $DATA_PATH/data_source/congress/$group/*.csv -P "search -s retweeted_id -E" | \
@@ -49,7 +49,7 @@ xan behead >> descriptive_stats_per_day.csv ;
 
 # supporters
 
-for group in majority rn lr nupes ;
+for group in ensemble rn lr nupes ;
 do
     echo "supporters $group"
     xan parallel groupby user_id 'count() as tweet_count' $DATA_PATH/data_source/supporter/$group/*.csv -P "search -s retweeted_id -E" | \

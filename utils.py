@@ -15,7 +15,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from collections import defaultdict
 
 GROUPS = [
-    "majority",
+    "ensemble",
     "lr",
     "rn",
     "nupes",
@@ -516,7 +516,7 @@ def grep_group_name(filename):
         if group in filename.lower():
             group_name = group
             if group_name == "lrem":
-                group_name = "majority"
+                group_name = "ensemble"
             return group_name
     return ""
 
