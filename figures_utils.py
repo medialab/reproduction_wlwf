@@ -1,6 +1,7 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+from utils import create_dir
 
 
 def draw_topic_keywords(topic, words, x, root=os.getcwd()):
@@ -43,9 +44,14 @@ def draw_topic_keywords(topic, words, x, root=os.getcwd()):
     ax.set_yticks(np.arange(1, len(words) + 1))  # On fixe les ticks pour l'axe y
     ax.get_yaxis().set_tick_params(which="both", left=False, right=False)
 
+    output_folder = create_dir(
+        os.path.join(root, "data_prod", "dashboard", "bertopic", "img")
+    )
+
     fig.savefig(
-        os.path.join(root,
-            "data_prod", "dashboard", "bertopic", "img", "bertopic_{}.png".format(topic)
+        os.path.join(
+            output_folder,
+            "bertopic_{}.png".format(topic),
         )
     )
     plt.close()
