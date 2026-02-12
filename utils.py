@@ -872,12 +872,10 @@ def write_ids_and_representative_docs(
             doc_topic_pairs.append((doc_id, min_topic + topic_enum))
     doc_topic_pairs = sorted(doc_topic_pairs)
 
+    output_folder = create_dir(os.path.join(path, "data_prod", "dashboard", "bertopic"))
     with open(
         os.path.join(
-            path,
-            "data_prod",
-            "dashboard",
-            "bertopic",
+            output_folder,
             f"representative_docs_{public}.csv",
         ),
         "w",
@@ -1018,14 +1016,19 @@ def count_topics_info(topics, party_day_counts, group_type):
 
 
 def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_path):
+    output_folder = create_dir(
+        os.path.join(
+            origin_path,
+            "data_prod",
+            "dashboard",
+            "bertopic",
+            "data",
+        )
+    )
     for topic in tqdm(topics, desc="Write time series"):
         with open(
             os.path.join(
-                origin_path,
-                "data_prod",
-                "dashboard",
-                "bertopic",
-                "data",
+                output_folder,
                 f"bertopic_ts_{topic}.csv",
             ),
             "w" if group_type == "congress" else "a",
