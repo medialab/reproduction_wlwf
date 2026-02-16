@@ -981,15 +981,15 @@ def count_topics_info(topics, party_day_counts, group_type):
     """
 
     file_index = 0
-
+    count_outliers = 0
     if group_type == "supporter" or group_type == "congress":
         doc_count, party, day = party_day_counts[file_index]
-        count_outliers = 0
         topics_info = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
         doc_count_sum = doc_count
         for i, topic in enumerate(topics):
             while i >= doc_count_sum:
                 party_day_counts[file_index] = (doc_count - count_outliers, party, day)
+                count_outliers = 0
                 file_index += 1
                 doc_count, party, day = party_day_counts[file_index]
                 doc_count_sum += doc_count
@@ -999,12 +999,12 @@ def count_topics_info(topics, party_day_counts, group_type):
 
     else:
         doc_count, day = party_day_counts[file_index]
-        count_outliers = 0
         topics_info = defaultdict(lambda: defaultdict(int))
         doc_count_sum = doc_count
         for i, topic in enumerate(topics):
-            party_day_counts[file_index] = (doc_count - count_outliers, day)
             while i >= doc_count_sum:
+                party_day_counts[file_index] = (doc_count - count_outliers, day)
+                count_outliers = 0
                 file_index += 1
                 doc_count, day = party_day_counts[file_index]
                 doc_count_sum += doc_count

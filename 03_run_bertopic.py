@@ -166,6 +166,7 @@ for group in group_list:
             top_list = topic_model.get_topic(topic)
             top_words, top_ctfidf = zip(*top_list)
             write_keywords(topic, top_words, top_ctfidf, args.origin_path)
+
     else:
         topics, probs = topic_model.transform(docs, embeddings)
 
