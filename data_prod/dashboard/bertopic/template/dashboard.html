@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/css/style.css" />
+  <title>Topic {{ topic }}</title>
+  <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+
+<body>
+
+<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<select id="topic-select">
+  {% for t in all_topics %}
+    <option value="{{ t }}" {% if t == topic %}selected{% endif %}>
+      Topic {{ t }}
+    </option>
+  {% endfor %}
+</select>
+
+<!-- <h2>Topic {{ topic }}</h2> -->
+<div id="vis"></div>
+<div class="grid">
+  {% for public in ["media", "congress"] %}
+  <div>
+    <h3>{{ display_strings[public] }}</h3>
+
+    {% for t in tweets if t.public == public %}
+      {% if t.exists %}
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/{{ t.user }}/status/{{ t.id }}"></a>
+        </blockquote>
+      {% else %}
+        <div class="tweet-fallback-container">
+          <div class="tweet-fallback">
+            <strong>@{{ t.user }}</strong><br><br>
+              {{ t.text }}<br><br>
+            <a href="https://twitter.com/{{ t.user }}/status/{{ t.id }}">
+              {{ t.time }}
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+<script async src="https://platform.twitter.com/widgets.js"></script>
+<script>
+  document.getElementById("topic-select").addEventListener("change", function () {
+    const topic = this.value;
+    window.location.href = `topic_${topic}.html`;
+  });
+</script>
+<script type="text/javascript">
+    var opt = {"renderer": "canvas", "actions": false};
+    function render(spec, opt) {
+      console.log("coucou altair");
+      vegaEmbed("#vis", spec, opt);
+    }
+    fetch('/json/data.json')
+        .then(res => res.json())
+        .then(spec => render(spec))
+        .catch(err => console.error(err));
+  </script>
+
+</body>
+</html>

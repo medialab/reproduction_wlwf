@@ -1,0 +1,29 @@
+body {
+    font-family: system-ui;
+    margin: 0;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.tweet-fallback-container {
+    margin-bottom: 16px;
+    max-width: 550px;
+}
+
+.tweet-fallback {
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    font-size: 18px;
+}
+
+.tweet-fallback:hover {
+  background-color: #fafafa;
+}
