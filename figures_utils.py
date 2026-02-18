@@ -15,7 +15,6 @@ def draw_topic_keywords(topic, words, x, root=os.getcwd()):
     ax = fig.add_subplot()
 
     interval_x = (max(x) - min(x)) / len(x)
-    interval_y = range(len(words))
 
     max_word_length = max(
         len(word) for word in words

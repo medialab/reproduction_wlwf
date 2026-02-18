@@ -6,6 +6,10 @@ body {
     margin: auto;
 }
 
+#vis {
+    margin: 12px;
+}
+
 .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

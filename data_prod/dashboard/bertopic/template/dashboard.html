@@ -56,16 +56,11 @@
   });
 </script>
 <script type="text/javascript">
-    var opt = {"renderer": "canvas", "actions": false};
-    function render(spec, opt) {
-      console.log("coucou altair");
-      vegaEmbed("#vis", spec, opt);
-    }
-    fetch('/json/data.json')
-        .then(res => res.json())
-        .then(spec => render(spec))
-        .catch(err => console.error(err));
-  </script>
+  var spec = {{json_chart}};
+  console.log(spec);
+  var opt = {"renderer": "canvas", "actions": false};
+  vegaEmbed("#vis", spec, opt);
+</script>
 
 </body>
 </html>

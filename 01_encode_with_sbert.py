@@ -44,7 +44,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "public",
     choices=choices,
-    help="Choose the political group you want to encode : congress, attentive, media, general, supporter",
+    help="Choose the political group you want to encode : congress, attentive, media, supporter",
 )
 
 parser.add_argument(
