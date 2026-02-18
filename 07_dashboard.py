@@ -5,9 +5,11 @@ import pandas as pd
 import altair as alt
 from jinja2 import Environment, FileSystemLoader
 
+from utils import RANDOM_SEED
+
 INPUT_PATH = os.path.join("data_prod", "dashboard", "bertopic")
-OUTPUT_PATH = os.path.join(INPUT_PATH, "site")
 TEMPLATE_PATH = os.path.join(INPUT_PATH, "template")
+OUTPUT_PATH = os.path.join("docs")
 
 df = []
 for public in ["media", "congress"]:
@@ -26,6 +28,7 @@ display_strings = {"media": "médias", "congress": "députés"}
 
 
 def tweet_exists(username, tweet_id):
+    random.seed(RANDOM_SEED)
     render = random.choices([1, 0], weights=[0.8, 0.2])
     if render:
         url = "https://publish.twitter.com/oembed"
