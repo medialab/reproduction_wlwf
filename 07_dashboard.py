@@ -1,7 +1,8 @@
 import os
-import altair as alt
-from vega_datasets import data
+import random
+import requests
 import pandas as pd
+import altair as alt
 from jinja2 import Environment, FileSystemLoader
 
 INPUT_PATH = os.path.join("data_prod", "dashboard", "bertopic")
@@ -25,14 +26,13 @@ display_strings = {"media": "médias", "congress": "députés"}
 
 
 def tweet_exists(username, tweet_id):
-    return True
-    # render = random.choices([1, 0], weights=[0.8, 0.2])
-    # if render:
-    #     url = "https://publish.twitter.com/oembed"
-    #     params = {"url": f"https://twitter.com/{username}/status/{tweet_id}"}
-    #     r = requests.get(url, params=params, timeout=10)
-    #     return r.status_code == 200
-    # return False
+    render = random.choices([1, 0], weights=[0.8, 0.2])
+    if render:
+        url = "https://publish.twitter.com/oembed"
+        params = {"url": f"https://twitter.com/{username}/status/{tweet_id}"}
+        r = requests.get(url, params=params, timeout=30)
+        return r.status_code == 200
+    return False
 
 
 env = Environment(loader=FileSystemLoader(TEMPLATE_PATH))
@@ -85,7 +85,13 @@ for topic in all_topics:
     # "rn_supp": "mediumpurple",
     # "attentive": "#d5dae5",
     chart = (
-        alt.Chart(ts_data)
+        alt.Chart(
+            ts_data,
+            title=alt.Title(
+                f"Proportion d'attention accordée au topic {topic} par chacun des publics au cours du temps",
+                subtitle="Il s'agit du nombre de tweets consacrés à ce topic rapporté au nombre de tweets émis le même jour par le même public.",
+            ),
+        )
         .configure_range(
             category=[
                 "#ffd16a",
@@ -103,7 +109,7 @@ for topic in all_topics:
         .mark_line()
         .encode(
             x="date:T",
-            y="prop:Q",
+            y=alt.Y("prop:Q").axis(format="%").title("proportion d'attention"),
             color=alt.Color(
                 "party:N",
                 sort=[
