@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 23</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Propos racistes à l'Assemblée</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" >
-      Topic 9
-    </option>
-
-    <option value="10" >
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" selected>
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" >
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" >
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" >
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
-    <option value="58" >
-      Topic 58
+  
+    <option value="40" >
+      Logement
     </option>
-
-    <option value="59" >
-      Topic 59
+  
+    <option value="18" >
+      Précarité étudiante
     </option>
-
-    <option value="61" >
-      Topic 61
-    </option>
-
-    <option value="62" >
-      Topic 62
-    </option>
-
-    <option value="63" >
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
-    <option value="74" >
-      Topic 74
-    </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
-    <option value="78" >
-      Topic 78
-    </option>
-
-    <option value="79" >
-      Topic 79
-    </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
+  
     <option value="85" >
-      Topic 85
+      Innovation, FrenchTech et startups françaises
     </option>
-
-    <option value="86" >
-      Topic 86
+  
+    <option value="42" >
+      Uber
     </option>
-
-    <option value="87" >
-      Topic 87
+  
+    <option value="2" >
+      Hôpital et santé publique
     </option>
-
-    <option value="88" >
-      Topic 88
+  
+    <option value="58" >
+      Prévention et traitement du cancer
     </option>
-
-    <option value="89" >
-      Topic 89
+  
+    <option value="61" >
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="90" >
-      Topic 90
+  
+    <option value="5" >
+      Education nationale
     </option>
-
+  
+    <option value="74" >
+      Harcèlement scolaire
+    </option>
+  
+    <option value="78" >
+      Uniforme à l'école
+    </option>
+  
+    <option value="1" >
+      Énergie et transition énergétique
+    </option>
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" >
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" >
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" >
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" selected="selected">
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" >
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" >
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 23</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_23.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@lobs</strong><br><br>
-              Ce que risque le député RN Grégoire de Fournas après ses propos racistes à l’Assemblée<br><br>
-            <a href="https://twitter.com/lobs/status/1588476550495838208">
-              2022-11-04 11:21:36
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@sudouest</strong><br><br>
-              Propos racistes à l’Assemblée nationale : que risque le député Grégoire de Fournas (RN) ?<br><br>
-            <a href="https://twitter.com/sudouest/status/1588249851321470977">
-              2022-11-03 20:20:47
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@sudouest</strong><br><br>
-              Propos racistes à l’Assemblée : le député RN du Médoc Grégoire de Fournas en pleine tourmente<br><br>
-            <a href="https://twitter.com/sudouest/status/1588273872784302081">
-              2022-11-03 21:56:14
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@RTLFrance</strong><br><br>
-              Propos racistes à l'Assemblée : le député RN Grégoire de Fournas exclu 15 jours de l'hémicycle<br><br>
-            <a href="https://twitter.com/RTLFrance/status/1588556665711910914">
-              2022-11-04 16:39:57
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              Propos racistes de Grégoire de Fournas: pourquoi le député RN ne risque rien sur le plan judiciaire<br><br>
-            <a href="https://twitter.com/BFMTV/status/1588520441798602752">
-              2022-11-04 14:16:01
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@actufr</strong><br><br>
-              Qui est Grégoire de Fournas, le député RN de Gironde, accusé de racisme à l'#Assemblée ? #QAG via @ActufrBordeaux<br><br>
-            <a href="https://twitter.com/actufr/status/1588267772911329280">
-              2022-11-03 21:32:00
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@RTLFrance</strong><br><br>
-              Propos jugés racistes à l'Assemblée nationale : sanction maximale prononcée contre le député RN Grégoire de Fournas<br><br>
-            <a href="https://twitter.com/RTLFrance/status/1588563053091627008">
-              2022-11-04 17:05:20
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Midilibre</strong><br><br>
-              Insulte raciste à l'Assemblée nationale : la sanction la plus lourde contre le député RN Grégoire de Fournas adoptée<br><br>
-            <a href="https://twitter.com/Midilibre/status/1588560058073350145">
-              2022-11-04 16:53:26
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@actufr</strong><br><br>
-              "Lâche" ou victime de LFI ? Accusé de racisme, le député RN Grégoire de Fournas dans la tourmente ⤵️ via @ActufrBordeaux<br><br>
-            <a href="https://twitter.com/actufr/status/1588479573771288576">
-              2022-11-04 11:33:37
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CPAveyron</strong><br><br>
-              🔴 #Politique Propos racistes à l’Assemblée nationale : quelles sont les sanctions encourues par le député RN Grégoire De Fournas ?<br><br>
-            <a href="https://twitter.com/CPAveyron/status/1588421385990410242">
-              2022-11-04 07:42:24
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/lobs/status/1588476550495838208"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/sudouest/status/1588249851321470977"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/sudouest/status/1588273872784302081"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/RTLFrance/status/1588556665711910914"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1588520441798602752"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/actufr/status/1588267772911329280"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/RTLFrance/status/1588563053091627008"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Midilibre/status/1588560058073350145"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/actufr/status/1588479573771288576"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CPAveyron/status/1588421385990410242"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BilongoCarlos</strong><br><br>
-              Ma déclaration suite à l’interpellation raciste du deputé RN Grégoire de Fournas<br><br>
-            <a href="https://twitter.com/BilongoCarlos/status/1588230798402011136">
-              2022-11-03 19:05:04
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MathildePanot</strong><br><br>
-              🔴 Propos racistes dans l’hémicycle : la NUPES demande la plus haute sanction contre Grégoire de Fournas.<br><br>
-            <a href="https://twitter.com/MathildePanot/status/1588221495829987329">
-              2022-11-03 18:28:06
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@leboucher_elise</strong><br><br>
-              Soutien total à mon collègue @BilongoCarlos « BilongoCarlos: Ma déclaration suite à l’interpellation raciste du deputé RN Grégoire de Fournas — »<br><br>
-            <a href="https://twitter.com/leboucher_elise/status/1588231893589303297">
-              2022-11-03 19:09:26
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MaximeLaisneyFi</strong><br><br>
-              La parole à @BilongoCarlos , député LFI-NUPES de la République : « BilongoCarlos: Ma déclaration suite à l’interpellation raciste du deputé RN Grégoire de Fournas — »<br><br>
-            <a href="https://twitter.com/MaximeLaisneyFi/status/1588239875379183623">
-              2022-11-03 19:41:09
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@SegoleneAmiot</strong><br><br>
-              ⚠️Le Rassemblement National nous montre son vrai visage Le parti fondé par des nazis ne change pas #haine #racisme #JeSoutiensCarlos « BilongoCarlos: Ma déclaration suite à l’interpellation raciste du deputé RN Grégoire de Fournas — »<br><br>
-            <a href="https://twitter.com/SegoleneAmiot/status/1588234963266277376">
-              2022-11-03 19:21:37
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ErsiliaSoudais</strong><br><br>
-              Soutien total, camarade et collègue ! ✊ Face au #racisme et au #fascisme du #RN et de toute la fange d'extrême droite, nous ne cèderons pas. « BilongoCarlos: Ma déclaration suite à l’interpellation raciste du deputé RN Grégoire de Fournas — »<br><br>
-            <a href="https://twitter.com/ErsiliaSoudais/status/1588237628410929164">
-              2022-11-03 19:32:13
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LeoWalter04</strong><br><br>
-              Admirable réaction de @BilongoCarlos. Sa dignité et son calme ne font que renforcer le contraste avec les éructations racistes de @gdefournas. « BilongoCarlos: Ma déclaration suite à l’interpellation raciste du deputé RN Grégoire de Fournas — »<br><br>
-            <a href="https://twitter.com/LeoWalter04/status/1588232445958098944">
-              2022-11-03 19:11:37
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@RaquelGarridoFr</strong><br><br>
-              La récidive. Grégoire de Fournas est un militant d’extrême-droite qui veut imposer sa vision du monde à la République. Il sait très bien ce qu’il fait. Les faux-naïfs qui relaient la version des faits RN savent à quoi s’en tenir. « 2022Elections: 🔴⚡️ Sur @BFMTV, le député RN Grégoire de Fournas accuse le député LFI Carlos Martens Bilongo de « victimisation communautaire ». Il affirme aussi ne pas avoir supprimé ses tweets à caractère raciste. — »<br><br>
-            <a href="https://twitter.com/RaquelGarridoFr/status/1588482500871196672">
-              2022-11-04 11:45:15
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MathildeHignet</strong><br><br>
-              Total soutien à mon collègue @BilongoCarlos, victime d’insulte raciste par le député RN G. de Fournas pendant les #QAG à l'Assemblée Nationale. Ces propos scandaleux n'ont leur place nulle part. Ne laissons pas passer ce genre d'insulte ! #JesoutiensCarlos « FiAssemblee: 🔴 Notre groupe apporte son soutien total à notre député @BilongoCarlos, qui a fait l'objet d'une immonde insulte raciste de la part d'un député RN. Nous demandons la sanction la plus haute permise par notre règlement : la censure et l'exclusion de ce député raciste. — »<br><br>
-            <a href="https://twitter.com/MathildeHignet/status/1588219809631805441">
-              2022-11-03 18:21:24
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Portes_Thomas</strong><br><br>
-              Votre stratégie de défense et égale aux propos de votre député : raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. Raciste. « MLP_officiel: Grégoire de Fournas a évidemment parlé des migrants transportés en bateaux par les ONG qu’évoquait notre collègue dans sa question au gouvernement. La polémique créée par nos adversaires politiques est grossière et ne trompera pas les Français. — »<br><br>
-            <a href="https://twitter.com/Portes_Thomas/status/1588295936220221442">
-              2022-11-03 23:23:54
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BilongoCarlos/status/1588230798402011136"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MathildePanot/status/1588221495829987329"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/leboucher_elise/status/1588231893589303297"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MaximeLaisneyFi/status/1588239875379183623"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/SegoleneAmiot/status/1588234963266277376"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ErsiliaSoudais/status/1588237628410929164"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LeoWalter04/status/1588232445958098944"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/RaquelGarridoFr/status/1588482500871196672"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MathildeHignet/status/1588219809631805441"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Portes_Thomas/status/1588295936220221442"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 23 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>

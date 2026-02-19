@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 85</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Innovation, FrenchTech et startups françaises</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" >
-      Topic 9
-    </option>
-
-    <option value="10" >
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" >
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" >
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" >
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" >
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
+  
+    <option value="40" >
+      Logement
+    </option>
+  
+    <option value="18" >
+      Précarité étudiante
+    </option>
+  
+    <option value="85" selected="selected">
+      Innovation, FrenchTech et startups françaises
+    </option>
+  
+    <option value="42" >
+      Uber
+    </option>
+  
+    <option value="2" >
+      Hôpital et santé publique
+    </option>
+  
     <option value="58" >
-      Topic 58
+      Prévention et traitement du cancer
     </option>
-
-    <option value="59" >
-      Topic 59
-    </option>
-
+  
     <option value="61" >
-      Topic 61
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="62" >
-      Topic 62
+  
+    <option value="5" >
+      Education nationale
     </option>
-
-    <option value="63" >
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
+  
     <option value="74" >
-      Topic 74
+      Harcèlement scolaire
     </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
+  
     <option value="78" >
-      Topic 78
+      Uniforme à l'école
     </option>
-
-    <option value="79" >
-      Topic 79
+  
+    <option value="1" >
+      Énergie et transition énergétique
     </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
-    <option value="85" selected>
-      Topic 85
-    </option>
-
-    <option value="86" >
-      Topic 86
-    </option>
-
-    <option value="87" >
-      Topic 87
-    </option>
-
-    <option value="88" >
-      Topic 88
-    </option>
-
-    <option value="89" >
-      Topic 89
-    </option>
-
-    <option value="90" >
-      Topic 90
-    </option>
-
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" >
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" >
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" >
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" >
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" >
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" >
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 85</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_85.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LaTribuneBdx</strong><br><br>
-              Avec un financement de 70 millions d'euros, Groupe Berkem va encore racheter des entreprises<br><br>
-            <a href="https://twitter.com/LaTribuneBdx/status/1589854762195095554">
-              2022-11-08 06:38:08
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Contexte</strong><br><br>
-              [France 2030] La stratégie d’accélération « Santé numérique » récupère 48,4 millions de plus pour la formation Extrait du briefing de @ContexteEsante<br><br>
-            <a href="https://twitter.com/Contexte/status/1595797118543106051">
-              2022-11-24 16:10:56
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              🤝 Les investissements industriels en France doublent par rapport à l'année dernière 💸 Cette année, on a eu 4 annonces de projets industriels dépassant le milliard d'euros<br><br>
-            <a href="https://twitter.com/BFMTV/status/1608795236892901376">
-              2022-12-30 13:00:49
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@acteurspublics</strong><br><br>
-              L’État a injecté 90 millions d’euros pour soutenir des projets numériques dans les collectivités. Avec un défi de taille, désormais : réussir leur déploiement dans un maximum de territoires.<br><br>
-            <a href="https://twitter.com/acteurspublics/status/1616483622894329858">
-              2023-01-20 18:11:43
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@france3Bretagne</strong><br><br>
-              Le ministre délégué à la Transition numérique, Jean-Noël Barrot annonce à Rennes une série de mesures pour créer un "bouclier cyber" à destination notamment des PME et des collectivités, pour une enveloppe de 30 millions d'euros.<br><br>
-            <a href="https://twitter.com/france3Bretagne/status/1592902681995010049">
-              2022-11-16 16:29:28
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LaTribune</strong><br><br>
-              [Article partenaire] contribue à l’économie en France «Notre stratégie vise d'une part à favoriser la transformation des entreprises [...] et d'autre part à les aider à s'inscrire dans une nouvelle économie», affirme Julien Groues.<br><br>
-            <a href="https://twitter.com/LaTribune/status/1575164158630404101">
-              2022-09-28 18:42:55
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@acteurspublics</strong><br><br>
-              🟡 Rencontre avec @FlorenceCanton, cheffe du service numérique de @justice_gouv qui intervenait dans le cadre du colloque “L’action publique peut-elle se passer du cloud ☁️ ?” organisé le 13 décembre par Acteurs publics avec le soutien de S3NS !<br><br>
-            <a href="https://twitter.com/acteurspublics/status/1609956465061793792">
-              2023-01-02 17:55:07
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@acteurspublics</strong><br><br>
-              La nouvelle stratégie de la direction interministérielle du numérique ambitionne de généraliser la méthode start-up d’État pour faire réussir les politiques prioritaires du gouvernement. Et de positionner la Dinum en DRH de la filière numérique de l’État<br><br>
-            <a href="https://twitter.com/acteurspublics/status/1633909109375287309">
-              2023-03-09 20:14:22
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@acteurspublics</strong><br><br>
-              Interview de @NicolasDufourcq, directeur général de @Bpifrance dans le cadre des entretiens de la rencontre des entrepreneurs de France 2022 #LaREF22 @NicolasDufourcq : Il ne faut jamais rater l’opportunité d’une crise. Ça c’est la qualité de l’entrepreneur #LaREF22 . @NicolasDufourcq : la @Bpifrance est jeune et créative, elle est certainement portée par sa propre dynamique. Ce que nous avons créé en 2022, c’est nouveau, unique en Europe #LaREF22 . @NicolasDufourcq : Aujourd’hui, nous avons une autre mission qui n’était pas celle à l’origine de la création de la @Bpifrance il y a 10 ans ➡️Faire pivoter tout l’appareil productif #LaREF22 . @NicolasDufourcq sur la capacité de la @Bpifrance à s’adapter en période particulière et aux évolutions : La force c’est le capital et c’est également de la compétence #LaREF22<br><br>
-            <a href="https://twitter.com/acteurspublics/status/1564590237665353728">
-              2022-08-30 14:25:55
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LaTribune</strong><br><br>
-              [À DÉROULER ⤵] Le gouvernement a dévoilé les 16 Capitales et les 32 Communautés françaises labellisées pour la période 2023-2025 par la Mission #FrenchTech 🔍 L'objectif: développer et faire rayonner la tech sur tous les territoires 💬 ENTRETIEN - Le ministre délégué au Numérique et aux Télécommunications, Jean-Noël Barrot, et la directrice de la Mission #FrenchTech, Clara Chappaz, expliquent dans une interview croisée cette stratégie 🔍 La Réunion, porte-étendard de l'innovation dans les Outre-Mer Grâce à son ambition de devenir le principal hub de l'innovation ultra-marine, La Réunion est le premier territoire d'Outre-Mer à obtenir la labellisation Capitale #FrenchTech 💡 Retour en métropole, #FrenchTech Paris-Saclay, nouvelle capitale des deeptech L'antenne de la French Tech à Paris-Saclay présente une particularité : 75% de ses startups adhérentes sont des deeptech 📈 De son côté, comment la Bourgogne-Franche-Comté est-elle devenue attractive pour les #startups? Après avoir reçu le label «Communauté #FrenchTech» en 2019, la région passe un cap en devenant «Capitale French Tech»<br><br>
-            <a href="https://twitter.com/LaTribune/status/1621152778461798402">
-              2023-02-02 15:25:16
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LaTribuneBdx/status/1589854762195095554"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Contexte/status/1595797118543106051"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1608795236892901376"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/acteurspublics/status/1616483622894329858"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/france3Bretagne/status/1592902681995010049"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LaTribune/status/1575164158630404101"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/acteurspublics/status/1609956465061793792"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/acteurspublics/status/1633909109375287309"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/acteurspublics/status/1564590237665353728"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LaTribune/status/1621152778461798402"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LisettePollet</strong><br><br>
-              Quand allons faire de même et évitez de nous sortir le refrain habituel que cela n’est pas possible les espagnols y arrivent !.#tva0% « BFMTV: Le gouvernement espagnol supprime la TVA sur les denrées de première nécessité — »<br><br>
-            <a href="https://twitter.com/LisettePollet/status/1608102040177197057">
-              2022-12-28 15:06:18
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LeoWalter04</strong><br><br>
-              Le projet de loi pour le financement de la sécurité sociale en 2023 est mortifère. Les milliards doivent aller là où ils sont nécessaires : aux services publics et en particulier l’hôpital ! Notre rapport d’enquête #AllôSégur↩️ ➡️ #NUPES #PLFSS<br><br>
-            <a href="https://twitter.com/LeoWalter04/status/1584960163559063552">
-              2022-10-25 19:28:44
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MIRALLESMP</strong><br><br>
-              Il y a les forces morales que nous cultivons et les moyens que nous mobilisons : 413 milliards d’€ pour la prochaine loi de programmation militaire, @EmmanuelMacron s’engage de manière historique pour garantir notre sécurité. D ́ici 2030 nous aurons doublé nos moyens aux #armées. « EmmanuelMacron: Nous allons transformer nos armées. — »<br><br>
-            <a href="https://twitter.com/MIRALLESMP/status/1616450106085052417">
-              2023-01-20 15:58:32
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@alma_dufour</strong><br><br>
-              En pleine réforme des retraites, Macron donne la légion d'honneur au patron qui : - a permis une fraude massive à la TVA sur - a contribué à la destruction de 85 000 emplois dans le commerce en France Dis moi qui sont tes amis, je te dirais qui tu es « paul_denton: Macron décore Jeff Bezos en secret. Le président a remis les insignes de la Légion d'honneur au fondateur d'Amazon le 16 février, sans aucune communication sur le sujet, relate Le Point. Le jour-même, les Français défilaient contre la réforme des retraites... — »<br><br>
-            <a href="https://twitter.com/alma_dufour/status/1628684421673918465">
-              2023-02-23 10:13:20
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LopezLiguori</strong><br><br>
-              🚨Je répondais à une question de Mme Simonet (LFI) lors de la présentation de mon rapport pour avis. Elle m'accuse de faire le jeu des puissants mais utilise les arguments des lobbyistes des GAFAM. #LFI dans toute sa splendeur ! #SouveraineteNumerique « SimonnetDeputee: La souveraineté numérique est un enjeu démocratique: faire du numérique un bien commun qui ne crée pas de nouvelles inégalités et restreigne les libertés au profit de quelques le pari du logiciel libre,protégeons la neutralité du net et les droits des usagers. — »<br><br>
-            <a href="https://twitter.com/LopezLiguori/status/1580233893944340480">
-              2022-10-12 18:28:14
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Farida_Amrani_</strong><br><br>
-              Lors de la visite du ministre de la Santé @FrcsBraun au @CHSF91 nous avons pu observer la paralysie des services de l'hôpital, ciblé par une cyber-attaque dimanche dernier. 1/3 Hors de question de céder aux criminels. Dans le cadre d'un vaste plan pour la cybersécurité de nos hôpitaux, le ministre annonce le déblocage de 20 millions d’euros supplémentaires. Une mesure essentielle pour la protection des établissements de santé. 2/3 Je n'ai pas manqué de lui rappeler mon alerte du 22 juin sur les sous-investissements chroniques et le manque de personnel. Nous avons eu des paroles, nous attendons des actes. Je remercie une nouvelle fois les agents hospitaliers pour leur engagement sans faille. 🙏🏼 3/3<br><br>
-            <a href="https://twitter.com/Farida_Amrani_/status/1563222047836483587">
-              2022-08-26 19:49:14
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@KelouaF</strong><br><br>
-              📢Retrouvez à travers ce THREAD l'examen en direct de ma proposition de loi en commission affaires culturelles et éducation ! 🧶 Pour rappel, à l'occasion de la #nicheparlementaire des @socialistesAN j'ai déposé une proposition de loi pour rétablir le repas à 1euro pour tous les étudiants. Aujourd'hui nous examinons ma proposition de loi en commission avant de l'examiner en séance le 9/02. ❌Le premier amendement que j'ai proposé a été refusé par la majorité des députés de la majorité présidentielle et des Républicains. 🧶 Le deuxième amendement examiné en commission a également été rejeté❌ Le troisième amendement porté par Les Républicains visait à conditionner le tarif du repas CROUS à des heures de bénévolat. J'ai évidemment, rendu un avis défavorable à cet amendement. ❌ ❌Le 4e amendement a également été rejeté.🧶 ❌Les 5e, 6e et 7e amendement étant des amendements identiques ont été voté ensemble. Ils ont été adopté, entrainant ainsi un changement de sens de la proposition de loi. ❌ ❌ Le 8e amendement était mon amendement. Celui-ci avait pour objectif d'inscrire dans la loi des standards de qualité de repas. Pourtant, celui ci a été rejeté par LR et la majorité présidentielle.<br><br>
-            <a href="https://twitter.com/KelouaF/status/1620703252244496386">
-              2023-02-01 09:39:01
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CarolineYADAN</strong><br><br>
-              L’Assemblée nationale a adopté, hier soir, la quatrième partie du projet de loi de financement de la Sécurité sociale pour 2023 pour laquelle plus de 150 amendements ont été retenus. 🧶 Les @DeputesRE ont obtenu des avancées importantes : 👉 Pour renforcer l’accès aux soins et améliorer la prévention : rendez-vous de prévention aux âges clés de la vie ; prise en charge à 100% et sans ordonnance de la contraception d’urgence pour les femmes en âge de procréer et du dépistage de certaines IST, etc. Pour lutter contre les déserts médicaux : contrat unique d’incitation à l’installation, étendu aux remplaçants et internes en médecine ; tarification à l’acte pour les internes de 4ème année en médecine générale ; etc. Pour améliorer le quotidien de nos aînés : renforcement du contrôle et de la transparence financière des EHPAD et leurs groupes gestionnaires ; modernisation du financement des services d’autonomie à domicile pour plus de justice et d’efficacité. Pour soutenir les familles : calcul ➕ progressif pour l’aide à la garde individuelle ; dispositif étendu aux enfants jusqu’à 12 ans pour les familles monoparentales ; avance par les employeurs du montant des indemnités journalières en cas de congé maternité/paternité).<br><br>
-            <a href="https://twitter.com/CarolineYADAN/status/1585655473428217858">
-              2022-10-27 17:31:39
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MFesneau</strong><br><br>
-              #PFUE2022 | Aujourd'hui, se concluent 6 mois de travail sous notre Présidence, en Européens et au service de nos agricultures ! Ensemble, et avec le travail mené par @J_Denormandie, nous avons avancé sur de nombreux sujets ⤵️ ➡️La réciprocité des normes, notamment les mesures miroirs. Notre Présidence a permis d'inscrire durablement cette question, notamment pour le monde agricole. Le chemin continue pour que les exigences demandées à nos producteurs FR et UE soient les mêmes dans nos importations. ➡️Le rôle de nos agriculteurs face au défi climatique avec l’agriculture bas-carbone. L'engagement a été pris par les Etats en faveur d’un cadre UE valorisant les pratiques de réduction et de captation du carbone par nos agriculteurs. Dès la fin 2022, un texte sera présenté. ➡️Le soutien continu et sans faille à l'#Ukraine pour garantir la sécurité alimentaire mondiale et dégager les voies de solidarités en Europe. L'initiative #FARM poursuit son déploiement avec, récemment, la mobilisation des acteurs du secteur privé. D'autres chantiers majeurs ont pu être amorcés comme une stratégie vaccinale dans le cadre de la lutte contre le virus de l'influenza aviaire. Je souhaite tous mes vœux de succès à la Présidence tchèque et à mon collègue @ZNekula. Nous continuerons d'agir en Européens.<br><br>
-            <a href="https://twitter.com/MFesneau/status/1542503523748675584">
-              2022-06-30 15:41:13
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MartineEtienne_</strong><br><br>
-              🔴"La Poste est entrée dans une logique de concurrence commerciale mettant ainsi la pression sur le personnel pour toujours plus de résultats ! L’usager est devenu un client, et la poste s’est éloignée de ses missions de Service Public." ⤵️ "La baisse drastique des effectifs entraine une surcharge de travail pour ceux qui restent. Au final on se retrouve avec beaucoup d’emplois non pourvus, des départs en retraites non remplacés, et des employés épuisés."⤵️ Les tournées des facteurs s’allongent, se complexifient, et finalement, ne sont plus à taille humaine. Les logiciels et la mécanisation les amènent à passer plus de temps à l’extérieur, plus chargés en courrier, sous les intempéries ou les chaleurs excessives de l’été dernier ⤵️ Des bureaux de poste ferment progressivement, les usagers doivent parfois faire plusieurs dizaines de kilomètres pour trouver un bureau ouvert. ⤵️ Cette logique de rentabilité a de graves conséquences sur les employés. Leur sécurité est mise à mal par le rallongement des tournées. Leur santé en prend un sévère coup. Le nombre des suicides explose, et l’État ne semble pas s’en inquiéter outre mesure. ⤵️ En 2013, un cadre s’est suicidé parce que la Poste l’a obligé à travailler sur les suicides au sein de l’entreprise, alors qu’il était en burn-out ! ⤵️ Cette proposition de loi supprime les CHSCT, pourtant essentiels dans le traitement des questions de santé et de sécurité au travail. Elle diminue le nombre de représentants du personnel, et enlève des moyens aux instances de dialogue social à la Poste ⤵️ Nous nous battons contre cette loi. Parce que Le cœur de la poste, ça n’est pas de faire du profit, ou d’être rentable et lucrative. Le cœur de La Poste c’est la proximité. La création de lien. C’est de savoir pendre le temps. D’accompagner les usagers au quotidien. ⤵️ Nous voulons rendre à la poste ses missions de service public, redonner du sens et e la dignité au métier de Postier. Il est temps de parler de la santé au travail. Il est temps de rajouter de la proximité. Il est temps que La Poste redevienne un Service Public.<br><br>
-            <a href="https://twitter.com/MartineEtienne_/status/1592191866631770112">
-              2022-11-14 17:24:57
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LisettePollet/status/1608102040177197057"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LeoWalter04/status/1584960163559063552"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MIRALLESMP/status/1616450106085052417"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/alma_dufour/status/1628684421673918465"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LopezLiguori/status/1580233893944340480"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Farida_Amrani_/status/1563222047836483587"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/KelouaF/status/1620703252244496386"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CarolineYADAN/status/1585655473428217858"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MFesneau/status/1542503523748675584"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MartineEtienne_/status/1592191866631770112"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 85 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>

@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" type=“text/css” href="css/style.css"/>
-  <title>Topic {{ topic }}</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>{{ titles[topic] }}</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,17 +11,23 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-  {% for t in all_topics %}
-    <option value="{{ t }}" {% if t == topic %}selected{% endif %}>
-      Topic {{ t }}
+  {% for t, title in titles.items() %}
+    <option value="{{ t }}" {% if t == topic %}selected="selected"{% endif %}>
+      {{ title }}
     </option>
   {% endfor %}
 </select>
 
-<!-- <h2>Topic {{ topic }}</h2> -->
-<div id="vis"></div>
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_{{topic}}.png">
+</div>
+
+
 <div class="grid">
   {% for public in ["media", "congress"] %}
   <div>

@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 9</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Agression Permanence / Immigration / Extrême-Droite</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" selected>
-      Topic 9
-    </option>
-
-    <option value="10" >
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" >
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" >
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" >
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" >
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
-    <option value="58" >
-      Topic 58
+  
+    <option value="40" >
+      Logement
     </option>
-
-    <option value="59" >
-      Topic 59
+  
+    <option value="18" >
+      Précarité étudiante
     </option>
-
-    <option value="61" >
-      Topic 61
-    </option>
-
-    <option value="62" >
-      Topic 62
-    </option>
-
-    <option value="63" >
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
-    <option value="74" >
-      Topic 74
-    </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
-    <option value="78" >
-      Topic 78
-    </option>
-
-    <option value="79" >
-      Topic 79
-    </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
+  
     <option value="85" >
-      Topic 85
+      Innovation, FrenchTech et startups françaises
     </option>
-
-    <option value="86" >
-      Topic 86
+  
+    <option value="42" >
+      Uber
     </option>
-
-    <option value="87" >
-      Topic 87
+  
+    <option value="2" >
+      Hôpital et santé publique
     </option>
-
-    <option value="88" >
-      Topic 88
+  
+    <option value="58" >
+      Prévention et traitement du cancer
     </option>
-
-    <option value="89" >
-      Topic 89
+  
+    <option value="61" >
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="90" >
-      Topic 90
+  
+    <option value="5" >
+      Education nationale
     </option>
-
+  
+    <option value="74" >
+      Harcèlement scolaire
+    </option>
+  
+    <option value="78" >
+      Uniforme à l'école
+    </option>
+  
+    <option value="1" >
+      Énergie et transition énergétique
+    </option>
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" >
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" >
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" >
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" >
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" selected="selected">
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" >
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 9</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_9.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              🔴 Gérald Darmanin (@GDarmanin) est l'invité de BFMTV<br><br>
-            <a href="https://twitter.com/BFMTV/status/1551963243769434112">
-              2022-07-26 18:10:46
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LeMessagerfr</strong><br><br>
-              Haute-Savoie: mais qu’est venu faire Gérald Darmanin à Vulbens?<br><br>
-            <a href="https://twitter.com/LeMessagerfr/status/1630235818726944771">
-              2023-02-27 16:58:02
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@20Minutes</strong><br><br>
-              Gérald Darmanin en visite à Lyon sur fond de tensions avec le maire<br><br>
-            <a href="https://twitter.com/20Minutes/status/1568234088326381568">
-              2022-09-09 15:45:17
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ledauphine</strong><br><br>
-              Politique. Gérald Darmanin, à la droite de Jupiter #DauphineLibere #<br><br>
-            <a href="https://twitter.com/ledauphine/status/1551619573518159876">
-              2022-07-25 19:25:08
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              3000 "étrangers délinquants" expulsés en deux ans, selon Gérald Darmanin<br><br>
-            <a href="https://twitter.com/BFMTV/status/1553413391624146951">
-              2022-07-30 18:13:08
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Nice_Matin</strong><br><br>
-              "étrangers délinquants" expulsés en deux ans, selon Gérald Gérald Darmanin<br><br>
-            <a href="https://twitter.com/Nice_Matin/status/1553639617265557504">
-              2022-07-31 09:12:04
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              Délinquance: Gérald Darmanin veut se montrer "ferme avec la minorité d'emmerdeurs"<br><br>
-            <a href="https://twitter.com/BFMTV/status/1561245468784529410">
-              2022-08-21 08:55:00
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CNEWS</strong><br><br>
-              La République en Marche doit «parler aux tripes des Français», pour Gérald Darmanin<br><br>
-            <a href="https://twitter.com/CNEWS/status/1545690119264411649">
-              2022-07-09 10:43:36
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@lyonmag</strong><br><br>
-              Attaques de l'ultradroite à Lyon : les députés demandent à nouveau à Gérald Darmanin d'agir %3A+lyonmag #Lyon<br><br>
-            <a href="https://twitter.com/lyonmag/status/1603166635271012354">
-              2022-12-15 00:14:45
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CNEWS</strong><br><br>
-              Franck Louvrier, sur les propos de Gérald Darmanin au sujet de l'immigration et de la délinquance : «C'est un constat un peu tardif mais c'est une réalité» dans #LaMatinale<br><br>
-            <a href="https://twitter.com/CNEWS/status/1559793420348137473">
-              2022-08-17 08:45:05
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1551963243769434112"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LeMessagerfr/status/1630235818726944771"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/20Minutes/status/1568234088326381568"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ledauphine/status/1551619573518159876"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1553413391624146951"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Nice_Matin/status/1553639617265557504"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1561245468784529410"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CNEWS/status/1545690119264411649"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/lyonmag/status/1603166635271012354"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CNEWS/status/1559793420348137473"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@gdefournas</strong><br><br>
-              Et s’il y a aujourd’hui 89 députés Rassemblement National c’est parce que Darmanin est incapable de résoudre le problème de l’immigration en France. « BFMTV: Gérald Darmanin: "S'il n'y avait plus de problème d'immigration en France, il n'y aurait plus de Front national" — »<br><br>
-            <a href="https://twitter.com/gdefournas/status/1587859944115769344">
-              2022-11-02 18:31:26
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@mbompard</strong><br><br>
-              Tout mon soutien à mon collègue @PrudhommeLoic ! « PrudhommeLoic: Ma permanence a été dégradée par un groupuscule néo-fasciste xénophobe, comme avant d'autres tags haineux visaient les locaux du planning familial 33. Cela ne me dissuadera jamais de défendre l'universalisme de notre République. Ce groupuscule doit être identifié et dissous. — »<br><br>
-            <a href="https://twitter.com/mbompard/status/1633459993369513989">
-              2023-03-08 14:29:45
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@abomangoli</strong><br><br>
-              On est là ! Avec toi @PrudhommeLoic face à ces racistes. Lâches évidemment. « PrudhommeLoic: Ma permanence a été dégradée par un groupuscule néo-fasciste xénophobe, comme avant d'autres tags haineux visaient les locaux du planning familial 33. Cela ne me dissuadera jamais de défendre l'universalisme de notre République. Ce groupuscule doit être identifié et dissous. — »<br><br>
-            <a href="https://twitter.com/abomangoli/status/1633426309459181568">
-              2023-03-08 12:15:54
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CharlotteLeducV</strong><br><br>
-              Total soutien à mon collègue @PrudhommeLoic L'extrême droite ne nous empêchera jamais de mener nos combats ! ✊ « PrudhommeLoic: Ma permanence a été dégradée par un groupuscule néo-fasciste xénophobe, comme avant d'autres tags haineux visaient les locaux du planning familial 33. Cela ne me dissuadera jamais de défendre l'universalisme de notre République. Ce groupuscule doit être identifié et dissous. — »<br><br>
-            <a href="https://twitter.com/CharlotteLeducV/status/1633391510925262848">
-              2023-03-08 09:57:37
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@STaillePolian</strong><br><br>
-              Tout mon soutien à @LouisBoyard et @BilongoCarlos. La situation est devenue intolérable. Ces groupes doivent être dissous et Ces militants poursuivis par la justice. « LouisBoyard: 30 militants d’extrême droite viennent d’attaquer notre conférence à Bordeaux avec @BilongoCarlos. Armés de matraques, ils ont tenté d’entrer dans la salle pour nous agresser. Merci au SO qui les a heureusement repoussé. , dissolvez les groupes d’extrême droite. — »<br><br>
-            <a href="https://twitter.com/STaillePolian/status/1600577159919190040">
-              2022-12-07 20:45:06
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@alexiscorbiere</strong><br><br>
-              Soutien à mon ami @PrudhommeLoic dont la permanence a été dégradée par des groupes d'extrême droite... Rien ne fera faiblir la détermination de ce courageux député « PrudhommeLoic: Ma permanence a été dégradée par un groupuscule néo-fasciste xénophobe, comme avant d'autres tags haineux visaient les locaux du planning familial 33. Cela ne me dissuadera jamais de défendre l'universalisme de notre République. Ce groupuscule doit être identifié et dissous. — »<br><br>
-            <a href="https://twitter.com/alexiscorbiere/status/1633417204493434880">
-              2023-03-08 11:39:43
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LachaudB</strong><br><br>
-              Insupportable ! Soutien à mon collègue @PrudhommeLoic. Nous attendons le soutien et la dénonciation de cette violence par @YaelBRAUNPIVET et l’ensemble de l’@AssembleeNat. « PrudhommeLoic: Ma permanence a été dégradée par un groupuscule néo-fasciste xénophobe, comme avant d'autres tags haineux visaient les locaux du planning familial 33. Cela ne me dissuadera jamais de défendre l'universalisme de notre République. Ce groupuscule doit être identifié et dissous. — »<br><br>
-            <a href="https://twitter.com/LachaudB/status/1633390916361760770">
-              2023-03-08 09:55:16
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@PaulVannierFI</strong><br><br>
-              Le raciste @RNational_off Fournas a libéré la haine et la violence. Soutien et solidarité à mes camarades, les députés @BilongoCarlos et @LouisBoyard. Merci aux militants du SO qui les ont protégé. La République doit dissoudre les groupuscules d’extrême droite. « LouisBoyard: 30 militants d’extrême droite viennent d’attaquer notre conférence à Bordeaux avec @BilongoCarlos. Armés de matraques, ils ont tenté d’entrer dans la salle pour nous agresser. Merci au SO qui les a heureusement repoussé. , dissolvez les groupes d’extrême droite. — »<br><br>
-            <a href="https://twitter.com/PaulVannierFI/status/1600575001186684928">
-              2022-12-07 20:36:32
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Portes_Thomas</strong><br><br>
-              Ce soir des militants d’extrême-droite ont pris d’assaut la conférence de @BilongoCarlos et @LouisBoyard à Bordeaux. Munis de matraques ils ont tenté de s’en prendre aux personnes présentes. @GDarmanin ferme les yeux sur la violence de l’extrême-droite, voilà le résultat ! « LouisBoyard: 30 militants d’extrême droite viennent d’attaquer notre conférence à Bordeaux avec @BilongoCarlos. Armés de matraques, ils ont tenté d’entrer dans la salle pour nous agresser. Merci au SO qui les a heureusement repoussé. , dissolvez les groupes d’extrême droite. — »<br><br>
-            <a href="https://twitter.com/Portes_Thomas/status/1600579768721752086">
-              2022-12-07 20:55:28
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@S_Legrain</strong><br><br>
-              Tous les jours de nouvelles démonstrations du sentiment d’impunité des groupuscules d’extrême-droite, galvanisés par les paroles racistes du RN et l’inaction complice de Darmanin. Ça suffit ! ceux qui bafouent ainsi notre République doivent être punis. Soutien à @BilongoCarlos « LouisBoyard: 30 militants d’extrême droite viennent d’attaquer notre conférence à Bordeaux avec @BilongoCarlos. Armés de matraques, ils ont tenté d’entrer dans la salle pour nous agresser. Merci au SO qui les a heureusement repoussé. , dissolvez les groupes d’extrême droite. — »<br><br>
-            <a href="https://twitter.com/S_Legrain/status/1600577227674259456">
-              2022-12-07 20:45:23
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/gdefournas/status/1587859944115769344"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/mbompard/status/1633459993369513989"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/abomangoli/status/1633426309459181568"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CharlotteLeducV/status/1633391510925262848"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/STaillePolian/status/1600577159919190040"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/alexiscorbiere/status/1633417204493434880"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LachaudB/status/1633390916361760770"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/PaulVannierFI/status/1600575001186684928"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Portes_Thomas/status/1600579768721752086"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/S_Legrain/status/1600577227674259456"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 9 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>

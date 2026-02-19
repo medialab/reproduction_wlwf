@@ -31,3 +31,69 @@ body {
 .tweet-fallback:hover {
   background-color: #fafafa;
 }
+
+#topic-select {
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1em;
+    font-weight: 550;
+}
+
+#topic-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+#topic-select:hover {
+    border-color: #888;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2em;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e0e6ed;
+    font-size: 1.2em;
+    color: #1a202c;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+li {
+    margin: 8px 0;
+}
+
+a {
+    text-decoration: none;
+    color: #1d4ed8;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+a:hover {
+    background-color: #e0e7ff;
+    color: #1e3a8a;
+}
+
+img {
+    height: 280px;
+}
+
+.charts {
+    display: inline-block;
+    vertical-align: top;
+    max-width: 90%;
+}

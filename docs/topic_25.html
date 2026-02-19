@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 25</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Sécheresse et changement climatique</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" >
-      Topic 9
-    </option>
-
-    <option value="10" >
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" >
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" selected>
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" >
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" >
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
-    <option value="58" >
-      Topic 58
+  
+    <option value="40" >
+      Logement
     </option>
-
-    <option value="59" >
-      Topic 59
+  
+    <option value="18" >
+      Précarité étudiante
     </option>
-
-    <option value="61" >
-      Topic 61
-    </option>
-
-    <option value="62" >
-      Topic 62
-    </option>
-
-    <option value="63" >
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
-    <option value="74" >
-      Topic 74
-    </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
-    <option value="78" >
-      Topic 78
-    </option>
-
-    <option value="79" >
-      Topic 79
-    </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
+  
     <option value="85" >
-      Topic 85
+      Innovation, FrenchTech et startups françaises
     </option>
-
-    <option value="86" >
-      Topic 86
+  
+    <option value="42" >
+      Uber
     </option>
-
-    <option value="87" >
-      Topic 87
+  
+    <option value="2" >
+      Hôpital et santé publique
     </option>
-
-    <option value="88" >
-      Topic 88
+  
+    <option value="58" >
+      Prévention et traitement du cancer
     </option>
-
-    <option value="89" >
-      Topic 89
+  
+    <option value="61" >
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="90" >
-      Topic 90
+  
+    <option value="5" >
+      Education nationale
     </option>
-
+  
+    <option value="74" >
+      Harcèlement scolaire
+    </option>
+  
+    <option value="78" >
+      Uniforme à l'école
+    </option>
+  
+    <option value="1" >
+      Énergie et transition énergétique
+    </option>
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" selected="selected">
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" >
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" >
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" >
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" >
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" >
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 25</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_25.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@AlterEco_</strong><br><br>
-              Sécheresse : la crise de l'eau ne fait que commencer ➡️<br><br>
-            <a href="https://twitter.com/AlterEco_/status/1563263981007286274">
-              2022-08-26 22:35:51
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@AlterEco_</strong><br><br>
-              Sécheresse : la crise de l'eau ne fait que commencer ➡️<br><br>
-            <a href="https://twitter.com/AlterEco_/status/1563498683404271620">
-              2022-08-27 14:08:29
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@sudouest</strong><br><br>
-              Sécheresse et pénurie d’eau : qui prélève quoi en France ?<br><br>
-            <a href="https://twitter.com/sudouest/status/1628382200444907524">
-              2023-02-22 14:12:25
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMParis</strong><br><br>
-              Île-de-France: comment les agriculteurs s'adaptent à la sécheresse<br><br>
-            <a href="https://twitter.com/BFMParis/status/1556528429100572673">
-              2022-08-08 08:31:11
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LaCroix</strong><br><br>
-              Sécheresse 2022 : une équipe de scientifiques fait le lien avec le changement climatique<br><br>
-            <a href="https://twitter.com/LaCroix/status/1577778306723749902">
-              2022-10-05 23:50:36
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@lepopulaire_fr</strong><br><br>
-              Manque d'eau : la sécheresse aura-t-elle des conséquences sur l'eau du robinet à #Limoges ?<br><br>
-            <a href="https://twitter.com/lepopulaire_fr/status/1554044269177995264">
-              2022-08-01 12:00:01
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CPAveyron</strong><br><br>
-              Sécheresse 2022 : en 2023, la facture d’eau sera salée pour les habitants du Nord-Aveyron via @cpaveyron<br><br>
-            <a href="https://twitter.com/CPAveyron/status/1611276549373952001">
-              2023-01-06 09:20:40
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              Canicule: la sécheresse s'accentue dans le pays, la majorité des départements soumis à des restrictions d'eau<br><br>
-            <a href="https://twitter.com/BFMTV/status/1553653345109381120">
-              2022-07-31 10:06:37
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@franceinfo</strong><br><br>
-              Sécheresse : "Plus d'une centaine de communes en France" sont privées d'eau potable, annonce le ministre de la Transition écologique<br><br>
-            <a href="https://twitter.com/franceinfo/status/1555508864392593408">
-              2022-08-05 12:59:47
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@courrierinter</strong><br><br>
-              [🗞️ À la une🗞️] 💧Dans ce numéro, retour sur les pénuries d’eau qui ont frappé de nombreux pays cet été. En cause : le dérèglement climatique, la sécheresse et notre consommation effrénée. Une crise durable et qui risque d’être aggravée à long terme ⬇️<br><br>
-            <a href="https://twitter.com/courrierinter/status/1562367562960121856">
-              2022-08-24 11:13:49
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/AlterEco_/status/1563263981007286274"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/AlterEco_/status/1563498683404271620"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/sudouest/status/1628382200444907524"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMParis/status/1556528429100572673"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LaCroix/status/1577778306723749902"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/lepopulaire_fr/status/1554044269177995264"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CPAveyron/status/1611276549373952001"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1553653345109381120"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/franceinfo/status/1555508864392593408"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/courrierinter/status/1562367562960121856"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@sandraregol</strong><br><br>
-              ❌🌧️ La sécheresse hivernale bat des records historiques en France. , totalement dépassé par la situation annonce des restrictions « soft », alors qu’il y a urgence à transformer notre modèle agricole et à lutter vraiment contre le changement climatique.<br><br>
-            <a href="https://twitter.com/sandraregol/status/1628699038055899137">
-              2023-02-23 11:11:25
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@PascaleMartin24</strong><br><br>
-              La terre, notre bien le plus précieux « FiAssemblee: 🔴🗣️ « Il est déjà trop tard pour anticiper. La sécheresse ne doit pas être pensée seulement en situation de crise, mais dans sa globalité, afin d'aller aux sources du problème. » interpelle @Elisabeth_Borne sur les conséquences de la sécheresse pour les paysans. — »<br><br>
-            <a href="https://twitter.com/PascaleMartin24/status/1630640494047838208">
-              2023-02-28 19:46:04
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MC_Garin</strong><br><br>
-              ➡️Pollution de l’eau : 👉12 millions de personnes en France auraient bu de l'eau contaminée à cause des #pesticides. C'est 1 Français sur 5. Nous attendons le résultat de l'étude de l'@Anses_fr ⤵️ Bravo et merci aux journalistes @sfoucart @unevoyelle @StephaneMandard @lemondefr @BriceLeBorgne @franceinfo et @Cdenquete pour leurs enquêtes qui permettent de mettre en lumière la pollution de l'eau par les pesticides.<br><br>
-            <a href="https://twitter.com/MC_Garin/status/1575059674336006144">
-              2022-09-28 11:47:44
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MariePochon</strong><br><br>
-              50 jours de procédure accélérée pour la réforme des #retraites, 27 d'une sécheresse historique mettant en péril notre approvisionnement en eau potable 💧 Les priorités du @gouvernementFR « meteofrance: 😧La pluie n'est pas tombée en France depuis le 21 janvier, soit une série record de 27 jours. Du jamais vu en hiver. Cette situation se traduit par un assèchement des sols, déjà affaiblis par la sécheresse de l'été 2022. Le point ici 👉 📸@infoclimat — »<br><br>
-            <a href="https://twitter.com/MariePochon/status/1627055997549432833">
-              2023-02-18 22:22:33
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@hendrik_davi</strong><br><br>
-              Les effets du changement climatique : + degrés par rapport à la normale (1991-2020) pour ce mois d’octobre. Et le gouvernement rejette tous nos amendements pour la bifurcation écologique.🤬🤬🤬 « MaximCombes: Je ne sais pas si l'on se rend compte : l'anomalie thermique de ce mois d'octobre est plus forte que celle de cet été, quand nos forêts brûlaient, nos cours d'eau s'asséchaient, et le vivant suffoquait. Aujourd'hui, c'est pire, notamment parce que les effets se cumulent. — »<br><br>
-            <a href="https://twitter.com/hendrik_davi/status/1586105522729586688">
-              2022-10-28 23:19:59
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@sandrousseau</strong><br><br>
-              La forêt, facteur clé, dans le dérèglement climatique. Dès qu’un arbre meurt de sécheresse, de canicule, d’incendie ou de ravageurs, c’est tout un écosystème qui disparaît. Merci à @Canopee_asso pour ce colloque sur notre responsabilité à changer notre appréhension des forêts. 👋 @ChristopheBechu une réaction? Comment se fait il qu’un plan dit de « relance » favorise les coupes à blanc et ne prenne en considération que la valeur économique instantanée du bois (et non la biodiversité, la qualité paysagère par ex).<br><br>
-            <a href="https://twitter.com/sandrousseau/status/1572485888650903554">
-              2022-09-21 09:20:25
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@KarenErodi</strong><br><br>
-              💦L'EAU BIEN COMMUN DE L'HUMANITÉ💦 L'eau vient à manquer dans de nombreux territoires de notre république. Les outre-mers, avant-postes face au dérèglement climatique, sont durement touchés par ce phénomène aggravé par les sous investissements répétés dans les réseaux d’eau. Nul doute que la commission d'enquête mettra en lumière les errements de l'état mais aussi les réussites qui permettront aux territoires métropolitains de déployer à leurs tours des solutions. Le Tarn et particulièrement le sud tarnais a été durement touché par l'épisode de sécheresse cet été. Je vais être très attentive sur les suites données à cette commission. Pendant la campagne présidentielle, notre candidat Jean-Luc Mélenchon a porté cette question centrale pour l'avenir de l'humanité. Malheureusement, une fois de plus, la macronie pense que le seul marché nous sauvera... Le désastre est devant nous si on les laise faire ! Nos propositions ici 👇<br><br>
-            <a href="https://twitter.com/KarenErodi/status/1623708408770621440">
-              2023-02-09 16:40:26
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MarianneMaximi</strong><br><br>
-              Présente aujourd’hui au #SommetElevage avec ma collègue @CouturierCathy. L’occasion d’aller à la rencontre des professionnels du monde agricole. Nous avons choisi de rencontrer celles et ceux qui questionnent le modèle actuel et réfléchissent aux alternatives. Evidemement nous sommes allées voir les éleveurs de #Ferrandaises, race bovine du Puy-de-Dôme qui a failli disparaitre dans les années 70. L’@INRAE_France, qui étudie les adaptations du monde végétal et animal aux changements climatiques. Un institut de recherche public dont nous avons besoin pour répondre à la crise écologique et agricole que nous vivons. Le @ModefNational et @Terredeliens pour qui il est urgent de soutenir l'agriculture de proximité, de diversifier les exploitations et de sécuriser le foncier. Des revendications que je partage et que j'appuierai lors de mon mandat. Les écoles comme @VetAgroSup qui ont un rôle essentiel à jouer pour former les futurs professionnels aux enjeux de la planification et de la bifurcation. Nous avons écouté les revendications des éleveurs et leurs inquiétudes sur l’inflation et la sécheresse ? Comment ne pas remarquer, par exemple, l'augmentation de 25,9% du prix des aliments pour les vaches avec comme conséquence que nombre d'agriculteurs doivent vendre une partie de leur cheptel car ils ne peuvent les nourrir par manque d'herbe ? Où encore l'arrêt de production de Salers, fromage d'Auvergne, car les vaches n'ont plus d'herbe à brouter à cause de la sécheresse. En plein vote sur le budget de l’Etat pour l’année à venir, c’est le moment de rappeler que nous avons besoin d’un budget ambitieux qui répond à la crise écologique et sociale, avec la responsabilité de les mettre au cœur de notre politique.<br><br>
-            <a href="https://twitter.com/MarianneMaximi/status/1578469006981615616">
-              2022-10-07 21:35:12
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ChArrighi</strong><br><br>
-              [Thread]☀️🔥 son ampleur et sa durée, l’épisode caniculaire que nous traversons fait craindre un nouveau 2003. Note pour les moins de 20 ans : 2003, est l’année de la grande canicule qui a fait morts en France. ⤵️ 2. 4x plus fréquents qu’il a 25 ans, ces épisodes de chaleur extrême n’en sont pas pour autant normaux. Rappel: le dérèglement climatique n’est pas une lubie d’écolo angoissé 🥵 mais bien une réalité géophysique. 3. le climatologue & expert du #GIEC @cassouman40, souligne dans une itw à @libe, que nous ne sommes pas prêts à affronter ces épisodes extrêmes : « il y a un seuil où l’adaptation n’est plus possible. Nous approchons dangereusement de ce seuil » : 4. « nous pouvons supporter 45° pendant 2 jours. Pas pendant 10. » Conséquences sur la santé, l’alimentation, l’accès à l’eau et aux énergies : c’est ni plus ni moins notre capacité à maintenir la vie qui est en jeu. Aujourd’hui. En France. 5. Mais nous n’avons rien fait. Pire : l’🏥 public a été détruit au nom de la “rentabilité”, rendant la prise en charge des + fragiles très difficile. La déforestation, la suppression des zones humides accélèrent mettant à mal ces véritables barrières contre le dérèglement 6. On laisse exploser les émissions de GES et on continue à vouer un culte au dieu nucléaire, alors même que l’eau pour refroidir les centrales manque et manquera de plus en plus souvent et violemment. Quelle folie mène l’humanité, pourtant très informée, au désastre ? 7. hier à l’Assemblée, @faureolivier questionnait justement la première ministre : Pourquoi ne pas donner la même ambition à la lutte contre le dérèglement climatique que celle que nous avons donné à la lutte contre le covid ? Nous pouvons le faire. Nous devons le faire. 8. There is no alternative : il faut s’adapter & limiter. S’adapter à ces conditions extrêmes d’ores et déjà notre quotidien ; limiter en freinant la course folle du désastre climatique : « la dimension collective de sobriété est fondamentale » dit encore Christophe Cassou. 9.<br><br>
-            <a href="https://twitter.com/ChArrighi/status/1546851166365024257">
-              2022-07-12 15:37:11
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@nthierry</strong><br><br>
-              Je ne peux qu’alerter nos concitoyens devant l’irresponsabilité criminelle de certains élus. Certains souhaitent profiter de la loi #nucléaire pr réintroduire la construction de nouveaux réacteurs dans les zones littorales vulnérables aux inondations & aux submersions marines 1/8 « SO_Bordeaux: Nucléaire : ils militent pour faire annuler l’amendement interdisant la construction sur les sites submersibles — » Minimiser Fukushima et les inondations de 99 dans la centrale de Blaye est irresponsable. Ne pas intégrer que dans les années futures les bouleversements climatiques augmenteront irrémédiablement les risques déjà encourus, plus qu’une erreur politique, c’est une faute morale. 2/8 🏛️ Suites aux inondations de 1999, le rapport parlementaire a montré que lors de cet évènement plusieurs plans d’urgence internes avaient été activés et l’alerte nationale avait été déclenchée soulignant que la situation avait atteint un niveau de crise majeur pendant 36 h. 3/8 👉 🔬La tempête Martin (99) a produit une surcote estimée à plus de 2m ds l’estuaire de la Gironde. Les installations de la centrale du Blayais ont été menacées par le franchissement des digues, 3 des 4 réacteurs ont été mis à l’arrêt et un plan d’urgence interne a été déclenché 4/8 🌡️ Dans le rapport du GIEC régional "#Acclimatera", regroupant plusieurs centaines de scientifiques, ces derniers le soulignent : tous les scenarios montrent qu’avec le réchauffement climatique et la montée des eaux liée à la fonte des glaces, ces phénomènes s’aggraveront. 5/8 Même dans le scenario d’un réchauffement à 2°c, qui pour rappel n’est plus d’actualité, le ministre @ChristopheBechu ayant lui-même annoncé la semaine dernière qu’il faut « préparer notre pays à 4°C de réchauffement. 6/8 🌊 Ces scientifiques anticipent jusqu’à 1m50 d’élévation du niveau de la mer et nous rappellent que des grosses tempêtes ont historiquement lieu tous les 10 ans en #NouvelleAquitaine. 7/8 Avec le changement climatique ils prédisent que ces tempêtes ne feront qu’augmenter et que les risques de submersion sont encore plus grands dans l’estuaire par effet d’entonnoir. 8/8 👉<br><br>
-            <a href="https://twitter.com/nthierry/status/1630960286113865728">
-              2023-03-01 16:56:48
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/sandraregol/status/1628699038055899137"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/PascaleMartin24/status/1630640494047838208"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MC_Garin/status/1575059674336006144"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MariePochon/status/1627055997549432833"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/hendrik_davi/status/1586105522729586688"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/sandrousseau/status/1572485888650903554"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/KarenErodi/status/1623708408770621440"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MarianneMaximi/status/1578469006981615616"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ChArrighi/status/1546851166365024257"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/nthierry/status/1630960286113865728"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 25 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>

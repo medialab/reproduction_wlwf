@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 42</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Uber</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" >
-      Topic 9
-    </option>
-
-    <option value="10" >
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" >
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" >
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" >
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" selected>
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
-    <option value="58" >
-      Topic 58
+  
+    <option value="40" >
+      Logement
     </option>
-
-    <option value="59" >
-      Topic 59
+  
+    <option value="18" >
+      Précarité étudiante
     </option>
-
-    <option value="61" >
-      Topic 61
-    </option>
-
-    <option value="62" >
-      Topic 62
-    </option>
-
-    <option value="63" >
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
-    <option value="74" >
-      Topic 74
-    </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
-    <option value="78" >
-      Topic 78
-    </option>
-
-    <option value="79" >
-      Topic 79
-    </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
+  
     <option value="85" >
-      Topic 85
+      Innovation, FrenchTech et startups françaises
     </option>
-
-    <option value="86" >
-      Topic 86
+  
+    <option value="42" selected="selected">
+      Uber
     </option>
-
-    <option value="87" >
-      Topic 87
+  
+    <option value="2" >
+      Hôpital et santé publique
     </option>
-
-    <option value="88" >
-      Topic 88
+  
+    <option value="58" >
+      Prévention et traitement du cancer
     </option>
-
-    <option value="89" >
-      Topic 89
+  
+    <option value="61" >
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="90" >
-      Topic 90
+  
+    <option value="5" >
+      Education nationale
     </option>
-
+  
+    <option value="74" >
+      Harcèlement scolaire
+    </option>
+  
+    <option value="78" >
+      Uniforme à l'école
+    </option>
+  
+    <option value="1" >
+      Énergie et transition énergétique
+    </option>
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" >
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" >
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" >
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" >
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" >
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" >
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 42</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_42.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              Uber files: un "deal secret" entre Emmanuel Macron et Uber ?<br><br>
-            <a href="https://twitter.com/BFMTV/status/1546460176324108288">
-              2022-07-11 13:43:32
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMTV</strong><br><br>
-              "Uber Files": un deal secret révélé entre Emmanuel Macron et Uber?<br><br>
-            <a href="https://twitter.com/BFMTV/status/1546244681448755201">
-              2022-07-10 23:27:14
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@idj_infodujour</strong><br><br>
-              Macron et Uber, c’était du sérieux !, #infodujour #actu #info #actualité<br><br>
-            <a href="https://twitter.com/idj_infodujour/status/1546822109682405376">
-              2022-07-12 13:41:44
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@leparisien_pol</strong><br><br>
-              Uber Files : entre Emmanuel Macron et Uber, une relation très privilégiée ➡️<br><br>
-            <a href="https://twitter.com/leparisien_pol/status/1546194327340212228">
-              2022-07-10 20:07:09
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@zinfoslive</strong><br><br>
-              "Uber Files" : Des révélations sur "le deal secret" entre Emmanuel Macron et Uber<br><br>
-            <a href="https://twitter.com/zinfoslive/status/1546350940902531073">
-              2022-07-11 06:29:28
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@atlantico_fr</strong><br><br>
-              Un ex-lobbyiste d'Uber critique l'autosatisfaction d'Emmanuel Macron via @atlantico_fr<br><br>
-            <a href="https://twitter.com/atlantico_fr/status/1588164289378017280">
-              2022-11-03 14:40:47
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@lemondefr</strong><br><br>
-              Vidéo. « Uber Files » : Comment Uber s’est allié à Emmanuel Macron pour s’implanter en France<br><br>
-            <a href="https://twitter.com/lemondefr/status/1546604729924550658">
-              2022-07-11 23:17:56
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CPAveyron</strong><br><br>
-              Uber Files : on vous résume les révélations sur Uber et l'implication d'Emmanuel Macron via @cpaveyron<br><br>
-            <a href="https://twitter.com/CPAveyron/status/1546460497406562304">
-              2022-07-11 13:44:49
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ladepechedumidi</strong><br><br>
-              Uber files : "enquête parlementaire", "droit de suite"... Les oppositions veulent des explications de Macron sur ses liens avec Uber<br><br>
-            <a href="https://twitter.com/ladepechedumidi/status/1546475332542382080">
-              2022-07-11 14:43:46
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@le_Parisien</strong><br><br>
-              Les députés LFI ont annoncé mardi le lancement d’une commission d’enquête sur les «Uber files» et le rôle d’Emmanuel Macron «dans l’implantation d’Uber en France»<br><br>
-            <a href="https://twitter.com/le_Parisien/status/1597890202575437825">
-              2022-11-30 10:48:06
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1546460176324108288"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMTV/status/1546244681448755201"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/idj_infodujour/status/1546822109682405376"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/leparisien_pol/status/1546194327340212228"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/zinfoslive/status/1546350940902531073"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/atlantico_fr/status/1588164289378017280"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/lemondefr/status/1546604729924550658"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CPAveyron/status/1546460497406562304"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ladepechedumidi/status/1546475332542382080"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/le_Parisien/status/1597890202575437825"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@SimonnetDeputee</strong><br><br>
-              Il y a Uber et l’agent d’Uber : M. Dussopt ! En macronie, le rôle du ministre du Travail consiste à empêcher l’Inspection du travail d’enquêter contre le travail dissimulé d'Uber... M. Dussopt, ne craquez pas et défendez la présomption de salariat au Conseil de l'UE !<br><br>
-            <a href="https://twitter.com/SimonnetDeputee/status/1630588628794482691">
-              2023-02-28 16:19:58
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@KekeRachel</strong><br><br>
-              BRAVO 👏👏✊!!! « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/KekeRachel/status/1621296257581940738">
-              2023-02-03 00:55:24
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BilongoCarlos</strong><br><br>
-              très bonne nouvelle ✅ « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/BilongoCarlos/status/1621091095051661316">
-              2023-02-02 11:20:10
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@RaquelGarridoFr</strong><br><br>
-              Magnifique ! Bravo @leilachaibi 👏🏽 « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/RaquelGarridoFr/status/1621099690497540096">
-              2023-02-02 11:54:19
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@alma_dufour</strong><br><br>
-              YEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEESSSS! « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/alma_dufour/status/1621100214462590977">
-              2023-02-02 11:56:24
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Francois_Ruffin</strong><br><br>
-              A Bercy, Emmanuel Macron servait déjà Uber. A Bruxelles, il tentait de bloquer la reconnaissance comme salariés des travailleurs d'Uber. Sans surprise, à Paris, le ministère du Travail empêche les contrôles de l'inspection du Travail chez Uber. Gouvernement des firmes. "Olivier Dussopt critiqué pour s’être opposé à un contrôle d’Uber par l’Inspection du travail", via @lobs<br><br>
-            <a href="https://twitter.com/Francois_Ruffin/status/1630907025147273218">
-              2023-03-01 13:25:10
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Anne_Stambach</strong><br><br>
-              🔥Victoire !!! Le Parlement européen reconnaît la présomption de salariat pour les travailleurs des plateformes ! Bravo @leilachaibi ! « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/Anne_Stambach/status/1621108600734158850">
-              2023-02-02 12:29:43
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MathildePanot</strong><br><br>
-              Vote au Parlement européen de la présomption de salariat des travailleurs des plateformes : immense camouflet pour #Uber et Macron. Bravo à @leilachaibi qui mène ce combat de longue date ! « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/MathildePanot/status/1621179401596698630">
-              2023-02-02 17:11:04
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Clem_Autain</strong><br><br>
-              Toutes mes félicitations à @LeilaChaibi pour son travail de longue haleine. Grâce à elle, le parlement européen a reconnu la présomption de salariat pour les employés de plates-formes. Une belle victoire contre l'uberisation du monde « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/Clem_Autain/status/1621113935297658882">
-              2023-02-02 12:50:55
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@AndyKerbrat</strong><br><br>
-              Bravo à @leilachaibi, engagée sur cette bataille contre Uber et son monde. Une grande victoire pour les travailleurs des plateformes. Le Parlement européen reconnaît la présomption de salariat ! Macron, qui a tout fait pour empêcher que ça arrive, est battu ✊ « leilachaibi: 🔴Victoire décisive à Bruxelles : le Parlement🇪🇺 entérine la présomption de salariat des travailleurs de plateformes. Avant-dernière marche avant les congés payés, le salaire minimum ou la #retraite pour des millions de travailleurs! Camouflet pour #Uber & Macron. Explications⤵️ — »<br><br>
-            <a href="https://twitter.com/AndyKerbrat/status/1621105933945376769">
-              2023-02-02 12:19:08
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/SimonnetDeputee/status/1630588628794482691"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/KekeRachel/status/1621296257581940738"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BilongoCarlos/status/1621091095051661316"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/RaquelGarridoFr/status/1621099690497540096"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/alma_dufour/status/1621100214462590977"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Francois_Ruffin/status/1630907025147273218"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Anne_Stambach/status/1621108600734158850"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MathildePanot/status/1621179401596698630"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Clem_Autain/status/1621113935297658882"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/AndyKerbrat/status/1621105933945376769"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 42 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>

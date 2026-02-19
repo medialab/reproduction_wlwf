@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 63</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Chasse et biodiversité</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" >
-      Topic 9
-    </option>
-
-    <option value="10" >
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" >
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" >
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" >
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" >
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
-    <option value="58" >
-      Topic 58
+  
+    <option value="40" >
+      Logement
     </option>
-
-    <option value="59" >
-      Topic 59
+  
+    <option value="18" >
+      Précarité étudiante
     </option>
-
-    <option value="61" >
-      Topic 61
-    </option>
-
-    <option value="62" >
-      Topic 62
-    </option>
-
-    <option value="63" selected>
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
-    <option value="74" >
-      Topic 74
-    </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
-    <option value="78" >
-      Topic 78
-    </option>
-
-    <option value="79" >
-      Topic 79
-    </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
+  
     <option value="85" >
-      Topic 85
+      Innovation, FrenchTech et startups françaises
     </option>
-
-    <option value="86" >
-      Topic 86
+  
+    <option value="42" >
+      Uber
     </option>
-
-    <option value="87" >
-      Topic 87
+  
+    <option value="2" >
+      Hôpital et santé publique
     </option>
-
-    <option value="88" >
-      Topic 88
+  
+    <option value="58" >
+      Prévention et traitement du cancer
     </option>
-
-    <option value="89" >
-      Topic 89
+  
+    <option value="61" >
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="90" >
-      Topic 90
+  
+    <option value="5" >
+      Education nationale
     </option>
-
+  
+    <option value="74" >
+      Harcèlement scolaire
+    </option>
+  
+    <option value="78" >
+      Uniforme à l'école
+    </option>
+  
+    <option value="1" >
+      Énergie et transition énergétique
+    </option>
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" >
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" >
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" selected="selected">
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" >
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" >
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" >
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 63</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_63.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@franceinfo</strong><br><br>
-              Chasse et sécurité : ce que prévoit le plan du gouvernement<br><br>
-            <a href="https://twitter.com/franceinfo/status/1584762710805315584">
-              2022-10-25 06:24:08
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@20Minutes</strong><br><br>
-              Va-t-on vers une interdiction de la chasse le dimanche ? ➡️<br><br>
-            <a href="https://twitter.com/20Minutes/status/1612016258794283010">
-              2023-01-08 10:20:00
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LaCroix</strong><br><br>
-              Accidents de chasse : le dépistage de l’alcoolémie des chasseurs à l’étude<br><br>
-            <a href="https://twitter.com/LaCroix/status/1584273152515117057">
-              2022-10-23 21:58:48
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@lesteclair</strong><br><br>
-              Chasse : une application pour géolocaliser les chasseurs serait-elle vraiment efficace ?<br><br>
-            <a href="https://twitter.com/lesteclair/status/1612383695008141314">
-              2023-01-09 10:40:04
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@idj_infodujour</strong><br><br>
-              Voici pourquoi il faut interdire l’alcool à la chasse, #infodujour #actu #info #actualité<br><br>
-            <a href="https://twitter.com/idj_infodujour/status/1573608553830572032">
-              2022-09-24 11:41:30
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MagazineCapital</strong><br><br>
-              Chasse : bientôt un « délit d’alcoolémie à la chasse », mais pas d'interdiction le dimanche<br><br>
-            <a href="https://twitter.com/MagazineCapital/status/1584405904350662656">
-              2022-10-24 06:46:19
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@charentelibre</strong><br><br>
-              Chasse interdite le dimanche : la ruralité sera « à feu et à sang », prévient le patron des chasseurs<br><br>
-            <a href="https://twitter.com/charentelibre/status/1611483015548489728">
-              2023-01-06 23:01:05
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Lebienpublic</strong><br><br>
-              Willy Schraen, président de la Fédération nationale des chasseurs : « Pourquoi une telle stigmatisation de la chasse ? »<br><br>
-            <a href="https://twitter.com/Lebienpublic/status/1633862266322862082">
-              2023-03-09 17:08:14
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@leJDD</strong><br><br>
-              [TRIBUNE] L’Alliance des opposants à la chasse alerte : « Les annonces du gouvernement manquent leur cible » Les auteurs proposent la création d'une police de la chasse indépendante, mais aussi de « mieux apprendre aux chasseurs à tirer ».<br><br>
-            <a href="https://twitter.com/leJDD/status/1586444936517500928">
-              2022-10-29 21:48:42
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@OuestFrance</strong><br><br>
-              Pour la Fédération de chasse du Morbihan, « pas de raison de repousser l’ouverture de la chasse » Plusieurs voix se sont fait entendre pour réclamer une interdiction de la chasse jusqu’à nouvel ordre compte tenu de l’épisode de sécheresse en France<br><br>
-            <a href="https://twitter.com/OuestFrance/status/1562475094391148545">
-              2022-08-24 18:21:06
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/franceinfo/status/1584762710805315584"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/20Minutes/status/1612016258794283010"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LaCroix/status/1584273152515117057"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/lesteclair/status/1612383695008141314"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/idj_infodujour/status/1573608553830572032"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MagazineCapital/status/1584405904350662656"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/charentelibre/status/1611483015548489728"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Lebienpublic/status/1633862266322862082"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/leJDD/status/1586444936517500928"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/OuestFrance/status/1562475094391148545"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BarthesChristop</strong><br><br>
-              244 ciclistes morts en 2022 ,8 seulement victimes de la chasse<br><br>
-            <a href="https://twitter.com/BarthesChristop/status/1624786774097645568">
-              2023-02-12 16:05:28
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@jordan_guitton</strong><br><br>
-              On ne touche pas à la chasse 😉😃🇲🇫! #Traditions #France #Ruralité<br><br>
-            <a href="https://twitter.com/jordan_guitton/status/1612390700011716608">
-              2023-01-09 11:07:54
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@sandrousseau</strong><br><br>
-              👏👏👏👏 « NicoleFerroniZe: Le @gouvernementFR agit pour les français. ⤵️ Parce qu’il n’y a pas que la réforme des retraites, il y a la chasse aussi... — »<br><br>
-            <a href="https://twitter.com/sandrousseau/status/1616717463005143041">
-              2023-01-21 09:40:54
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@cfourniereelv</strong><br><br>
-              Encore une fois sur la chasse, le gouvernement se trompe de cible oublie la démocratie. 8 Français sur 10 demandent l’interdiction de la chasse le dimanche, entendez-les!<br><br>
-            <a href="https://twitter.com/cfourniereelv/status/1612721071161069571">
-              2023-01-10 09:00:40
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@jordan_guitton</strong><br><br>
-              On ne touche pas à la chasse 😉😃🇲🇫! Le besoin naturel de régulation fait des chasseurs les premiers écologistes.. J'aime les animaux et la nature donc je soutiens la chasse. #Traditions #Chasse #Ruralité #Aube #Nature<br><br>
-            <a href="https://twitter.com/jordan_guitton/status/1612391809241546752">
-              2023-01-09 11:12:18
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CaronAymericoff</strong><br><br>
-              Chasse : en un mois, deux morts et des dizaines de blessés. A titre personnel, je suis opposé à la chasse. Au sein de @FiAssemblee, je milite pour la suppression de la chasse le week-end, les jours fériés et pendant les vacances.<br><br>
-            <a href="https://twitter.com/CaronAymericoff/status/1584932135097765892">
-              2022-10-25 17:37:22
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@cfourniereelv</strong><br><br>
-              Encore une fois sur la chasse, le gouvernement se trompe de cible et oublie la démocratie. 8 Français sur 10 demandent l’interdiction de la chasse le dimanche, entendez-les! @EELV @marinetondelier @EcologistesAN @ASPASnature @CAPpolitique @FBB_Officiel<br><br>
-            <a href="https://twitter.com/cfourniereelv/status/1612721849665982464">
-              2023-01-10 09:03:46
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BrunoBilde</strong><br><br>
-              Quoi qu’on en dise, les accidents de chasse se multiplient. Si la majorité des chasseurs sont sans doute précautionneux, il serait temps que la fédération de chasse fasse le ménage dans ses rangs ! « le_Parisien: Un berger allemand a été abattu d’une balle dans la tête par un chasseur qui dit l’avoir «confondu avec un sanglier» ➡️ — »<br><br>
-            <a href="https://twitter.com/BrunoBilde/status/1597319621685567488">
-              2022-11-28 21:00:49
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@cfourniereelv</strong><br><br>
-              La chasse à la marmotte est une aberration. Purement récréative, elle ne repose meme pas sur le « besoin de régulation » avancé par les défenseurs de la chasse. Quand est-ce que @ChristopheBechu et @gouvernementFR sortiront de leur silence sur la condition animale ? « CAPpolitique: A l'initiative d'@AjaSavoie, rassemblement devant @Ecologie_Gouv pour l'interdiction de la chasse à la marmotte, avec @jfcoulomme @fondationLFDA @onevoiceanimal @ParisZoopolis @L214 et l'APRAD. — »<br><br>
-            <a href="https://twitter.com/cfourniereelv/status/1588486448801804290">
-              2022-11-04 12:00:56
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LachaudB</strong><br><br>
-              Il était temps ! Enfin nos revendications sur la chasse sont entendues ! Il faut concrétiser toutes ces mesures et même aller plus loin. Instaurer des jours sans chasse le week-end, les jours fériés et pendant les vacances pour sécuriser les espaces naturels ! « le_Parisien: Le gouvernement a annoncé mardi une «feuille de route pour améliorer et garantir la sécurité à la chasse», envisageant notamment dans certaines régions des demi-journées sans chasse et d’instaurer un délit d’alcoolémie — »<br><br>
-            <a href="https://twitter.com/LachaudB/status/1584983205429784577">
-              2022-10-25 21:00:18
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BarthesChristop/status/1624786774097645568"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/jordan_guitton/status/1612390700011716608"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/sandrousseau/status/1616717463005143041"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/cfourniereelv/status/1612721071161069571"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/jordan_guitton/status/1612391809241546752"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CaronAymericoff/status/1584932135097765892"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/cfourniereelv/status/1612721849665982464"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BrunoBilde/status/1597319621685567488"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/cfourniereelv/status/1588486448801804290"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LachaudB/status/1584983205429784577"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 63 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>

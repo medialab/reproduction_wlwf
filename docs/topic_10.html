@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 10</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Train et transports en commun</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" >
-      Topic 9
-    </option>
-
-    <option value="10" selected>
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" >
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" >
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" >
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" >
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
-    <option value="58" >
-      Topic 58
+  
+    <option value="40" >
+      Logement
     </option>
-
-    <option value="59" >
-      Topic 59
+  
+    <option value="18" >
+      Précarité étudiante
     </option>
-
-    <option value="61" >
-      Topic 61
-    </option>
-
-    <option value="62" >
-      Topic 62
-    </option>
-
-    <option value="63" >
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
-    <option value="74" >
-      Topic 74
-    </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
-    <option value="78" >
-      Topic 78
-    </option>
-
-    <option value="79" >
-      Topic 79
-    </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
+  
     <option value="85" >
-      Topic 85
+      Innovation, FrenchTech et startups françaises
     </option>
-
-    <option value="86" >
-      Topic 86
+  
+    <option value="42" >
+      Uber
     </option>
-
-    <option value="87" >
-      Topic 87
+  
+    <option value="2" >
+      Hôpital et santé publique
     </option>
-
-    <option value="88" >
-      Topic 88
+  
+    <option value="58" >
+      Prévention et traitement du cancer
     </option>
-
-    <option value="89" >
-      Topic 89
+  
+    <option value="61" >
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="90" >
-      Topic 90
+  
+    <option value="5" >
+      Education nationale
     </option>
-
+  
+    <option value="74" >
+      Harcèlement scolaire
+    </option>
+  
+    <option value="78" >
+      Uniforme à l'école
+    </option>
+  
+    <option value="1" >
+      Énergie et transition énergétique
+    </option>
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" >
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" selected="selected">
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" >
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" >
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" >
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" >
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 10</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_10.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@20Minutes</strong><br><br>
-              La SNCF va bien supprimer 140 trains par jour en Hauts-de-France<br><br>
-            <a href="https://twitter.com/20Minutes/status/1583465440671502337">
-              2022-10-21 16:29:15
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@leparisien_91</strong><br><br>
-              Grève dans les transports en Île-de-France : les usagers se sont organisés ➡️<br><br>
-            <a href="https://twitter.com/leparisien_91/status/1582378187736195073">
-              2022-10-18 16:28:53
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@BFMParis</strong><br><br>
-              Grève dans les transports: trafic quasi-normal dans le métro, les RER perturbés ce samedi<br><br>
-            <a href="https://twitter.com/BFMParis/status/1634250833360461828">
-              2023-03-10 18:52:16
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LesEchos</strong><br><br>
-              En Auvergne-Rhône-Alpes, la Région et SNCF Réseau topent pour limiter les retards de trains<br><br>
-            <a href="https://twitter.com/LesEchos/status/1583019340084846592">
-              2022-10-20 10:56:36
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@leparisien_91</strong><br><br>
-              Retards, pannes, trains supprimés... Le ras-le-bol des usagers du RER C en Île-de-France ➡️<br><br>
-            <a href="https://twitter.com/leparisien_91/status/1602167335363792897">
-              2022-12-12 06:03:54
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@leparisien_92</strong><br><br>
-              Retards, pannes, trains supprimés... Le ras-le-bol des usagers du RER C en Île-de-France ➡️<br><br>
-            <a href="https://twitter.com/leparisien_92/status/1602167335485378566">
-              2022-12-12 06:03:54
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@76actu</strong><br><br>
-              Trains : le ministre des Transports confirme la rénovation de la ligne Abbeville - Le Tréport<br><br>
-            <a href="https://twitter.com/76actu/status/1599066427679555584">
-              2022-12-03 16:42:00
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LesEchos</strong><br><br>
-              La RATP et la SNCF accélèrent les recrutements face à la crise des transports en Ile-de-France<br><br>
-            <a href="https://twitter.com/LesEchos/status/1613937844841582600">
-              2023-01-13 17:35:42
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LeParisien_75</strong><br><br>
-              Financement des transports pour Paris 2024 : la hausse du passe Navigo s’invite dans le débat ➡️<br><br>
-            <a href="https://twitter.com/LeParisien_75/status/1580242976806248448">
-              2022-10-12 19:04:19
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@leparisien_91</strong><br><br>
-              Transports en Île-de-France : face aux galères en série sur le RER B, les usagers forcés de se réorganiser ➡️<br><br>
-            <a href="https://twitter.com/leparisien_91/status/1613405105201582080">
-              2023-01-12 06:18:47
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/20Minutes/status/1583465440671502337"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/leparisien_91/status/1582378187736195073"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/BFMParis/status/1634250833360461828"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LesEchos/status/1583019340084846592"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/leparisien_91/status/1602167335363792897"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/leparisien_92/status/1602167335485378566"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/76actu/status/1599066427679555584"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LesEchos/status/1613937844841582600"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LeParisien_75/status/1580242976806248448"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/leparisien_91/status/1613405105201582080"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ericcoquerel</strong><br><br>
-              🗞Par cette tribune, nous demandons à @Elisabeth_Borne et @vpecresse de surseoir à la privatisation des transports d’IDF. Le service public des transports mal en point à besoin d’investissement pas de destruction.<br><br>
-            <a href="https://twitter.com/ericcoquerel/status/1610202933471186944">
-              2023-01-03 10:14:30
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@RaquelGarridoFr</strong><br><br>
-              Présente auprès des usagers, personnels des transports et élus franciliens qui se mobilisent contre l’augmentation du #PassNavigo. Prendre les transports en commun ce n’est pas un choix, mais c’est un droit. Nous ne laisserons pas @vpecresse faire ! #StopGalere<br><br>
-            <a href="https://twitter.com/RaquelGarridoFr/status/1600423318682640385">
-              2022-12-07 10:33:48
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Farida_Amrani_</strong><br><br>
-              Train bondé, Train bloqué, Train retardé, Pénurie de conducteurs, Privatisation de nos transports en commun... Voici les 2 principaux coupables de notre enfer quotidien ⤵️ #RATP #SNCF @STOPGALEREIDF « CBeaune: #Transports | Échange avec @vpecresse au sujet des transports franciliens, pour travailler ensemble sur leur amélioration et leur financement. — »<br><br>
-            <a href="https://twitter.com/Farida_Amrani_/status/1615716995487469569">
-              2023-01-18 15:25:24
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@CouturierCathy</strong><br><br>
-              Le #gouvernement annonce 100 Milliards pour le ferroviaire La ligne #Polt attend depuis des années un investissement massif combien seront alloués à cette ligne délaissée depuis trop longtemps « damienmaudt: "100 milliards, mais combien pour la ligne #POLT ?" Avec mes collègues @SDelautrette, @CouturierCathy et @ManonMeunier_UP, avant la réunion avec le ministre des transports, nous avons souhaité soutenir les syndicats et usagers qui se battent pour des transports publics dignes. — »<br><br>
-            <a href="https://twitter.com/CouturierCathy/status/1631680873325027328">
-              2023-03-03 16:40:10
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@abomangoli</strong><br><br>
-              Au lieu de faire le malin avec les déplacements du PSG, le ministre des transports pourrait peut-être s’occuper de la situation des transports en commun qui s’effondrent en Île-de-France. Bientôt les usagers du RER feront la grève de l’abonnement. #Seinesaintdenis « leparisien_93: Le manque de conducteurs de train et de bus se traduit par des suppressions et des temps d’attente rallongés partout en Île-de-France «C’est à eux de s’organiser, pas à nous. Parce que nous, nous continuons à payer», s'énerve Eva 😡 — »<br><br>
-            <a href="https://twitter.com/abomangoli/status/1571745465355440128">
-              2022-09-19 08:18:15
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Farida_Amrani_</strong><br><br>
-              Pas une seule question sur la galère quotidienne des millions d'usagers des transports en @iledefrance ... La honte @LeaSalame @franceinter ! Il est vrai que c'est moins intéressant que les ambitions de Monsieur @CBeaune 🤷🏽 ♀️ #RATP #SNCF @IDFmobilites « franceinter: "Je sais que, pour beaucoup de Français, le train reste cher en France" mais "par rapport à l'avant-Covid, les prix n'ont pas tellement augmenté", estime @CBeaune. "Nous avons le meilleur réseau à grande vitesse d'Europe", ajoute le ministre des Transports. #le7930inter — »<br><br>
-            <a href="https://twitter.com/Farida_Amrani_/status/1603314460332101633">
-              2022-12-15 10:02:10
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Farida_Amrani_</strong><br><br>
-              Hier se tenaient les assises du financement des transports franciliens pour la période 2024-2030. 🚆 Que de déceptions ⤵️ 🟢 Alors qu'on aurait pu espérer un changement de cap radical au regard de la situation catastrophique des transports en IDF, la direction actuelle d'@IDFmobilites a confirmé sa volonté de privatisation des transports. Les libéraux, main dans la main à l'Assemblée nationale et à la @iledefrance mettent en place leur réforme de casse du service public. Nous avions pourtant gagné des batailles politiques à l'Assemblée nationale dans le Projet de Loi de Finance avec : 🟢 Un amendement de 3,5 milliards pour le transport ferroviaire 🟢 Un amendement d'1 milliard pour nos transports en commun ...Tous rejetés après l'adoption des ! Pour trouver des financements pour nos transports des dizaines de solutions existent. La privatisation et la mise en concurrence de nos bus prévu par @vpecresse coûtera 5 milliards... Au final, ce sont toujours les mêmes qui payent : les usagers.<br><br>
-            <a href="https://twitter.com/Farida_Amrani_/status/1617966500102692871">
-              2023-01-24 20:24:08
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MariePochon</strong><br><br>
-              Retour sur ma question sur les trains de nuit au ministre des transports @CBeaune 🎙️ "Allez-vous mettre les 1,5 milliards préconisés par le rapport gouvernemental TET de mai 2021 pour commander les 600 voitures nécessaires au développement du train de nuit ?" 🚉 Le secteur des transports est aujourd’hui la première source d’émissions de GES dans notre pays : en 2019, le secteur représentait 31 % des émissions françaises et plus de la moitié étaient émises par les voitures individuelles 🚗 Le train de nuit est une solution écologique, qui permet d’investir à moindre coût sur des lignes existantes, de créer des milliers d’emplois, de mettre un coup d’arrêt à l’artificialisation des sols, d'économiser le coût de l'hébergement pour les usagers Pourtant, après des décennies de sous-investissement, la plupart des trains de nuit français ont été démantelés. Dans la Drôme, deux trains passent encore, quand ils ne sont pas en travaux ou supprimés pour de longues périodes ❌ Cet automne par exemple, seuls 30 trains de nuit circuleront dans le sens Briançon-Paris. 54 trains sont supprimés. Pour dix d'entre eux seulement, des autocars de remplacement sont annoncés. L’information manque, et derrière, les réservations diminuent... Sa réponse ici en vidéo à partir de 1h26'20" :<br><br>
-            <a href="https://twitter.com/MariePochon/status/1577590888137723905">
-              2022-10-05 11:25:52
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ElsaFaucillon</strong><br><br>
-              Ce matin, nous étions sur le quai du RER C avec @FMPasquini à la rencontre des usagers et des salariés. Un🧵 1/9 19 trains par jour ont été supprimés sur la ligne C, sans même compter les retards, chez les usagers, c’est la résignation et la colère, « c’est la galère, on a l’habitude. » ⤵️ 2/9 👉Officiellement ? Un manque de conducteurs alors que la @SNCF bloque depuis plusieurs mois les recrutements. En réalité, la SNCF anticipe l’ouverture à la concurrence en mimant la situation de la Ratp. 3/9 👉Il y a quelques semaines, nous étions déjà à Gabriel Péri au contact des usagers et salariés de . La aussi face à un manque de , le temps d’attente pour un bus dépassait parfois les 25mn. 4/9 👉C’est notamment la conséquence de l’ouverture à la concurrence du réseau de bus en Île-de-France: la RATP veut optimiser le coût du personnel pour être prêt à l’ouverture à la concurrence.⬇ 5/9 ❌Pour cela, l’objectif est d’augmenter le temps de travail, en réduisant les primes et les repos. 6/9 ❌C’est le même schéma qui avait été appliqué avec l’ouverture à la concurrence du réseau de bus Optile de la grande couronne francilienne, qui conduit aujourd’hui à une situation catastrophique. 7/9 ✅Nous devons garder un monopole public sur les transports en commun. La politique mis en place par @vpecresse à la tête de la région est catastrophique et n’a pour seul but que de casser le service public. 8/9 ✅ Face à la casse du service public du transport, il faut une grande mobilisation, et face à l'urgence climatique, nous avons plus que jamais besoin de plus de trains. 9/9<br><br>
-            <a href="https://twitter.com/ElsaFaucillon/status/1567460992841293826">
-              2022-09-07 12:33:17
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Arnaud_Le_Gall_</strong><br><br>
-              🔴 Hier soir, des milliers de passagers du #RERD se sont retrouvés bloqués dans des rames et dans l'impossibilité de rentrer chez eux durant plusieurs heures. La mobilité ferroviaire c’est tous les jours la galère ! 1/8 ⏩ Récemment, C. Beaune, ministre délégué chargé des transports, se félicitait du budget investi dans la modernisation du réseau ferroviaire : "Depuis plusieurs années nous portons un effort budgétaire extrêmement important, nous sommes à milliards par an sur 10 ans". 2/8 En parallèle, les remises sur le carburant accordées par l'Etat devraient avoir coûté milliards d'euros aux finances publiques à la fin 2022 ! 3/8 ⏩ En quelques mois, l'Etat aura donc dépensé en ristournes sur le carburant l'équivalent de 2 ans 1/2 du budget qu'il investit pour moderniser le réseau ferré. Et à la fin, ce sont les contribuables qui paieront la note ! Pourtant une solution existait : le blocage des prix. 4/8 ⏩ Les agents de la RATP et de la SNCF subissent eux-aussi la maltraitance du gouvernement. Ce gouvernement qui refuse d'obliger les entreprises à partager les superprofits avec celles et ceux qui travaillent. 5/8 Ils sont en grève pour la hausse de leurs salaires et l'amélioration de leurs conditions de travail. Aujourd'hui, la situation est telle que SNCF et RATP ne parviennent plus à recruter et ceux qui acceptent encore de rendre ce service public à la collectivité sont à bout ! 6/8 ⏩ La #greve18octobre est aussi une mobilisation collective pour la défense des services publics : les agents #SNCF et #RATP doivent pouvoir exercer leur métier dans de bonnes conditions et ne plus être les réceptacles de la colère des usagers. 7/8 Le gouvernement et IDF Mobilités doivent prendre leurs responsabilités en finançant, à la hauteur nécessaire, la modernisation des infrastructures, en renonçant à leurs projets de privatisation et en redonnant aux agents des salaires et conditions de travail dignes. 8/8<br><br>
-            <a href="https://twitter.com/Arnaud_Le_Gall_/status/1582334804007485440">
-              2022-10-18 13:36:30
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ericcoquerel/status/1610202933471186944"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/RaquelGarridoFr/status/1600423318682640385"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Farida_Amrani_/status/1615716995487469569"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/CouturierCathy/status/1631680873325027328"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/abomangoli/status/1571745465355440128"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Farida_Amrani_/status/1603314460332101633"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Farida_Amrani_/status/1617966500102692871"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MariePochon/status/1577590888137723905"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ElsaFaucillon/status/1567460992841293826"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Arnaud_Le_Gall_/status/1582334804007485440"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 10 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>

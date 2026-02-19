@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="css/style.css" />
-  <title>Topic 27</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <title>Territoires ultramarins</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -11,627 +11,497 @@
 
 <body>
 
-<label for="topic-select"><strong>Choisir un topic :</strong></label>
+<label for="topic-select"></label>
 <select id="topic-select">
-
+  
     <option value="0" >
-      Topic 0
+      Réforme des retraites
     </option>
-
-    <option value="1" >
-      Topic 1
-    </option>
-
-    <option value="2" >
-      Topic 2
-    </option>
-
-    <option value="3" >
-      Topic 3
-    </option>
-
-    <option value="4" >
-      Topic 4
-    </option>
-
-    <option value="5" >
-      Topic 5
-    </option>
-
-    <option value="6" >
-      Topic 6
-    </option>
-
-    <option value="7" >
-      Topic 7
-    </option>
-
-    <option value="8" >
-      Topic 8
-    </option>
-
-    <option value="9" >
-      Topic 9
-    </option>
-
-    <option value="10" >
-      Topic 10
-    </option>
-
-    <option value="11" >
-      Topic 11
-    </option>
-
-    <option value="12" >
-      Topic 12
-    </option>
-
-    <option value="13" >
-      Topic 13
-    </option>
-
-    <option value="14" >
-      Topic 14
-    </option>
-
-    <option value="15" >
-      Topic 15
-    </option>
-
-    <option value="16" >
-      Topic 16
-    </option>
-
-    <option value="17" >
-      Topic 17
-    </option>
-
-    <option value="18" >
-      Topic 18
-    </option>
-
-    <option value="19" >
-      Topic 19
-    </option>
-
-    <option value="20" >
-      Topic 20
-    </option>
-
-    <option value="21" >
-      Topic 21
-    </option>
-
-    <option value="22" >
-      Topic 22
-    </option>
-
-    <option value="23" >
-      Topic 23
-    </option>
-
-    <option value="24" >
-      Topic 24
-    </option>
-
-    <option value="25" >
-      Topic 25
-    </option>
-
-    <option value="26" >
-      Topic 26
-    </option>
-
-    <option value="27" selected>
-      Topic 27
-    </option>
-
-    <option value="28" >
-      Topic 28
-    </option>
-
-    <option value="29" >
-      Topic 29
-    </option>
-
-    <option value="30" >
-      Topic 30
-    </option>
-
-    <option value="31" >
-      Topic 31
-    </option>
-
-    <option value="32" >
-      Topic 32
-    </option>
-
-    <option value="33" >
-      Topic 33
-    </option>
-
-    <option value="34" >
-      Topic 34
-    </option>
-
-    <option value="35" >
-      Topic 35
-    </option>
-
-    <option value="36" >
-      Topic 36
-    </option>
-
-    <option value="37" >
-      Topic 37
-    </option>
-
-    <option value="38" >
-      Topic 38
-    </option>
-
-    <option value="39" >
-      Topic 39
-    </option>
-
-    <option value="40" >
-      Topic 40
-    </option>
-
-    <option value="41" >
-      Topic 41
-    </option>
-
-    <option value="42" >
-      Topic 42
-    </option>
-
-    <option value="43" >
-      Topic 43
-    </option>
-
-    <option value="44" >
-      Topic 44
-    </option>
-
-    <option value="45" >
-      Topic 45
-    </option>
-
-    <option value="46" >
-      Topic 46
-    </option>
-
-    <option value="47" >
-      Topic 47
-    </option>
-
-    <option value="48" >
-      Topic 48
-    </option>
-
-    <option value="49" >
-      Topic 49
-    </option>
-
-    <option value="51" >
-      Topic 51
-    </option>
-
-    <option value="52" >
-      Topic 52
-    </option>
-
-    <option value="53" >
-      Topic 53
-    </option>
-
-    <option value="54" >
-      Topic 54
-    </option>
-
-    <option value="55" >
-      Topic 55
-    </option>
-
+  
     <option value="56" >
-      Topic 56
+      Suppression redevance audiovisuelle
     </option>
-
-    <option value="57" >
-      Topic 57
+  
+    <option value="24" >
+      Prix de l'énergie pour les artisans boulangers
     </option>
-
-    <option value="58" >
-      Topic 58
+  
+    <option value="40" >
+      Logement
     </option>
-
-    <option value="59" >
-      Topic 59
+  
+    <option value="18" >
+      Précarité étudiante
     </option>
-
-    <option value="61" >
-      Topic 61
-    </option>
-
-    <option value="62" >
-      Topic 62
-    </option>
-
-    <option value="63" >
-      Topic 63
-    </option>
-
-    <option value="64" >
-      Topic 64
-    </option>
-
-    <option value="65" >
-      Topic 65
-    </option>
-
-    <option value="66" >
-      Topic 66
-    </option>
-
-    <option value="67" >
-      Topic 67
-    </option>
-
-    <option value="68" >
-      Topic 68
-    </option>
-
-    <option value="69" >
-      Topic 69
-    </option>
-
-    <option value="70" >
-      Topic 70
-    </option>
-
-    <option value="71" >
-      Topic 71
-    </option>
-
-    <option value="72" >
-      Topic 72
-    </option>
-
-    <option value="73" >
-      Topic 73
-    </option>
-
-    <option value="74" >
-      Topic 74
-    </option>
-
-    <option value="75" >
-      Topic 75
-    </option>
-
-    <option value="76" >
-      Topic 76
-    </option>
-
-    <option value="77" >
-      Topic 77
-    </option>
-
-    <option value="78" >
-      Topic 78
-    </option>
-
-    <option value="79" >
-      Topic 79
-    </option>
-
-    <option value="80" >
-      Topic 80
-    </option>
-
-    <option value="81" >
-      Topic 81
-    </option>
-
-    <option value="83" >
-      Topic 83
-    </option>
-
-    <option value="84" >
-      Topic 84
-    </option>
-
+  
     <option value="85" >
-      Topic 85
+      Innovation, FrenchTech et startups françaises
     </option>
-
-    <option value="86" >
-      Topic 86
+  
+    <option value="42" >
+      Uber
     </option>
-
-    <option value="87" >
-      Topic 87
+  
+    <option value="2" >
+      Hôpital et santé publique
     </option>
-
-    <option value="88" >
-      Topic 88
+  
+    <option value="58" >
+      Prévention et traitement du cancer
     </option>
-
-    <option value="89" >
-      Topic 89
+  
+    <option value="61" >
+      Fin de vie et soins palliatifs
     </option>
-
-    <option value="90" >
-      Topic 90
+  
+    <option value="5" >
+      Education nationale
     </option>
-
+  
+    <option value="74" >
+      Harcèlement scolaire
+    </option>
+  
+    <option value="78" >
+      Uniforme à l'école
+    </option>
+  
+    <option value="1" >
+      Énergie et transition énergétique
+    </option>
+  
     <option value="91" >
-      Topic 91
+      Politique énergétique européenne
     </option>
-
+  
+    <option value="25" >
+      Sécheresse et changement climatique
+    </option>
+  
+    <option value="88" >
+      Transports et écologie
+    </option>
+  
+    <option value="10" >
+      Train et transports en commun
+    </option>
+  
+    <option value="67" >
+      Vélo
+    </option>
+  
+    <option value="63" >
+      Chasse et biodiversité
+    </option>
+  
+    <option value="57" >
+      Consommation et production de viande
+    </option>
+  
+    <option value="13" >
+      Incendies et Pompiers
+    </option>
+  
+    <option value="45" >
+      Déconjugalisation de l'AAH
+    </option>
+  
+    <option value="6" >
+      Constitutionnalisation du droit à l'IVG
+    </option>
+  
+    <option value="35" >
+      Droits des femmes
+    </option>
+  
+    <option value="41" >
+      Violences faites aux femmes
+    </option>
+  
+    <option value="37" >
+      Droits des enfants et violences intrafamiliales
+    </option>
+  
+    <option value="47" >
+      Homophobie et droits LGBT
+    </option>
+  
+    <option value="84" >
+      Laïcité
+    </option>
+  
+    <option value="46" >
+      Dénonciation islam radical
+    </option>
+  
+    <option value="20" >
+      Abolition de la corrida
+    </option>
+  
+    <option value="16" >
+      Défense nationale et armées
+    </option>
+  
+    <option value="75" >
+      Service National Universel
+    </option>
+  
+    <option value="17" >
+      Sécurité intérieure
+    </option>
+  
+    <option value="32" >
+      Prison et Justice
+    </option>
+  
+    <option value="83" >
+      Incivilités routières
+    </option>
+  
+    <option value="52" >
+      Fusillade centre culturel kurde
+    </option>
+  
+    <option value="54" >
+      Meurtre professeure Saint-Jean-de-Luz
+    </option>
+  
+    <option value="64" >
+      Meurtre de Lola Daviet
+    </option>
+  
+    <option value="68" >
+      Gendarmerie et sécurité
+    </option>
+  
+    <option value="4" >
+      Guerre en Ukraine
+    </option>
+  
+    <option value="11" >
+      Relations avec Israël-Palestine
+    </option>
+  
+    <option value="12" >
+      Soutien au peuple iranien
+    </option>
+  
+    <option value="22" >
+      Relations diplomatiques avec l’Algérie
+    </option>
+  
+    <option value="28" >
+      Invasion Arménie par Azebaïdjan
+    </option>
+  
+    <option value="29" >
+      Sauvetage de migrants en mer
+    </option>
+  
+    <option value="36" >
+      Elections présidentielles au Brésil
+    </option>
+  
+    <option value="51" >
+      Giorgia Meloni
+    </option>
+  
+    <option value="81" >
+      Mayotte
+    </option>
+  
+    <option value="23" >
+      Propos racistes à l'Assemblée
+    </option>
+  
+    <option value="39" >
+      Organisation des JOP 2024
+    </option>
+  
     <option value="92" >
-      Topic 92
+      Affaire Quatennens
     </option>
-
+  
+    <option value="70" >
+      Controverse Hanouna-Boyard TPMP / Médias Bolloré
+    </option>
+  
+    <option value="53" >
+      Critiques coupe du monde au Qatar
+    </option>
+  
+    <option value="26" >
+      Hommage victimes terrorisme
+    </option>
+  
+    <option value="31" >
+      Hommage Vel d'Hiv / Shoah
+    </option>
+  
+    <option value="7" >
+      Hommages 11 novembre et Libération
+    </option>
+  
+    <option value="77" >
+      Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès
+    </option>
+  
+    <option value="30" >
+      Fête Nationale
+    </option>
+  
+    <option value="55" >
+      Sainte-Barbe / Pompiers
+    </option>
+  
+    <option value="49" >
+      Mort Elisabeth II
+    </option>
+  
+    <option value="89" >
+      Mort Benoit XVI
+    </option>
+  
+    <option value="86" >
+      Prix Nobel Annie Ernaux
+    </option>
+  
+    <option value="19" >
+      Annonces et hommages décès
+    </option>
+  
+    <option value="34" >
+      Bravo les bleus / Football
+    </option>
+  
+    <option value="44" >
+      Bravo le Rugby / Sport
+    </option>
+  
+    <option value="66" >
+      Match France-Maroc
+    </option>
+  
+    <option value="87" >
+      Sport, Téléthon, Nouvelle-Zélande
+    </option>
+  
+    <option value="21" >
+      Marché de Noël / Joyeux Noël
+    </option>
+  
+    <option value="79" >
+      Epiphanie
+    </option>
+  
+    <option value="3" >
+      Interventions à la TV ou à la radio
+    </option>
+  
+    <option value="80" >
+      Bras d'honneur de Dupond-Moretti
+    </option>
+  
+    <option value="15" >
+      Injure raciste Carlos Martens Bilongo / Afrique
+    </option>
+  
+    <option value="9" >
+      Agression Permanence / Immigration / Extrême-Droite
+    </option>
+  
+    <option value="59" >
+      Visions de la République et de la Nation
+    </option>
+  
+    <option value="72" >
+      Agendas et campagnes
+    </option>
+  
+    <option value="71" >
+      Groupes d'amitié avec pays étrangers / Chili
+    </option>
+  
+    <option value="38" >
+      Relations franco-allemandes
+    </option>
+  
+    <option value="76" >
+      Intempéries en Corse/ Corse
+    </option>
+  
+    <option value="27" selected="selected">
+      Territoires ultramarins
+    </option>
+  
+    <option value="62" >
+      Biélorussie, Russie, Ukraine
+    </option>
+  
+    <option value="43" >
+      FDO blessées, refus d'obtempérer, agressions
+    </option>
+  
+    <option value="33" >
+      Condition animale
+    </option>
+  
+    <option value="90" >
+      Grève des éboueurs
+    </option>
+  
+    <option value="69" >
+      Enfance et numérique
+    </option>
+  
+    <option value="8" >
+      Twitter et généralités
+    </option>
+  
 </select>
 
-<!-- <h2>Topic 27</h2> -->
-<div id="vis"></div>
-<div class="grid">
+<div class="charts">
+  <div id="vis"></div>
+</div>
+<div class="charts"></div>
+  <img src="img/bertopic_27.png">
+</div>
 
+
+<div class="grid">
+  
   <div>
     <h3>médias</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@OuestFrance</strong><br><br>
-              Assemblée nationale. Vers un 10e groupe parlementaire composite avec des Ultramarins<br><br>
-            <a href="https://twitter.com/OuestFrance/status/1539911080939589632">
-              2022-06-23 11:59:46
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@zinfoslive</strong><br><br>
-              Gérard Darmanin en charge de l'Outre-mer : "Un déni et une insulte envers les ultramarins"<br><br>
-            <a href="https://twitter.com/zinfoslive/status/1543958792903299072">
-              2022-07-04 16:03:56
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@zinfoslive</strong><br><br>
-              Diner entre élus ultramarins et Emmanuel Macron : La question du statut finalement peu abordée<br><br>
-            <a href="https://twitter.com/zinfoslive/status/1567966447238008832">
-              2022-09-08 22:01:47
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@zinfoslive</strong><br><br>
-              Vie chère : Naillet interpelle Carenco sur le "sentiment d'injustice ressenti par les ultramarins"<br><br>
-            <a href="https://twitter.com/zinfoslive/status/1612778756430602240">
-              2023-01-10 12:49:54
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@LeHuffPost</strong><br><br>
-              "Quasiment une insulte": la position de la majorité sur cet amendement a ulcéré les élus ultramarins<br><br>
-            <a href="https://twitter.com/LeHuffPost/status/1549349263171325952">
-              2022-07-19 13:03:44
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@franceguyane</strong><br><br>
-              #EducationNationale Inauguration de l'école de proximité de Beli Kampu, en présence de Jean-François Carenco, ministre délégué chargé des Outremer👇🏽<br><br>
-            <a href="https://twitter.com/franceguyane/status/1602345391529365506">
-              2022-12-12 17:51:26
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@humanite_fr</strong><br><br>
-              #ReformeDesRetraites Dans les territoires ultramarins, les retraités sont beaucoup plus exposés à la grande pauvreté, en raison de carrières hachées et de salaires faibles. Une situation que dénonce la Réunionnaise @KarineLebon #DOMTOM<br><br>
-            <a href="https://twitter.com/humanite_fr/status/1625902772590870528">
-              2023-02-15 18:00:03
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@franceguyane</strong><br><br>
-              Deux sénatrices ont remis rapport de 372 pages. Le constat : sans une profonde remise en question du système de traitement et de collecte, les territoires ultramarins courent à une catastrophe sanitaire. La Guyane est déjà face à l'urgence 👇<br><br>
-            <a href="https://twitter.com/franceguyane/status/1613257926134603782">
-              2023-01-11 20:33:57
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Politis_fr</strong><br><br>
-              #NeoColonialisme De l’archipel-monde aux frontières intérieures Les territoires ultramarins posent des problématiques de gestion nouvelles aux États incapables de répondre à leurs aspirations. Par @Mikaa_H2 dans le hors-série #RepenserLesFrontières.<br><br>
-            <a href="https://twitter.com/Politis_fr/status/1550519769035587587">
-              2022-07-22 18:34:54
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@franceguyane</strong><br><br>
-              Le ministre délégué aux Outre-mer estime que la constitution d'un panier de produits à prix régulés pourrait aider à faire baisser le coût de la vie dans les territoires ultramarins, mais que cela passe surtout par la création d'activité et de valeur 👇<br><br>
-            <a href="https://twitter.com/franceguyane/status/1562841051856941056">
-              2022-08-25 18:35:17
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/OuestFrance/status/1539911080939589632"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/zinfoslive/status/1543958792903299072"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/zinfoslive/status/1567966447238008832"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/zinfoslive/status/1612778756430602240"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/LeHuffPost/status/1549349263171325952"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/franceguyane/status/1602345391529365506"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/humanite_fr/status/1625902772590870528"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/franceguyane/status/1613257926134603782"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Politis_fr/status/1550519769035587587"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/franceguyane/status/1562841051856941056"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
   <div>
     <h3>députés</h3>
 
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ChrisBapt</strong><br><br>
-              Assemblée nationale : le groupe centré sur l'Outremer restera un voeu pieux<br><br>
-            <a href="https://twitter.com/ChrisBapt/status/1542425757624008704">
-              2022-06-30 10:32:12
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@mbompard</strong><br><br>
-              G. Darmanin insulte une fois de plus nos compatriotes ultramarins, il faut que cesse ce mépris insupportable.<br><br>
-            <a href="https://twitter.com/mbompard/status/1623389404084547584">
-              2023-02-08 19:32:49
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MathildePanot</strong><br><br>
-              Grande émotion. Face au mépris du gouvernement, les parlementaires ultramarins de tous bords se sont réunis en Guyane pour un séminaire sur les enjeux de leurs territoires. Une initiative historique pour construire une alternative à la maltraitance sociale !<br><br>
-            <a href="https://twitter.com/MathildePanot/status/1613493759022436354">
-              2023-01-12 12:11:04
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@STaillePolian</strong><br><br>
-              Victoire ! L’amendement de mon collègue @frdric_maillot adopté contre l’avis du gouvernement, pour soutenir davantage les territoires dans la valorisation du patrimoine local, en particulier les territoires ultramarins et le rapport de la 🇫🇷à son passé esclavagiste.<br><br>
-            <a href="https://twitter.com/STaillePolian/status/1585940462682218498">
-              2022-10-28 12:24:06
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@MathildePanot</strong><br><br>
-              Budget Outre-mer : 30 amendements #NUPES gagnés, + de 200 millions d’€ pour garantir le droit à l’eau, au logement ou lutter contre la vie chère. Si le gouvernement écarte ces victoires par le 49-3, ils réitèreront leur mépris pour la démocratie et nos compatriotes ultramarins!<br><br>
-            <a href="https://twitter.com/MathildePanot/status/1586147844657913858">
-              2022-10-29 02:08:10
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ChrisBapt</strong><br><br>
-              Retrouvez mon intervention du jour au propos des pensions de retraite dans les territoires dits "d’outre-mer" juste ici 👇🏾 « LCP: "Comment pensez-vous une réforme des retraites qui se voudrait universelle, sans pour autant prendre en considération les spécificités des territoires ultramarins ?", questionne @ChrisBapt. #QAG #RéformeDesRetraites — »<br><br>
-            <a href="https://twitter.com/ChrisBapt/status/1617920807153594368">
-              2023-01-24 17:22:34
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@Deputee_Obono</strong><br><br>
-              🔴🏛️ "Alors que le sur le #PLF2023 n’est plus qu’une question de temps, les députés #NUPES [ultramarins] mettent en garde le gouvernement. Revenir sur les mesures votées...serait vécu comme une brutalisation insupportable pour nos compatriotes d’Outre-mer." « FiAssemblee: 🔴✊ Vendredi a eu lieu à l'Assemblée nationale un débat historique pour les Outre-mer ! ✅ 30 amendements de la NUPES ont été adoptés - contre l'avis du gouvernement - pour répondre aux besoins urgents de nos concitoyens d'Outre-mer. Communiqué des députés NUPES ultramarins⤵️ — »<br><br>
-            <a href="https://twitter.com/Deputee_Obono/status/1587075823764471809">
-              2022-10-31 14:35:37
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ElieCalifer</strong><br><br>
-              Le 8 et 9 mars 2023 s’est tenue en Guadeloupe la Conférence de Coopération Régionale Antilles-Guyane organisée sous le haut patronage du Ministre délégué chargé des Outre-mer, Jean-François CARENCO. Durant ces deux jours, il a été question d’évoquer les leçons de la crise du Covid-19 dans la région et les perspectives en matière de coopération de santé, la protection de l’environnement et la lutte contre le changement climatique [...] la mobilité des jeunes et la formation dans la région caribéenne, les connexions aériennes et maritimes au service de la création de valeur en matière de commerce et d’emploi. On ne le dira assez : le développement de nos territoires ultramarins ne pourra se faire sans encourager leur intégration dans leurs espaces géographiques respectifs.<br><br>
-            <a href="https://twitter.com/ElieCalifer/status/1634275991148265473">
-              2023-03-10 20:32:14
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ElieCalifer2022</strong><br><br>
-              Dans le cadre de l’examen des budgets de l’Etat et de la Sécurité sociale, l’intergroupe NUPES a organisé un point presse consacré aux Outre-mer. Durant mon intervention, j’ai souhaité rappeler à l’Etat les responsabilités qu’il a en matière de sécurité. En 2021, les services du ministère de l’intérieur ont constaté une hausse des homicides : "En cumul sur les trois dernières années, le taux d’homicides atteint 0,13 homicide pour 1000 ha­bitants en Guyane, 0,07 en Guadeloupe, 0,06 en Martinique et 0,05 à Mayotte, contre 0,02 homicide pour 1000 habi­tants en moyenne sur toute la France". Les DROM sont également pointés du doigt concernant les augmentations du nombre de victimes de coups et blessures volontaires, dans et en dehors de la sphère familiale. Les violences sexuelles ne manquent elles aussi pas de grimper : "Par rapport à 2020, le nombre de vio­lences sexuelles enregistrées augmente fortement en 2021 dans l’ensemble des régions françaises, notamment de façon plus marquée en Guadeloupe (+58%), à Mayotte (+54%) et en Martinique (+49%) que sur l’ensemble du territoire (+33%)." Enfin, "en 2021, quatre DROM enregistrent un nombre de vols avec armes par habitant bien supérieur à la moyenne nationale (0,13‰) : Guyane (3,6‰), Mayotte (2,1‰), Guadeloupe et Martinique (0,7‰)". Stop Stop STOP<br><br>
-            <a href="https://twitter.com/ElieCalifer2022/status/1595791853475229696">
-              2022-11-24 15:50:00
-            </a>
-          </div>
-        </div>
-
-
-
-        <div class="tweet-fallback-container">
-          <div class="tweet-fallback">
-            <strong>@ElieCalifer2022</strong><br><br>
-              [THREAD] #guadeloupe #outremer Me voilà de retour à Paris. Je réitère à chacun d’entre vous mes meilleurs voeux (🥳 ) en ce début d’année qui s’annonce intense, notamment du fait du débat sur le texte de la réforme des retraites 📄 : - Retraites 👴🏽 : ce mardi 17 janvier, notre groupe socialiste a posé deux questions sur la réforme des retraites qui s’avère profondément injuste pour les Français. J’aurai l’occasion de revenir sur ce sujet tout au long des semaines à venir. - Cherté de la vie 💸 : très prochainement, mon collègue @DeputeHajjar proposera la création d’une commission d’enquête sur le coût de la vie dans les Départements et Régions d’Outre-mer. Le Vice-Président de la Délégation des Outre-mer que je suis ne peut qu’encourager cette initiative et co-signera cette proposition 👏🏼 - Situation des outre-mer 🏛️: dès lundi prochain, je rencontrerai avec les parlementaires guadeloupéens le Ministre délégué chargé des Outre-mer @lesoutremer, Jean-François CARENCO, pour aborder les questions propres au territoire (billets d’avion ? ✈️ ). - Suite de la rencontre des députés 97 en Guyane. Il faut sensibiliser ! Il faut convaincre ! 🗣️ : nous tiendrons très prochainement une séance de travail avec le Président du groupe @socialistesAN, @BorisVallaud, pour mieux faire connaître nos spécificités... - Service National Universel (SNU) 👥 : des annonces sur l’instauration obligatoire du SNU pour les jeunes à partir de 15 ans pourraient être examinées. Instruit par l’expérience du RSMA en Guadeloupe, je prendrai part au débat dans l’intérêt de notre jeunesse.<br><br>
-            <a href="https://twitter.com/ElieCalifer2022/status/1615465041964277769">
-              2023-01-17 22:44:14
-            </a>
-          </div>
-        </div>
-
-
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ChrisBapt/status/1542425757624008704"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/mbompard/status/1623389404084547584"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MathildePanot/status/1613493759022436354"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/STaillePolian/status/1585940462682218498"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/MathildePanot/status/1586147844657913858"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ChrisBapt/status/1617920807153594368"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/Deputee_Obono/status/1587075823764471809"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ElieCalifer/status/1634275991148265473"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ElieCalifer2022/status/1595791853475229696"></a>
+        </blockquote>
+      
+    
+      
+        <blockquote class="twitter-tweet" data-conversation="none" data-cards="hidden" data-dnt="true">
+          <a href="https://twitter.com/ElieCalifer2022/status/1615465041964277769"></a>
+        </blockquote>
+      
+    
   </div>
-
+  
 </div>
 
 <script async src="https://platform.twitter.com/widgets.js"></script>
@@ -647,6 +517,7 @@
   "config": {
     "range": {
       "category": [
+        "#29b09d",
         "#ffd16a",
         "#ff2b2b",
         "#6d3fc0",
@@ -655,7 +526,6 @@
         "#ffabab",
         "mediumpurple",
         "#83c9ff",
-        "#29b09d",
         "black"
       ]
     },
@@ -19438,6 +19308,7 @@
         "title": "Public"
       },
       "sort": [
+        "m\u00e9dias",
         "d\u00e9put\u00e9s Ensemble",
         "d\u00e9put\u00e9s NUPES",
         "d\u00e9put\u00e9s RN",
@@ -19446,7 +19317,6 @@
         "supporters NUPES",
         "supporters RN",
         "supporters LR",
-        "m\u00e9dias",
         "attentive"
       ],
       "type": "nominal"
@@ -19488,16 +19358,15 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "d\u00e9put\u00e9s Ensemble"
+      "value": "m\u00e9dias"
     }
   ],
   "title": {
-    "subtitle": "Il s'agit du nombre de tweets consacr\u00e9s \u00e0 ce topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic 27 par chacun des publics au cours du temps"
+    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
   },
-  "width": 1000
+  "width": 550
 };
-  console.log(spec);
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);
 </script>
