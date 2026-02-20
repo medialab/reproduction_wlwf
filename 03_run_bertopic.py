@@ -1,7 +1,6 @@
 import os
 import sys
 import argparse
-from figures_utils import draw_topic_keywords
 from hdbscan import HDBSCAN
 from bertopic import BERTopic
 from bertopic.dimensionality import BaseDimensionalityReduction
@@ -18,6 +17,7 @@ from utils import (
     vectorizer,
     write_bertopic_TS,
     write_ids_and_representative_docs,
+    write_keywords,
     DEFAULT_SAVE_SIZE,
     NB_DOCS_SMALL_TRAIN,
 )
@@ -165,7 +165,7 @@ for group in group_list:
             topic_ids_list.append(topic)
             top_list = topic_model.get_topic(topic)
             top_words, top_ctfidf = zip(*top_list)
-            draw_topic_keywords(topic, top_words, top_ctfidf, args.origin_path)
+            write_keywords(topic, top_words, top_ctfidf, args.origin_path)
     else:
         topics, probs = topic_model.transform(docs, embeddings)
 

@@ -1058,3 +1058,20 @@ def write_bertopic_TS(topics, topics_info, group_type, party_day_counts, origin_
                             topics_info[topic][day],
                         ]
                     )
+
+
+def write_keywords(topic, words, x, root=os.getcwd()):
+    """
+    topic: the topic number
+    words: a list of words
+    x: list of values on the x-axis
+    """
+    output_folder = create_dir(
+        os.path.join(root, "data_prod", "dashboard", "bertopic", "img")
+    )
+
+    with open(os.path.join(output_folder, f"bertopic_keywords_{topic}.csv"), "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["word", "x"])
+        for word, score in zip(words, x):
+            writer.writerow([word, score])
