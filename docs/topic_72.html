@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="css/style.css"/>
-  <title>Agendas et campagnes</title>
+  <title>Qui murmure à l'oreille des députés - Annexe en ligne</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -360,13 +360,7 @@
   
 </select>
 
-<div class="charts">
-  <div id="vis"></div>
-</div>
-<div class="charts"></div>
-  <img src="img/bertopic_72.png">
-</div>
-
+<div id="vis"></div>
 
 <div class="grid">
   
@@ -533,9 +527,6 @@
       "continuousHeight": 300,
       "continuousWidth": 300
     }
-  },
-  "data": {
-    "name": "data-394080c34200ab052e90186ba20c63fe"
   },
   "datasets": {
     "data-394080c34200ab052e90186ba20c63fe": [
@@ -19299,54 +19290,178 @@
         "prop": 0.00144,
         "topic": 72
       }
+    ],
+    "data-aed001ae1d27a19ef816123fbdc4bc6d": [
+      {
+        "word": "twitch",
+        "x": 0.0066217559366627
+      },
+      {
+        "word": "suivre",
+        "x": 0.005807525585017
+      },
+      {
+        "word": "travail",
+        "x": 0.0052566012604506
+      },
+      {
+        "word": "twitter",
+        "x": 0.0050951780464563
+      },
+      {
+        "word": "grand",
+        "x": 0.004637375441418
+      },
+      {
+        "word": "numerique",
+        "x": 0.0045056257547854
+      },
+      {
+        "word": "bravo",
+        "x": 0.0044365494781285
+      },
+      {
+        "word": "direct",
+        "x": 0.0043258759986582
+      },
+      {
+        "word": "loi",
+        "x": 0.0041960964857216
+      },
+      {
+        "word": "dun",
+        "x": 0.0040998470225305
+      }
     ]
   },
-  "encoding": {
-    "color": {
-      "field": "party",
-      "legend": {
-        "title": "Public"
+  "hconcat": [
+    {
+      "data": {
+        "name": "data-394080c34200ab052e90186ba20c63fe"
       },
-      "sort": [
-        "m\u00e9dias",
-        "d\u00e9put\u00e9s Ensemble",
-        "d\u00e9put\u00e9s NUPES",
-        "d\u00e9put\u00e9s RN",
-        "d\u00e9put\u00e9s LR",
-        "supporters Ensemble",
-        "supporters NUPES",
-        "supporters RN",
-        "supporters LR",
-        "attentive"
-      ],
-      "type": "nominal"
+      "encoding": {
+        "color": {
+          "field": "party",
+          "legend": {
+            "title": "Public"
+          },
+          "sort": [
+            "m\u00e9dias",
+            "d\u00e9put\u00e9s Ensemble",
+            "d\u00e9put\u00e9s NUPES",
+            "d\u00e9put\u00e9s RN",
+            "d\u00e9put\u00e9s LR",
+            "supporters Ensemble",
+            "supporters NUPES",
+            "supporters RN",
+            "supporters LR",
+            "attentive"
+          ],
+          "type": "nominal"
+        },
+        "opacity": {
+          "condition": [
+            {
+              "param": "param_71",
+              "value": 1
+            }
+          ],
+          "value": 0.01
+        },
+        "x": {
+          "field": "date",
+          "type": "temporal"
+        },
+        "y": {
+          "axis": {
+            "format": "%"
+          },
+          "field": "prop",
+          "title": "proportion d'attention",
+          "type": "quantitative"
+        }
+      },
+      "height": 200,
+      "mark": {
+        "type": "line"
+      },
+      "name": "view_71",
+      "title": {
+        "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+        "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
+      },
+      "width": 600
     },
-    "opacity": {
-      "condition": [
+    {
+      "data": {
+        "name": "data-aed001ae1d27a19ef816123fbdc4bc6d"
+      },
+      "height": 200,
+      "layer": [
         {
-          "param": "param_71",
-          "value": 1
+          "encoding": {
+            "color": {
+              "field": "x",
+              "legend": null,
+              "scale": {
+                "scheme": "lightorange"
+              },
+              "type": "quantitative"
+            },
+            "text": {
+              "field": "word",
+              "type": "ordinal"
+            },
+            "x": {
+              "field": "x",
+              "title": "score c-TFIDF",
+              "type": "quantitative"
+            },
+            "y": {
+              "axis": null,
+              "field": "word",
+              "sort": "-x",
+              "type": "ordinal"
+            }
+          },
+          "mark": {
+            "type": "bar"
+          },
+          "title": {
+            "text": "10 mots-clefs les plus repr\u00e9sentatifs du topic"
+          }
+        },
+        {
+          "encoding": {
+            "text": {
+              "field": "word",
+              "type": "ordinal"
+            },
+            "x": {
+              "field": "x",
+              "title": "score c-TFIDF",
+              "type": "quantitative"
+            },
+            "y": {
+              "axis": null,
+              "field": "word",
+              "sort": "-x",
+              "type": "ordinal"
+            }
+          },
+          "mark": {
+            "align": "right",
+            "dx": -1,
+            "type": "text"
+          },
+          "title": {
+            "text": "10 mots-clefs les plus repr\u00e9sentatifs du topic"
+          }
         }
       ],
-      "value": 0.01
-    },
-    "x": {
-      "field": "date",
-      "type": "temporal"
-    },
-    "y": {
-      "axis": {
-        "format": "%"
-      },
-      "field": "prop",
-      "title": "proportion d'attention",
-      "type": "quantitative"
+      "width": 300
     }
-  },
-  "height": 200,
-  "mark": {
-    "type": "line"
-  },
+  ],
   "params": [
     {
       "bind": "legend",
@@ -19358,14 +19473,12 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "m\u00e9dias"
+      "value": "m\u00e9dias",
+      "views": [
+        "view_71"
+      ]
     }
-  ],
-  "title": {
-    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
-  },
-  "width": 550
+  ]
 };
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);

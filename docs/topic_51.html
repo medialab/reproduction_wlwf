@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="css/style.css"/>
-  <title>Giorgia Meloni</title>
+  <title>Qui murmure à l'oreille des députés - Annexe en ligne</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@6"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
@@ -360,13 +360,7 @@
   
 </select>
 
-<div class="charts">
-  <div id="vis"></div>
-</div>
-<div class="charts"></div>
-  <img src="img/bertopic_51.png">
-</div>
-
+<div id="vis"></div>
 
 <div class="grid">
   
@@ -534,10 +528,49 @@
       "continuousWidth": 300
     }
   },
-  "data": {
-    "name": "data-c9e8b7dbf15b6491e6e894dd4c4a6124"
-  },
   "datasets": {
+    "data-0443da8fac5bdf52f2a946a345465420": [
+      {
+        "word": "italie",
+        "x": 0.0633439585512149
+      },
+      {
+        "word": "meloni",
+        "x": 0.0462876904817362
+      },
+      {
+        "word": "italiens",
+        "x": 0.0320040405705221
+      },
+      {
+        "word": "litalie",
+        "x": 0.0291347958956959
+      },
+      {
+        "word": "giorgia",
+        "x": 0.0291032802807521
+      },
+      {
+        "word": "giorgia meloni",
+        "x": 0.0291032802807521
+      },
+      {
+        "word": "italien",
+        "x": 0.025485973261009
+      },
+      {
+        "word": "italienne",
+        "x": 0.0234535737287397
+      },
+      {
+        "word": "fasciste",
+        "x": 0.0224884233779659
+      },
+      {
+        "word": "mussolini",
+        "x": 0.0199436868593805
+      }
+    ],
     "data-c9e8b7dbf15b6491e6e894dd4c4a6124": [
       {
         "date": "2022-06-20T00:00:00",
@@ -19301,52 +19334,134 @@
       }
     ]
   },
-  "encoding": {
-    "color": {
-      "field": "party",
-      "legend": {
-        "title": "Public"
+  "hconcat": [
+    {
+      "data": {
+        "name": "data-c9e8b7dbf15b6491e6e894dd4c4a6124"
       },
-      "sort": [
-        "m\u00e9dias",
-        "d\u00e9put\u00e9s Ensemble",
-        "d\u00e9put\u00e9s NUPES",
-        "d\u00e9put\u00e9s RN",
-        "d\u00e9put\u00e9s LR",
-        "supporters Ensemble",
-        "supporters NUPES",
-        "supporters RN",
-        "supporters LR",
-        "attentive"
-      ],
-      "type": "nominal"
+      "encoding": {
+        "color": {
+          "field": "party",
+          "legend": {
+            "title": "Public"
+          },
+          "sort": [
+            "m\u00e9dias",
+            "d\u00e9put\u00e9s Ensemble",
+            "d\u00e9put\u00e9s NUPES",
+            "d\u00e9put\u00e9s RN",
+            "d\u00e9put\u00e9s LR",
+            "supporters Ensemble",
+            "supporters NUPES",
+            "supporters RN",
+            "supporters LR",
+            "attentive"
+          ],
+          "type": "nominal"
+        },
+        "opacity": {
+          "condition": [
+            {
+              "param": "param_51",
+              "value": 1
+            }
+          ],
+          "value": 0.01
+        },
+        "x": {
+          "field": "date",
+          "type": "temporal"
+        },
+        "y": {
+          "axis": {
+            "format": "%"
+          },
+          "field": "prop",
+          "title": "proportion d'attention",
+          "type": "quantitative"
+        }
+      },
+      "height": 200,
+      "mark": {
+        "type": "line"
+      },
+      "name": "view_51",
+      "title": {
+        "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
+        "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
+      },
+      "width": 600
     },
-    "opacity": {
-      "condition": [
+    {
+      "data": {
+        "name": "data-0443da8fac5bdf52f2a946a345465420"
+      },
+      "height": 200,
+      "layer": [
         {
-          "param": "param_51",
-          "value": 1
+          "encoding": {
+            "color": {
+              "field": "x",
+              "legend": null,
+              "scale": {
+                "scheme": "lightorange"
+              },
+              "type": "quantitative"
+            },
+            "text": {
+              "field": "word",
+              "type": "ordinal"
+            },
+            "x": {
+              "field": "x",
+              "title": "score c-TFIDF",
+              "type": "quantitative"
+            },
+            "y": {
+              "axis": null,
+              "field": "word",
+              "sort": "-x",
+              "type": "ordinal"
+            }
+          },
+          "mark": {
+            "type": "bar"
+          },
+          "title": {
+            "text": "10 mots-clefs les plus repr\u00e9sentatifs du topic"
+          }
+        },
+        {
+          "encoding": {
+            "text": {
+              "field": "word",
+              "type": "ordinal"
+            },
+            "x": {
+              "field": "x",
+              "title": "score c-TFIDF",
+              "type": "quantitative"
+            },
+            "y": {
+              "axis": null,
+              "field": "word",
+              "sort": "-x",
+              "type": "ordinal"
+            }
+          },
+          "mark": {
+            "align": "right",
+            "dx": -1,
+            "type": "text"
+          },
+          "title": {
+            "text": "10 mots-clefs les plus repr\u00e9sentatifs du topic"
+          }
         }
       ],
-      "value": 0.01
-    },
-    "x": {
-      "field": "date",
-      "type": "temporal"
-    },
-    "y": {
-      "axis": {
-        "format": "%"
-      },
-      "field": "prop",
-      "title": "proportion d'attention",
-      "type": "quantitative"
+      "width": 300
     }
-  },
-  "height": 200,
-  "mark": {
-    "type": "line"
-  },
+  ],
   "params": [
     {
       "bind": "legend",
@@ -19358,14 +19473,12 @@
         "toggle": "true",
         "type": "point"
       },
-      "value": "m\u00e9dias"
+      "value": "m\u00e9dias",
+      "views": [
+        "view_51"
+      ]
     }
-  ],
-  "title": {
-    "subtitle": "Nombre de tweets du topic rapport\u00e9 au nombre de tweets \u00e9mis le m\u00eame jour par le m\u00eame public.",
-    "text": "Proportion d'attention accord\u00e9e au topic par chacun des publics au cours du temps"
-  },
-  "width": 550
+  ]
 };
   var opt = {"renderer": "canvas", "actions": false};
   vegaEmbed("#vis", spec, opt);

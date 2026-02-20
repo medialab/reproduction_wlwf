@@ -7,7 +7,7 @@ body {
 }
 
 #vis {
-    margin: 12px;
+    margin: 20px 0;
 }
 
 .grid {
@@ -53,7 +53,6 @@ body {
 }
 
 h1 {
-    text-align: center;
     margin-bottom: 40px;
     font-size: 2em;
 }
@@ -86,14 +85,4 @@ a {
 a:hover {
     background-color: #e0e7ff;
     color: #1e3a8a;
-}
-
-img {
-    height: 280px;
-}
-
-.charts {
-    display: inline-block;
-    vertical-align: top;
-    max-width: 90%;
 }

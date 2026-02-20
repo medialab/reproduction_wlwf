@@ -20,6 +20,95 @@ for public in ["media", "congress"]:
 df = pd.concat(df)
 df["text_length"] = df.text.apply(len)
 
+titles = {
+    0: "Réforme des retraites",
+    56: "Suppression redevance audiovisuelle",
+    24: "Prix de l'énergie pour les artisans boulangers",
+    40: "Logement",
+    18: "Précarité étudiante",
+    85: "Innovation, FrenchTech et startups françaises",
+    42: "Uber",
+    2: "Hôpital et santé publique",
+    58: "Prévention et traitement du cancer",
+    61: "Fin de vie et soins palliatifs",
+    5: "Education nationale",
+    74: "Harcèlement scolaire",
+    78: "Uniforme à l'école",
+    1: "Énergie et transition énergétique",
+    91: "Politique énergétique européenne",
+    25: "Sécheresse et changement climatique",
+    88: "Transports et écologie",
+    10: "Train et transports en commun",
+    67: "Vélo",
+    63: "Chasse et biodiversité",
+    57: "Consommation et production de viande",
+    13: "Incendies et Pompiers",
+    45: "Déconjugalisation de l'AAH",
+    6: "Constitutionnalisation du droit à l'IVG",
+    35: "Droits des femmes",
+    41: "Violences faites aux femmes",
+    37: "Droits des enfants et violences intrafamiliales",
+    47: "Homophobie et droits LGBT",
+    84: "Laïcité",
+    46: "Dénonciation islam radical",
+    20: "Abolition de la corrida",
+    16: "Défense nationale et armées",
+    75: "Service National Universel",
+    17: "Sécurité intérieure",
+    32: "Prison et Justice",
+    83: "Incivilités routières",
+    52: "Fusillade centre culturel kurde",
+    54: "Meurtre professeure Saint-Jean-de-Luz",
+    64: "Meurtre de Lola Daviet",
+    68: "Gendarmerie et sécurité",
+    4: "Guerre en Ukraine",
+    11: "Relations avec Israël-Palestine",
+    12: "Soutien au peuple iranien",
+    22: "Relations diplomatiques avec l’Algérie",
+    28: "Invasion Arménie par Azebaïdjan",
+    29: "Sauvetage de migrants en mer",
+    36: "Elections présidentielles au Brésil",
+    51: "Giorgia Meloni",
+    81: "Mayotte",
+    23: "Propos racistes à l'Assemblée",
+    39: "Organisation des JOP 2024",
+    92: "Affaire Quatennens",
+    70: "Controverse Hanouna-Boyard TPMP / Médias Bolloré",
+    53: "Critiques coupe du monde au Qatar",
+    26: "Hommage victimes terrorisme",
+    31: "Hommage Vel d'Hiv / Shoah",
+    7: "Hommages 11 novembre et Libération",
+    77: "Vel d'Hiv / Pétain / Mémoire Vichy / Jaurès",
+    30: "Fête Nationale",
+    55: "Sainte-Barbe / Pompiers",
+    49: "Mort Elisabeth II",
+    89: "Mort Benoit XVI",
+    86: "Prix Nobel Annie Ernaux",
+    19: "Annonces et hommages décès",
+    34: "Bravo les bleus / Football",
+    44: "Bravo le Rugby / Sport",
+    66: "Match France-Maroc",
+    87: "Sport, Téléthon, Nouvelle-Zélande",
+    21: "Marché de Noël / Joyeux Noël",
+    79: "Epiphanie",
+    3: "Interventions à la TV ou à la radio",
+    80: "Bras d'honneur de Dupond-Moretti",
+    15: "Injure raciste Carlos Martens Bilongo / Afrique",
+    9: "Agression Permanence / Immigration / Extrême-Droite",
+    59: "Visions de la République et de la Nation",
+    72: "Agendas et campagnes",
+    71: "Groupes d'amitié avec pays étrangers / Chili",
+    38: "Relations franco-allemandes",
+    76: "Intempéries en Corse/ Corse",
+    27: "Territoires ultramarins",
+    62: "Biélorussie, Russie, Ukraine",
+    43: "FDO blessées, refus d'obtempérer, agressions",
+    33: "Condition animale",
+    90: "Grève des éboueurs",
+    69: "Enfance et numérique",
+    8: "Twitter et généralités",
+}
+
 merge = {82: 0, 50: 5, 60: 40}
 for topic, parent in merge.items():
     df["topic"] = df["topic"].replace(topic, parent)
@@ -75,7 +164,7 @@ for topic in all_topics:
     )
 
     selection = alt.selection_point(
-        fields=["party"], bind="legend", value="députés Ensemble", toggle="true"
+        fields=["party"], bind="legend", value="médias", toggle="true"
     )
     # "ensemble": "#ffd16a",
     # "lr": "#0068C9",
@@ -87,27 +176,13 @@ for topic in all_topics:
     # "nupes_supp": "#ffabab",
     # "rn_supp": "mediumpurple",
     # "attentive": "#d5dae5",
-    chart = (
+    chart_ts = (
         alt.Chart(
             ts_data,
             title=alt.Title(
-                f"Proportion d'attention accordée au topic {topic} par chacun des publics au cours du temps",
-                subtitle="Il s'agit du nombre de tweets consacrés à ce topic rapporté au nombre de tweets émis le même jour par le même public.",
+                "Proportion d'attention accordée au topic par chacun des publics au cours du temps",
+                subtitle="Nombre de tweets du topic rapporté au nombre de tweets émis le même jour par le même public.",
             ),
-        )
-        .configure_range(
-            category=[
-                "#ffd16a",
-                "#ff2b2b",
-                "#6d3fc0",
-                "#0068C9",
-                "#ff8700",
-                "#ffabab",
-                "mediumpurple",
-                "#83c9ff",
-                "#29b09d",
-                "black",
-            ]
         )
         .mark_line()
         .encode(
@@ -116,6 +191,7 @@ for topic in all_topics:
             color=alt.Color(
                 "party:N",
                 sort=[
+                    "médias",
                     "députés Ensemble",
                     "députés NUPES",
                     "députés RN",
@@ -124,17 +200,62 @@ for topic in all_topics:
                     "supporters NUPES",
                     "supporters RN",
                     "supporters LR",
-                    "médias",
                     "attentive",
                 ],
             ).legend(alt.Legend(title="Public")),
             opacity=alt.when(selection).then(alt.value(1)).otherwise(alt.value(0.01)),
         )
         .add_params(selection)
-        .properties(width=1000, height=200)
+        .properties(width=600, height=200)
     )
 
-    json_chart = chart.to_json()
+    words_and_counts = pd.read_csv(
+        os.path.join(INPUT_PATH, "img", f"bertopic_keywords_{topic}.csv")
+    )
+
+    base_keywords = alt.Chart(
+        words_and_counts,
+        title=alt.Title(
+            "10 mots-clefs les plus représentatifs du topic",
+        ),
+    ).encode(
+        x=alt.X("x").title("score c-TFIDF"),
+        y=alt.Y("word:O", axis=None).sort("-x"),
+        text=alt.Text("word:O"),
+    )
+
+    bars_keywords = base_keywords.mark_bar().encode(
+        color=alt.Color("x", legend=None).scale(scheme="lightorange")
+    )
+
+    text_keywords = base_keywords.mark_text(
+        align="right",
+        dx=-1,
+    )
+
+    keywords_histogram = (bars_keywords + text_keywords).properties(
+        width=300, height=200
+    )
+
+    json_chart = (
+        (chart_ts | keywords_histogram)
+        .configure_range(
+            category=[
+                "#29b09d",
+                "#ffd16a",
+                "#ff2b2b",
+                "#6d3fc0",
+                "#0068C9",
+                "#ff8700",
+                "#ffabab",
+                "mediumpurple",
+                "#83c9ff",
+                "black",
+            ]
+        )
+        .to_json()
+    )
+
     subset = df[df.topic == topic].sort_values("text_length")
 
     tweets = []
@@ -153,7 +274,7 @@ for topic in all_topics:
     html = template.render(
         topic=topic,
         tweets=tweets,
-        all_topics=all_topics,
+        titles=titles,
         display_strings=display_strings,
         json_chart=json_chart,
     )
@@ -162,3 +283,4 @@ for topic in all_topics:
 
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(html)
+    print(f"Generated {output_file}")
